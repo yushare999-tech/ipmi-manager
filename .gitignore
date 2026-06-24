@@ -1,0 +1,30 @@
+# 의존성
+node_modules/
+npm-debug.log*
+
+# Electron 빌드 결과물
+dist/
+build/
+out/
+
+# 런타임 캐시
+.cache/
+*.log
+
+# 사용자 설정 (민감 정보 포함 가능)
+# ※ config.json은 앱 userData 폴더에 저장되므로 여기엔 없음
+
+# OS 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# 환경변수 (추후 사용 시)
+.env
+.env.local
