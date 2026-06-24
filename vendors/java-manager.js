@@ -10,7 +10,6 @@
  */
 
 const { exec, spawn } = require('child_process');
-const { Registry } = require('winreg-alt') // fallback: 레지스트리는 직접 파싱
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
