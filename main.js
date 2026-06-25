@@ -4,14 +4,83 @@
  * 변경이력:
  *   - 2026-06-25: 최초 작성 (SSL 우회, KVM 창 열기, Java IPC 통합)
  *   - 2026-06-25: IPMI 자동 로그인 기능 추가 (벤더별 폼 자동 주입)
+ *   - 2026-06-26: Dev 모드 DevTools 자동 오픈 + 타이밍 로그 추가 (검수용)
+ *   - 2026-06-26: 대시보드 감지 후 자동 reload + iDRAC ST1/ST2 토큰 JNLP 개선
  */
 
 const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
-const path = require('path');
+const path    = require('path');
+const https   = require('https');
 const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const javaManager    = require('./vendors/java-manager');
+const fs      = require('fs');
+const javaManager      = require('./vendors/java-manager');
 const autoLoginScripts = require('./vendors/auto-login-scripts');
+
+// ─── iDRAC REST API 직접 로그인 (ST1/ST2 토큰 획득) ────────────────
+// POST /data/login → XML 또는 JSON 응답으로 ST1/ST2 토큰 반환
+function idracLogin(device) {
+  return new Promise((resolve, reject) => {
+    const postData = `user=${encodeURIComponent(device.username)}&password=${encodeURIComponent(device.password || '')}`;
+    const options = {
+      hostname: device.ipmi_ip,
+      port: 443,
+      path: '/data/login',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData),
+      },
+      rejectUnauthorized: false,
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          let authResult = -1;
+          let tokenString = '';  // "ST1=xxx,ST2=yyy" 형태
+
+          const trimmed = data.trim();
+
+          if (trimmed.startsWith('<?xml') || trimmed.startsWith('<root>')) {
+            // ─── XML 응답 (iDRAC 6/7/8) ───────────────────────────
+            const authMatch    = trimmed.match(/<authResult>(\d+)<\/authResult>/);
+            const forwardMatch = trimmed.match(/ST1=([a-f0-9]+),ST2=([a-f0-9]+)/i);
+
+            authResult  = authMatch    ? parseInt(authMatch[1])    : -1;
+            tokenString = forwardMatch ? `ST1=${forwardMatch[1]},ST2=${forwardMatch[2]}` : '';
+
+            console.log(`[iDRAC] XML 파싱 - authResult:${authResult}, token:${tokenString ? '획득' : '없음'}`);
+          } else {
+            // ─── JSON 응답 (iDRAC 9+) ─────────────────────────────
+            const json = JSON.parse(trimmed);
+            authResult = json.authResult ?? json.status ?? -1;
+            if (json.ST1) tokenString = `ST1=${json.ST1}${json.ST2 ? `,ST2=${json.ST2}` : ''}`;
+
+            console.log(`[iDRAC] JSON 파싱 - authResult:${authResult}, token:${tokenString ? '획득' : '없음'}`);
+          }
+
+          if (authResult === 0 && tokenString) {
+            const [st1Part, st2Part] = tokenString.split(',');
+            const st1 = st1Part?.replace('ST1=', '') || '';
+            const st2 = st2Part?.replace('ST2=', '') || '';
+            resolve({ success: true, st1, st2, tokenString });
+          } else if (authResult === 0) {
+            resolve({ success: true, st1: '', st2: '', tokenString: '' });
+          } else {
+            resolve({ success: false, error: `인증 실패 (authResult:${authResult})` });
+          }
+        } catch (e) {
+          reject(new Error(`iDRAC 응답 파싱 실패: ${e.message}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('iDRAC 로그인 타임아웃')); });
+    req.write(postData);
+    req.end();
+  });
+}
 
 // ─── SSL / 보안 우회 설정 (레거시 IPMI 장비 대응) ─────────────────
 app.commandLine.appendSwitch('ignore-certificate-errors');
@@ -24,6 +93,9 @@ app.commandLine.appendSwitch('cipher-suite-blacklist', '');
 
 // 설정 파일 경로
 const CONFIG_PATH = path.join(app.getPath('userData'), 'ipmi-config.json');
+
+// Dev 모드 여부 (npm run dev 시 --dev 플래그)
+const isDev = process.argv.includes('--dev');
 
 let mainWindow;
 let kvmWindows = {};
@@ -115,11 +187,15 @@ function buildLoginUrl(device) {
 }
 
 // ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
-function openIpmiWithAutoLogin(device) {
+async function openIpmiWithAutoLogin(device) {
   const winId = `ipmi-${device.id}`;
-
-  // 이미 열려있으면 포커스
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0  = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][IPMI][${Date.now()-t0}ms] ${msg}`);
+  const proto = device.https !== false ? 'https' : 'http';
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
 
   const win = new BrowserWindow({
     width: 1280,
@@ -134,40 +210,72 @@ function openIpmiWithAutoLogin(device) {
     show: false,
   });
 
-  // SSL 인증서 오류 무시
+  if (isDev) win.webContents.openDevTools({ mode: 'detach' });
   win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+  win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
+  win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
+  kvmWindows[winId] = win;
 
+  // ── Dell iDRAC: REST API 직접 로그인 → 대시보드 직접 오픈 ──────
+  if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
+    log('→ Dell iDRAC REST API 로그인 시도');
+    try {
+      const loginResult = await idracLogin(device);
+      if (loginResult.success && loginResult.tokenString) {
+        const dashUrl = `${proto}://${device.ipmi_ip}/index.html?${loginResult.tokenString}`;
+        log(`→ REST 로그인 성공! 대시보드 직접 오픈: ${dashUrl}`);
+        win.loadURL(dashUrl);
+        return;
+      }
+      log(`→ REST 로그인 실패 (${loginResult.error}), 폼 주입 방식으로 폴백`);
+    } catch (e) {
+      log(`→ REST 로그인 예외: ${e.message}, 폼 주입 방식으로 폴백`);
+    }
+  }
+
+  // ── 폴백: 브라우저 폼 주입 방식 (Dell 외 벤더 또는 REST 실패 시) ──
   const loginUrl = buildLoginUrl(device);
   win.loadURL(loginUrl);
+  log(`loginUrl 로드 시작 (폼 주입): ${loginUrl}`);
 
-  // 페이지 로드 완료 시 로그인 스크립트 주입
-  win.webContents.on('did-finish-load', () => {
+  let dashboardLoaded = false;
+
+  win.webContents.on('did-start-loading', () => log('did-start-loading'));
+  win.webContents.on('dom-ready',         () => log('dom-ready'));
+  win.webContents.on('did-finish-load',   () => {
     const currentUrl = win.webContents.getURL();
-    // 이미 로그인된 경우(대시보드 URL) 스크립트 주입 생략
+    log(`did-finish-load - currentUrl: ${currentUrl}`);
+
     const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
     const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
                         || currentUrl === loginUrl
                         || currentUrl === loginUrl + '/';
 
     if (isLoginPage && device.username) {
-      const script = autoLoginScripts.getLoginScript(
-        device.vendor,
-        device.username,
-        device.password || ''
-      );
-      win.webContents.executeJavaScript(script).catch(() => {});
+      log('→ 로그인 스크립트 주입');
+      const script = autoLoginScripts.getLoginScript(device.vendor, device.username, device.password || '');
+      win.webContents.executeJavaScript(script)
+        .then(() => log('→ 스크립트 주입 완료'))
+        .catch((e) => log(`→ 스크립트 오류: ${e.message}`));
+    } else if (!isLoginPage && !dashboardLoaded) {
+      dashboardLoaded = true;
+      log('→ 대시보드 감지! 1.5초 후 새로고침');
+      setTimeout(() => { if (!win.isDestroyed()) win.webContents.reload(); }, 1500);
     }
   });
-
-  win.once('ready-to-show', () => win.show());
-  win.on('closed', () => delete kvmWindows[winId]);
-  kvmWindows[winId] = win;
+  win.webContents.on('did-navigate', (_, url) => log(`did-navigate → ${url}`));
 }
+
 
 // ─── KVM HTML5 자동 로그인 후 KVM 진입 ──────────────────────────
 function openKvmWithAutoLogin(device) {
   const winId = device.id;
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0 = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][KVM][${Date.now()-t0}ms] ${msg}`);
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
 
   const kvmWin = new BrowserWindow({
     width: 1024,
@@ -182,10 +290,13 @@ function openKvmWithAutoLogin(device) {
     show: false,
   });
 
+  if (isDev) kvmWin.webContents.openDevTools({ mode: 'detach' });
+
   kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
 
   // 계정 정보 없으면 기존 방식으로 바로 KVM
   if (!device.username) {
+    log('계정 없음 → 직접 KVM 오픈');
     kvmWin.loadURL(buildKvmUrl(device));
     kvmWin.once('ready-to-show', () => kvmWin.show());
     kvmWin.on('closed', () => delete kvmWindows[winId]);
@@ -198,31 +309,42 @@ function openKvmWithAutoLogin(device) {
   const kvmUrl   = buildKvmUrl(device);
   let loginDone  = false;
 
+  log(`loginUrl 로드: ${loginUrl}`);
   kvmWin.loadURL(loginUrl);
 
-  kvmWin.webContents.on('did-finish-load', () => {
+  kvmWin.webContents.on('did-start-loading', () => log('did-start-loading'));
+  kvmWin.webContents.on('dom-ready',         () => log('dom-ready'));
+  kvmWin.webContents.on('did-finish-load',   () => {
     const currentUrl = kvmWin.webContents.getURL();
+    log(`did-finish-load - currentUrl: ${currentUrl}`);
+
     const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
     const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
                         || currentUrl === loginUrl
                         || currentUrl === loginUrl + '/';
 
+    log(`isLoginPage: ${isLoginPage}, loginDone: ${loginDone}`);
+
     if (!loginDone && isLoginPage) {
+      log('→ 로그인 스크립트 주입');
       const script = autoLoginScripts.getLoginScript(
         device.vendor,
         device.username,
         device.password || ''
       );
-      kvmWin.webContents.executeJavaScript(script).catch(() => {});
+      kvmWin.webContents.executeJavaScript(script)
+        .then(() => log('→ 스크립트 주입 완료'))
+        .catch((e) => log(`→ 스크립트 오류: ${e.message}`));
     } else if (!loginDone && !isLoginPage) {
-      // 로그인 완료 감지 → KVM URL로 이동
+      log(`→ 로그인 완료 감지! KVM URL로 이동: ${kvmUrl}`);
       loginDone = true;
       setTimeout(() => kvmWin.loadURL(kvmUrl), 800);
     }
   });
+  kvmWin.webContents.on('did-navigate', (_, url) => log(`did-navigate → ${url}`));
 
-  kvmWin.once('ready-to-show', () => kvmWin.show());
-  kvmWin.on('closed', () => delete kvmWindows[winId]);
+  kvmWin.once('ready-to-show', () => { log('ready-to-show → 창 표시'); kvmWin.show(); });
+  kvmWin.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
   kvmWindows[winId] = kvmWin;
 }
 
@@ -267,13 +389,37 @@ ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) 
   try {
     switch (method) {
       case 'jnlp': {
-        const proto = device.https !== false ? 'https' : 'http';
-        const jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+        const proto  = device.https !== false ? 'https' : 'http';
         const javaws = javawsPath || 'C:\\Program Files\\Java\\jre1.8.0_441\\bin\\javaws.exe';
         if (!fs.existsSync(javaws)) {
           return { success: false, error: 'javaws.exe를 찾을 수 없습니다. Java 설정을 확인하세요.' };
         }
+
+        let jnlpUrl;
+
+        // Dell iDRAC: REST API 직접 로그인 → ST1/ST2 토큰 포함 JNLP URL
+        if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
+          console.log(`[JNLP] Dell iDRAC REST 로그인 시도: ${device.ipmi_ip}`);
+          try {
+            const loginResult = await idracLogin(device);
+            if (loginResult.success && loginResult.tokenString) {
+              // iDRAC JNLP URL: viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&ST1=xxx,ST2=yyy
+              jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&${loginResult.tokenString}`;
+              console.log(`[JNLP] ✅ 로그인 성공! token: ${loginResult.tokenString}`);
+            } else {
+              console.warn(`[JNLP] REST 로그인 실패 (${loginResult.error}), 토큰 없이 시도`);
+              jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+            }
+          } catch (e) {
+            console.warn(`[JNLP] REST 예외: ${e.message}, 토큰 없이 시도`);
+            jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+          }
+        } else {
+          jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+        }
+
         spawn(`"${javaws}"`, [jnlpUrl], { shell: true, detached: true, stdio: 'ignore' });
+        console.log(`[JNLP] javaws 실행: ${javaws} ${jnlpUrl}`);
         break;
       }
       case 'ipmiview': {

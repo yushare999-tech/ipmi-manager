@@ -119,15 +119,11 @@ async function connectHtml5(id) {
   }
 }
 
-// JNLP: 계정 정보 있으면 IPMI 자동 로그인 선행 후 JNLP 실행
+// JNLP: Dell iDRAC은 main process에서 REST API 직접 로그인 후 ST1/ST2 포함 URL로 실행
 async function connectJnlp(id) {
   const d = state.devices.find(x => x.id === id);
   if (!d) return;
   const javawsPath = state.config.javawsPath;
-  if (d.username) {
-    await window.ipmiAPI.openIpmiAutoLogin(d);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
   const res = await window.ipmiAPI.launchExternal(d, 'jnlp', javawsPath);
   if (!res.success) alert('JNLP 실행 실패:\n' + res.error);
 }
