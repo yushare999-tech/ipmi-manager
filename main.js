@@ -3,13 +3,15 @@
  * 작성일: 2026-06-25
  * 변경이력:
  *   - 2026-06-25: 최초 작성 (SSL 우회, KVM 창 열기, Java IPC 통합)
+ *   - 2026-06-25: IPMI 자동 로그인 기능 추가 (벤더별 폼 자동 주입)
  */
 
 const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
 const path = require('path');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
-const javaManager = require('./vendors/java-manager');
+const javaManager    = require('./vendors/java-manager');
+const autoLoginScripts = require('./vendors/auto-login-scripts');
 
 // ─── SSL / 보안 우회 설정 (레거시 IPMI 장비 대응) ─────────────────
 app.commandLine.appendSwitch('ignore-certificate-errors');
@@ -99,6 +101,131 @@ function buildKvmUrl(device) {
   }
 }
 
+// ─── 벤더별 IPMI 로그인 페이지 URL 빌더 ─────────────────────────
+function buildLoginUrl(device) {
+  const proto = (device.https !== false) ? 'https' : 'http';
+  const base  = `${proto}://${device.ipmi_ip}`;
+  switch ((device.vendor || '').toLowerCase()) {
+    case 'dell':        return `${base}/login.html`;
+    case 'hp':
+    case 'hpe':         return `${base}/ui/`;
+    case 'supermicro':  return `${base}/cgi/login.cgi`;
+    default:            return base;
+  }
+}
+
+// ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
+function openIpmiWithAutoLogin(device) {
+  const winId = `ipmi-${device.id}`;
+
+  // 이미 열려있으면 포커스
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    title: `IPMI - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+    },
+    show: false,
+  });
+
+  // SSL 인증서 오류 무시
+  win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+
+  const loginUrl = buildLoginUrl(device);
+  win.loadURL(loginUrl);
+
+  // 페이지 로드 완료 시 로그인 스크립트 주입
+  win.webContents.on('did-finish-load', () => {
+    const currentUrl = win.webContents.getURL();
+    // 이미 로그인된 경우(대시보드 URL) 스크립트 주입 생략
+    const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
+    const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
+                        || currentUrl === loginUrl
+                        || currentUrl === loginUrl + '/';
+
+    if (isLoginPage && device.username) {
+      const script = autoLoginScripts.getLoginScript(
+        device.vendor,
+        device.username,
+        device.password || ''
+      );
+      win.webContents.executeJavaScript(script).catch(() => {});
+    }
+  });
+
+  win.once('ready-to-show', () => win.show());
+  win.on('closed', () => delete kvmWindows[winId]);
+  kvmWindows[winId] = win;
+}
+
+// ─── KVM HTML5 자동 로그인 후 KVM 진입 ──────────────────────────
+function openKvmWithAutoLogin(device) {
+  const winId = device.id;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const kvmWin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    title: `KVM - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+    },
+    show: false,
+  });
+
+  kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+
+  // 계정 정보 없으면 기존 방식으로 바로 KVM
+  if (!device.username) {
+    kvmWin.loadURL(buildKvmUrl(device));
+    kvmWin.once('ready-to-show', () => kvmWin.show());
+    kvmWin.on('closed', () => delete kvmWindows[winId]);
+    kvmWindows[winId] = kvmWin;
+    return;
+  }
+
+  // Step1: 로그인 페이지 먼저 로드 → 자동 로그인
+  const loginUrl = buildLoginUrl(device);
+  const kvmUrl   = buildKvmUrl(device);
+  let loginDone  = false;
+
+  kvmWin.loadURL(loginUrl);
+
+  kvmWin.webContents.on('did-finish-load', () => {
+    const currentUrl = kvmWin.webContents.getURL();
+    const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
+    const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
+                        || currentUrl === loginUrl
+                        || currentUrl === loginUrl + '/';
+
+    if (!loginDone && isLoginPage) {
+      const script = autoLoginScripts.getLoginScript(
+        device.vendor,
+        device.username,
+        device.password || ''
+      );
+      kvmWin.webContents.executeJavaScript(script).catch(() => {});
+    } else if (!loginDone && !isLoginPage) {
+      // 로그인 완료 감지 → KVM URL로 이동
+      loginDone = true;
+      setTimeout(() => kvmWin.loadURL(kvmUrl), 800);
+    }
+  });
+
+  kvmWin.once('ready-to-show', () => kvmWin.show());
+  kvmWin.on('closed', () => delete kvmWindows[winId]);
+  kvmWindows[winId] = kvmWin;
+}
+
 // ─── IPC 핸들러 ──────────────────────────────────────────────────
 
 // [설정] 저장
@@ -117,9 +244,21 @@ ipcMain.handle('config:load', async () => {
   } catch (_) { return {}; }
 });
 
-// [KVM] HTML5 창 열기
+// [KVM] HTML5 창 열기 (기존 - 로그인 없음)
 ipcMain.handle('kvm:open-html5', async (_, device) => {
   openKvmWindow(device);
+  return { success: true };
+});
+
+// [KVM] HTML5 창 열기 (자동 로그인 포함)
+ipcMain.handle('kvm:open-html5-autologin', async (_, device) => {
+  openKvmWithAutoLogin(device);
+  return { success: true };
+});
+
+// [IPMI] IPMI 페이지 자동 로그인
+ipcMain.handle('ipmi:open-autologin', async (_, device) => {
+  openIpmiWithAutoLogin(device);
   return { success: true };
 });
 

@@ -3,6 +3,7 @@
  * 작성일: 2026-06-25
  * 변경이력:
  *   - 2026-06-25: 최초 작성 (장비 관리, Java 탐지, API 연동, 설정 저장)
+ *   - 2026-06-25: IPMI 자동 로그인 기능 적용 (IPMI 페이지, HTML5 KVM, JNLP 선행수행)
  */
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -105,26 +106,42 @@ $('vendor-filter').addEventListener('change', renderDevices);
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // KVM 접속
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// HTML5 KVM: 계정 정보 있으면 자동 로그인 후 KVM 진입
 async function connectHtml5(id) {
   const d = state.devices.find(x => x.id === id);
   if (!d) return;
-  const res = await window.ipmiAPI.openHtml5Kvm(d);
-  if (!res.success) alert('KVM 연결 실패: ' + res.error);
+  if (d.username) {
+    const res = await window.ipmiAPI.openHtml5KvmAutoLogin(d);
+    if (!res.success) alert('KVM 연결 실패: ' + res.error);
+  } else {
+    const res = await window.ipmiAPI.openHtml5Kvm(d);
+    if (!res.success) alert('KVM 연결 실패: ' + res.error);
+  }
 }
 
+// JNLP: 계정 정보 있으면 IPMI 자동 로그인 선행 후 JNLP 실행
 async function connectJnlp(id) {
   const d = state.devices.find(x => x.id === id);
   if (!d) return;
   const javawsPath = state.config.javawsPath;
+  if (d.username) {
+    await window.ipmiAPI.openIpmiAutoLogin(d);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
   const res = await window.ipmiAPI.launchExternal(d, 'jnlp', javawsPath);
   if (!res.success) alert('JNLP 실행 실패:\n' + res.error);
 }
 
+// IPMI 페이지: 계정 정보 있으면 자동 로그인
 async function openIpmi(id) {
   const d = state.devices.find(x => x.id === id);
   if (!d) return;
-  const proto = d.https !== false ? 'https' : 'http';
-  await window.ipmiAPI.openUrl(`${proto}://${d.ipmi_ip}`);
+  if (d.username) {
+    await window.ipmiAPI.openIpmiAutoLogin(d);
+  } else {
+    const proto = d.https !== false ? 'https' : 'http';
+    await window.ipmiAPI.openUrl(`${proto}://${d.ipmi_ip}`);
+  }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

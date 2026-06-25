@@ -3,6 +3,7 @@
  * 작성일: 2026-06-25
  * 변경이력:
  *   - 2026-06-25: 최초 작성 (Java 탐지/관리 API 추가)
+ *   - 2026-06-25: IPMI 자동 로그인 API 추가
  */
 
 const { contextBridge, ipcRenderer } = require('electron');
@@ -12,9 +13,13 @@ contextBridge.exposeInMainWorld('ipmiAPI', {
   saveConfig: (config)          => ipcRenderer.invoke('config:save', config),
   loadConfig: ()                => ipcRenderer.invoke('config:load'),
 
-  // ── KVM 접속 ───────────────────────────────────
-  openHtml5Kvm: (device)                       => ipcRenderer.invoke('kvm:open-html5', device),
-  launchExternal: (device, method, javawsPath) => ipcRenderer.invoke('kvm:launch-external', { device, method, javawsPath }),
+  // ── KVM 접속 ────────────────────────────────────
+  openHtml5Kvm:           (device)                       => ipcRenderer.invoke('kvm:open-html5', device),
+  openHtml5KvmAutoLogin:  (device)                       => ipcRenderer.invoke('kvm:open-html5-autologin', device),
+  launchExternal:         (device, method, javawsPath)   => ipcRenderer.invoke('kvm:launch-external', { device, method, javawsPath }),
+
+  // ── IPMI 페이지 ──────────────────────────────────
+  openIpmiAutoLogin:      (device)                       => ipcRenderer.invoke('ipmi:open-autologin', device),
 
   // ── Java 관리 ──────────────────────────────────
   detectJava:          ()          => ipcRenderer.invoke('java:detect'),
