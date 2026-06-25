@@ -395,15 +395,31 @@ ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) 
           return { success: false, error: 'javaws.exe를 찾을 수 없습니다. Java 설정을 확인하세요.' };
         }
 
+        // ① Java 보안 예외 사이트 자동 등록 (SSL 경고 우회)
+        const siteUrl = `${proto}://${device.ipmi_ip}`;
+        try {
+          const exResult = javaManager.addJavaExceptionSite(siteUrl);
+          console.log(`[JNLP] Java 예외 사이트 등록: ${siteUrl} (추가: ${exResult.added}건)`);
+        } catch (e) {
+          console.warn(`[JNLP] 예외 사이트 등록 실패: ${e.message}`);
+        }
+
+        // ② Java 레거시 설정 자동 적용 (보안 레벨 완화, TLS 1.0/1.1 허용)
+        try {
+          javaManager.applyLegacyJavaConfig();
+          console.log('[JNLP] Java 레거시 보안 설정 적용 완료');
+        } catch (e) {
+          console.warn(`[JNLP] 레거시 설정 적용 실패: ${e.message}`);
+        }
+
         let jnlpUrl;
 
-        // Dell iDRAC: REST API 직접 로그인 → ST1/ST2 토큰 포함 JNLP URL
+        // ③ Dell iDRAC: REST API 직접 로그인 → ST1/ST2 토큰 포함 JNLP URL
         if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
           console.log(`[JNLP] Dell iDRAC REST 로그인 시도: ${device.ipmi_ip}`);
           try {
             const loginResult = await idracLogin(device);
             if (loginResult.success && loginResult.tokenString) {
-              // iDRAC JNLP URL: viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&ST1=xxx,ST2=yyy
               jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&${loginResult.tokenString}`;
               console.log(`[JNLP] ✅ 로그인 성공! token: ${loginResult.tokenString}`);
             } else {
@@ -418,8 +434,10 @@ ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) 
           jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
         }
 
+        // ④ javaws 실행
         spawn(`"${javaws}"`, [jnlpUrl], { shell: true, detached: true, stdio: 'ignore' });
-        console.log(`[JNLP] javaws 실행: ${javaws} ${jnlpUrl}`);
+        console.log(`[JNLP] javaws 실행: ${javaws}`);
+        console.log(`[JNLP] URL: ${jnlpUrl}`);
         break;
       }
       case 'ipmiview': {
