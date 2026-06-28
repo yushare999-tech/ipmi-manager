@@ -25,6 +25,7 @@ contextBridge.exposeInMainWorld('ipmiAPI', {
   detectJava:          ()          => ipcRenderer.invoke('java:detect'),
   addJavaException:    (siteUrl)   => ipcRenderer.invoke('java:add-exception', { siteUrl }),
   applyLegacyJava:     ()          => ipcRenderer.invoke('java:apply-legacy-config'),
+  patchJavaSecurity:   (javawsPath) => ipcRenderer.invoke('java:patch-security', { javawsPath }),
   getJavaDownloadInfo: ()          => ipcRenderer.invoke('java:get-download-links'),
 
   // ── 시스템/유틸 ────────────────────────────────

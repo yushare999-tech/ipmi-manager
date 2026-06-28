@@ -45,14 +45,24 @@ docs/
 
 ---
 
-### [v1.1.0] 2026-06-25 — IPMI 자동 로그인 기능 구현 (진행 중)
+### [v1.1.0] 2026-06-25 — IPMI 자동 로그인 기능 구현
 - **작업자**: 삼식이 (AI) + kuri
 - **내용**:
   - IPMI 페이지 접속 시 저장된 계정으로 자동 로그인 처리
   - HTML5 KVM / JNLP 실행 전 자동 로그인 선행 처리
   - 벤더별(Dell iDRAC / HP iLO / SuperMicro) 로그인 폼 자동화
-- **상태**: 🔄 진행 중
+- **상태**: ✅ 완료
 - **관련 문서**: [자동 로그인 기능 설계서](./features/auto-login.md)
+
+---
+
+### [v1.2.0] 2026-06-29 — JNLP 실행 차단 해결 및 보안 정책 우회 구현
+- **작업자**: 삼식이 (AI) + kuri
+- **내용**:
+  - JNLP 실행 시 대상 장비의 IP 및 포트 조합(80, 443)을 Java 예외 목록(`exception.sites`)에 자동 추가
+  - JRE 내부의 `java.security` 차단 정책(TLS 1.0/1.1 및 MD5/SHA1 차단) 해제를 위한 UAC 권한 파워셸 연동 기능 구현
+  - UI (Java 설정 탭)에 "Java 보안 차단 완전 해제" 패치 버튼 적용
+- **상태**: ✅ 완료
 
 ---
 
@@ -60,4 +70,4 @@ docs/
 [https://github.com/yushare999-tech/ipmi-manager](https://github.com/yushare999-tech/ipmi-manager)
 
 ---
-*Managed by [사무실-삼식이] | Last Updated: 2026-06-25*
+*Managed by [사무실-삼식이] | Last Updated: 2026-06-29*

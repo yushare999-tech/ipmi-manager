@@ -196,13 +196,26 @@ function addJavaExceptionSite(siteUrl) {
     existing = fs.readFileSync(exceptionFile, 'utf8').split('\n').map(l => l.trim()).filter(Boolean);
   }
 
-  // 정규화 (http/https 양쪽 추가)
-  const urlsToAdd = [];
-  if (!siteUrl.startsWith('http')) {
-    urlsToAdd.push(`http://${siteUrl}`);
-    urlsToAdd.push(`https://${siteUrl}`);
-  } else {
-    urlsToAdd.push(siteUrl);
+  // IP/도메인만 추출하여 다양한 조합 생성
+  let cleanHost = siteUrl.replace(/^(https?:\/\/)/, '').split('/')[0].split(':')[0];
+
+  const urlsToAdd = [
+    `http://${cleanHost}`,
+    `https://${cleanHost}`,
+    `http://${cleanHost}:80`,
+    `https://${cleanHost}:80`,
+    `http://${cleanHost}:443`,
+    `https://${cleanHost}:443`
+  ];
+
+  // 원래 보냈던 URL도 그대로 추가
+  if (!urlsToAdd.includes(siteUrl)) {
+    if (!siteUrl.startsWith('http')) {
+      urlsToAdd.push(`http://${siteUrl}`);
+      urlsToAdd.push(`https://${siteUrl}`);
+    } else {
+      urlsToAdd.push(siteUrl);
+    }
   }
 
   let added = 0;
@@ -216,6 +229,99 @@ function addJavaExceptionSite(siteUrl) {
   fs.writeFileSync(exceptionFile, existing.join('\n') + '\n', 'utf8');
   return { added, total: existing.length, file: exceptionFile };
 }
+
+/**
+ * JRE 내부의 java.security 파일에서 TLS 1.0/1.1 및 MD5/RC4/3DES 제한을 해제합니다.
+ * @param {string} javawsPath - javaws.exe 경로
+ * @returns {Promise<Object>} 결과 상태
+ */
+function patchJavaSecurity(javawsPath) {
+  return new Promise((resolve, reject) => {
+    if (!javawsPath || !fs.existsSync(javawsPath)) {
+      return reject(new Error('유효한 javaws.exe 경로가 아닙니다.'));
+    }
+
+    const javaHome = path.dirname(path.dirname(javawsPath));
+    const candidates = [
+      path.join(javaHome, 'lib', 'security', 'java.security'),
+      path.join(javaHome, 'jre', 'lib', 'security', 'java.security')
+    ];
+
+    const targetFile = candidates.find(f => fs.existsSync(f));
+    if (!targetFile) {
+      return reject(new Error('java.security 파일을 찾을 수 없습니다. JRE 경로를 확인하세요.'));
+    }
+
+    try {
+      let content = fs.readFileSync(targetFile, 'utf8');
+      let lines = content.split(/\r?\n/);
+      let changed = false;
+
+      const toRemove = ['TLSv1', 'TLSv1.1', 'MD5', 'MD5withRSA', 'RC4', '3DES_EDE_CBC', '3DES', 'DES'];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.startsWith('jdk.tls.disabledAlgorithms=') ||
+            line.startsWith('jdk.certpath.disabledAlgorithms=') ||
+            line.startsWith('jdk.jar.disabledAlgorithms=')) {
+          
+          const eqIdx = line.indexOf('=');
+          const key = line.substring(0, eqIdx);
+          const val = line.substring(eqIdx + 1);
+
+          let parts = val.split(',').map(p => p.trim());
+          const originalLength = parts.length;
+
+          parts = parts.filter(p => {
+            const firstWord = p.split(/\s+/)[0];
+            return !toRemove.includes(firstWord);
+          });
+
+          if (parts.length !== originalLength) {
+            lines[i] = `${key}=${parts.join(', ')}`;
+            changed = true;
+          }
+        }
+      }
+
+      if (!changed) {
+        return resolve({ success: true, message: '이미 제한이 해제되어 있거나 패치할 항목이 없습니다.', file: targetFile });
+      }
+
+      // 임시 파일에 쓰기
+      const tempFile = path.join(os.tmpdir(), 'java.security.patched');
+      fs.writeFileSync(tempFile, lines.join('\r\n'), 'utf8');
+
+      // UAC 관리자 권한 PowerShell 실행하여 덮어쓰기
+      const escapedTarget = targetFile.replace(/'/g, "''");
+      const escapedTemp = tempFile.replace(/'/g, "''");
+
+      const psCommand = `Start-Process powershell -ArgumentList "-NoProfile -WindowStyle Hidden -Command & { Copy-Item -Path '${escapedTarget}' -Destination '${escapedTarget}.bak' -Force; Copy-Item -Path '${escapedTemp}' -Destination '${escapedTarget}' -Force }" -Verb RunAs -Wait`;
+
+      exec(`powershell -NoProfile -Command "${psCommand.replace(/"/g, '\\"')}"`, (err) => {
+        if (err) {
+          return reject(new Error(`관리자 권한 실행 중 오류 발생: ${err.message}`));
+        }
+
+        // 패치 적용 확인을 위해 파일 다시 읽어 비교
+        try {
+          const postContent = fs.readFileSync(targetFile, 'utf8');
+          if (postContent.includes('TLSv1') && targetFile.includes('disabledAlgorithms')) {
+            // 여전히 제한 문구가 포함되어 있다면 패치 실패 (UAC 거부 등)
+            return reject(new Error('보안 설정이 수정되지 않았습니다. 관리자 권한(UAC) 승인이 필요합니다.'));
+          }
+          resolve({ success: true, message: 'Java 보안 제한 해제 성공! (기존 파일은 .bak로 백업됨)', file: targetFile });
+        } catch (e) {
+          reject(new Error(`패치 결과 확인 실패: ${e.message}`));
+        }
+      });
+
+    } catch (e) {
+      reject(new Error(`java.security 파일 처리 중 예외 발생: ${e.message}`));
+    }
+  });
+}
+
 
 /**
  * Java deployment.properties에 보안 레벨을 낮추는 설정 적용

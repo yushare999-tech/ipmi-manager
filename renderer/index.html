@@ -104,6 +104,10 @@
           <button class="btn btn-warning" id="btn-apply-legacy">🔧 레거시 Java 보안 설정 적용</button>
           <span class="hint">deployment.properties 수정 · TLS 1.0/1.1 허용</span>
         </div>
+        <div class="action-row" style="margin-top: 15px; border-top: 1px solid #2e323e; padding-top: 15px;">
+          <button class="btn btn-danger" id="btn-patch-java-security">🛡️ Java 보안 차단 완전 해제 (TLS/암호화 제한 제거)</button>
+          <span class="hint">java.security 수정 (관리자 권한 필요) · TLS 1.0/1.1, MD5 및 SHA1 차단 해제</span>
+        </div>
         <div id="legacy-result" class="result-box hidden"></div>
       </div>
 

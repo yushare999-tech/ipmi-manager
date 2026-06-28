@@ -286,6 +286,31 @@ $('btn-apply-legacy').addEventListener('click', async () => {
   }
 });
 
+$('btn-patch-java-security').addEventListener('click', async () => {
+  if (!confirm('이 작업은 Java JRE 내부의 보안 파일(java.security)을 수정하여 TLS 1.0/1.1 및 MD5/SHA1 차단을 제거합니다.\n\n수정 중 Windows 관리자 권한(UAC) 확인창이 표시됩니다. 계속하시겠습니까?')) {
+    return;
+  }
+
+  const javawsPath = state.config.javawsPath;
+  if (!javawsPath) {
+    alert('환경설정 탭에서 먼저 올바른 javaws.exe 경로를 지정해주세요.');
+    return;
+  }
+
+  showResult('legacy-result', 'info', '⏳ Java 보안 설정을 패치하는 중... (관리자 권한 승인 대기)');
+
+  try {
+    const res = await window.ipmiAPI.patchJavaSecurity(javawsPath);
+    if (res.success) {
+      showResult('legacy-result', 'success', `✅ ${res.message}\n대상 파일: ${res.file}`);
+    } else {
+      showResult('legacy-result', 'error', `❌ 실패: ${res.error}`);
+    }
+  } catch (e) {
+    showResult('legacy-result', 'error', `❌ 예외 발생: ${e.message || e}`);
+  }
+});
+
 $('btn-add-exception').addEventListener('click', async () => {
   const site = $('exception-site-input').value.trim();
   if (!site) return;
