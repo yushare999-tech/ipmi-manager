@@ -307,7 +307,12 @@ func handleDiagnose(w http.ResponseWriter, r *http.Request) {
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Write([]byte(`{"status":"running", "message":"IPMI Manager Daemon is active"}`))
+	response := map[string]string{
+		"status":  "running",
+		"message": "IPMI Manager Daemon is active",
+		"version": Version,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 // fetchDeviceFromJsProxy Js-Proxy API로부터 단일 IP 기반 장비 정보 조회
@@ -619,39 +624,49 @@ func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
 func launchWeb(device Device) error {
 	executablePath, _ := os.Executable()
 	execDir := filepath.Dir(executablePath)
-	
-	electronPaths := []string{
-		filepath.Join(execDir, "ipmi-manager.exe"),
-		"C:\\Users\\kuri\\MyProJ\\ipmi-manager\\dist\\win-unpacked\\ipmi-manager.exe",
-	}
-
-	var electronPath string
-	for _, p := range electronPaths {
-		if _, err := os.Stat(p); err == nil {
-			electronPath = p
-			break
-		}
-	}
-
-	if electronPath != "" {
-		logger.Infof("[WEB] Electron 뷰어 기동: %s (장비 ID: %s)", electronPath, device.ID)
-		cmd := exec.Command(electronPath, "--device-id="+device.ID, "--connect-type=web")
-		return cmd.Start()
-	}
 
 	proto := "https"
 	if !device.HTTPS {
 		proto = "http"
 	}
 	loginUrl := fmt.Sprintf("%s://%s", proto, device.IpmiIP)
-	
+
 	vendor := strings.ToLower(device.Vendor)
 	model := strings.ToLower(device.Model)
 	if vendor == "dell" && (strings.Contains(model, "r640") || strings.Contains(model, "r740")) {
 		loginUrl = fmt.Sprintf("%s://%s/restgui/start.html", proto, device.IpmiIP)
 	}
 
-	logger.Infof("[WEB] Electron 뷰어를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
+	// 순수 Go 기반 초경량 크로미움 웹 뷰어 탐색 경로
+	viewerPaths := []string{
+		filepath.Join(execDir, "ipmi-viewer.exe"),
+		filepath.Join(filepath.Dir(execDir), "ipmi-viewer.exe"),
+		"C:\\Users\\kuri\\MyProJ\\ipmi-manager\\go-daemon\\ipmi-viewer.exe",
+	}
+
+	var viewerPath string
+	for _, p := range viewerPaths {
+		if _, err := os.Stat(p); err == nil {
+			viewerPath = p
+			break
+		}
+	}
+
+	// 초경량 웹 뷰어가 존재하면 자식 프로세스로 기동하여 계정 자동 완성 처리
+	if viewerPath != "" {
+		logger.Infof("[WEB] 초경량 Go 웹 뷰어 기동: %s (IP: %s)", viewerPath, device.IpmiIP)
+		cmd := exec.Command(
+			viewerPath,
+			"--url="+loginUrl,
+			"--user="+device.Username,
+			"--pass="+device.Password,
+			"--vendor="+device.Vendor,
+		)
+		return cmd.Start()
+	}
+
+	// 뷰어를 찾을 수 없는 경우 최후의 폴백으로 기본 웹 브라우저 직접 기동
+	logger.Warningf("[WEB] 초경량 웹 뷰어(ipmi-viewer.exe)를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
 	cmd := exec.Command("cmd", "/c", "start", "", loginUrl)
 	return cmd.Start()
 }

@@ -82,6 +82,8 @@ const SettingsHTML = `<!DOCTYPE html>
             font-size: 1.3rem;
             font-weight: 600;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
         }
 
         .status-badge {
@@ -153,7 +155,7 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         input[type="text"], input[type="password"], input[type="number"], select, textarea {
-            background: #191926; /* 명확한 어두운 색상으로 설정하여 흰색 배경 방지 */
+            background: #191926;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-main);
             padding: 0.75rem 0.9rem;
@@ -170,7 +172,6 @@ const SettingsHTML = `<!DOCTYPE html>
             background: #1d1d2e;
         }
 
-        /* select 내부 option 태그 스타일 강제 지정 (다크테마 텍스트 가시성 해결) */
         select option {
             background-color: #191926;
             color: var(--text-main);
@@ -494,7 +495,7 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .modal {
-            background: #12121c; /* 명확한 다크그레이 */
+            background: #12121c;
             border: 1px solid var(--card-border);
             border-radius: 16px;
             width: 100%;
@@ -585,7 +586,7 @@ const SettingsHTML = `<!DOCTYPE html>
             <div class="brand">
                 <div class="brand-logo">⚡</div>
                 <div>
-                    <h1 class="brand-title">IPMI Manager</h1>
+                    <h1 class="brand-title" id="main-title">IPMI Manager</h1>
                     <p style="font-size: 0.75rem; color: var(--text-muted)">스마트 라우팅 및 다중 프로필 관리 센터 (Port: 4447)</p>
                 </div>
             </div>
@@ -758,6 +759,7 @@ const SettingsHTML = `<!DOCTYPE html>
 
         window.addEventListener('DOMContentLoaded', () => {
             loadConfig();
+            loadVersion();
         });
 
         function loadConfig() {
@@ -785,6 +787,17 @@ const SettingsHTML = `<!DOCTYPE html>
                     });
                 })
                 .catch(err => alert('설정 로드 실패: ' + err));
+        }
+
+        function loadVersion() {
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.version) {
+                        document.getElementById('main-title').innerHTML = 'IPMI Manager <span style="font-size:0.8rem; opacity:0.6; font-weight:400; margin-left:0.4rem;">v' + data.version + '</span>';
+                    }
+                })
+                .catch(e => {});
         }
 
         function renderProfiles() {
@@ -1028,6 +1041,7 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
+        // JS-Proxy 저장 및 테스트 등 나머지 동일 로직 유지...
         function saveProxyConfig() {
             configData.js_proxy_url = document.getElementById('js_proxy_url').value.trim();
             configData.js_proxy_token = document.getElementById('js_proxy_token').value.trim();
@@ -1139,6 +1153,7 @@ const SettingsHTML = `<!DOCTYPE html>
             document.getElementById('rule-modal').classList.add('active');
         }
 
+        // 규칙 편집창 활성화
         function openEditRuleById(id) {
             const rule = configData.rules.find(r => r.id === id);
             if (!rule) return;
