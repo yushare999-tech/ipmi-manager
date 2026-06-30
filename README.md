@@ -53,9 +53,11 @@ ipmi-manager/
 │   ├── java-manager.js  # Java 탐지/설정/실행 모듈
 │   └── auto-login-scripts.js # 벤더별 자동 로그인 스크립트 빌더
 ├── go-daemon/           # Go 기반 로컬 서비스 데몬 (자바 뷰어 기동 등 백그라운드 대행)
-│   ├── main.go          # 데몬 엔트리 포인트 및 윈도우 서비스 관리
+│   ├── main.go          # 데몬 엔트리 포인트 및 스마트 커넥터 처리
 │   ├── java.go          # 로컬 자바 환경 탐지 및 실행 모듈
 │   ├── session.go       # 세션 관리 및 백그라운드 웹 서버 핸들러
+│   ├── rules.go         # 스마트 라우터 규칙 매칭 및 설정 입출력
+│   ├── settings_ui.go   # 웹 GUI 설정 페이지 내장 HTML/CSS/JS 소스
 │   ├── go.mod           # Go 모듈 의존성 정의
 │   └── ipmi-daemon.exe  # 빌드된 윈도우 데몬 실행 파일
 ├── gui-client/          # Electron 기반 GUI 클라이언트

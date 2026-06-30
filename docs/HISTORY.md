@@ -15,15 +15,19 @@
 
 ## 🛠️ 최근 작업 이력
 
-### 📅 2026-07-01 (Go 데몬 빌드 및 실행) - *진행자: 삼식이*
-*   **Go 기반 서비스 데몬 빌드 인프라 구축**:
-    *   `go-daemon` 디렉토리 내의 외부 라이브러리 의존성 해결을 위해 `go mod tidy`를 실행하고 `go.sum` 생성.
-    *   `github.com/kardianos/service` (v1.2.2) 및 `golang.org/x/sys` (v0.8.0) 패키지 반영.
-*   **컴파일 오류 디버깅**:
-    *   [main.go](../go-daemon/main.go) 파일에서 사용하지 않는 `"io"` 패키지 임포트 구문을 제거하여 빌드 오류(`"io" imported and not used`) 해결.
-*   **바이너리 빌드 및 구동**:
-    *   `go build -o ipmi-daemon.exe` 명령어로 실행 파일 빌드 성공.
-    *   `.\ipmi-daemon.exe -run` 명령어를 실행하여 포그라운드에서 데몬 프로세스 즉시 기동 및 웹 서버 활성화 완료.
+### 📅 2026-07-01 (Go 데몬 스마트 라우터 및 웹 설정 GUI 구현) - *진행자: 삼식이*
+*   **스마트 라우팅 판단 엔진 탑재**:
+    *   [rules.go](../go-daemon/rules.go)를 신규 생성하여 장비 스펙(벤더, 모델)에 따른 KVM 구동 방식(`ikvm`, `jnlp`, `web`) 자동 판별 매커니즘 구현.
+    *   우선순위 기반의 규칙 패턴 매칭 처리 및 매칭 실패 시 `web` 폴백 흐름 보장.
+*   **웹 설정 GUI 인터페이스 개발**:
+    *   [settings_ui.go](../go-daemon/settings_ui.go)에 미려한 다크/네온 Glassmorphism 스타일의 웹 설정 페이지(HTML/CSS/JS)를 문자열 상수로 내장하여 서빙되도록 구현.
+    *   Js-Proxy(Node.js API) 연동 입력 폼 및 규칙 추가/수정/삭제/우선순위 변경 기능 탑재.
+*   **Go 데몬 웹 서버 및 커넥터 전면 개편**:
+    *   [main.go](../go-daemon/main.go)에 `/`, `/api/rules`, `/api/rules/save`, `/api/test-proxy` 신규 라우트 추가.
+    *   `/api/connect` 호출 시, 입력된 IP/ID를 기반으로 **로컬 설정** 및 **Js-Proxy API**를 실시간 조회하여 장비 스펙을 확보한 뒤, 규칙에 맞게 자바/브라우저를 기동시키는 스마트 라우터로 업그레이드 완료.
+*   **빌드 및 가동 검증**:
+    *   의존성 추가 패키지(`time`, `net/url`, `io/ioutil`) 임포트 및 `service.Logger` 로거 명칭(`Warningf`) 보정으로 빌드 성공.
+    *   `.\ipmi-daemon.exe -run` 구동 후 `http://127.0.0.1:8080/` 헬스체크 정상 수립 완료.
 
 ---
 
