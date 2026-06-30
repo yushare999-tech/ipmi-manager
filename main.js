@@ -94,6 +94,17 @@ app.commandLine.appendSwitch('cipher-suite-blacklist', '');
 // 설정 파일 경로
 const CONFIG_PATH = path.join(app.getPath('userData'), 'ipmi-config.json');
 
+function readConfig() {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) {
+      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    }
+  } catch (e) {
+    console.error('[Config] 로드 실패:', e);
+  }
+  return {};
+}
+
 // Dev 모드 여부 (npm run dev 시 --dev 플래그)
 const isDev = process.argv.includes('--dev');
 
