@@ -11,6 +11,7 @@
 const { app, BrowserWindow, ipcMain, shell, dialog, session } = require('electron');
 const path    = require('path');
 const https   = require('https');
+const http    = require('http');
 const { spawn, exec } = require('child_process');
 const fs      = require('fs');
 const javaManager      = require('./vendors/java-manager');
@@ -618,6 +619,79 @@ ipcMain.handle('ipmi:open-autologin', async (_, device) => {
   return { success: true };
 });
 
+// Supermicro JNLP 백그라운드 로그인 및 다운로드 헬퍼 함수
+function supermicroDownloadJnlp(device) {
+  return new Promise((resolve, reject) => {
+    const username = device.username;
+    const password = device.password || '';
+    const ip = device.ipmi_ip;
+    const postData = `name=${encodeURIComponent(username)}&pwd=${encodeURIComponent(password)}`;
+
+    console.log(`[Supermicro JNLP] 백그라운드 로그인 시도: http://${ip}/cgi/login.cgi`);
+
+    const loginOptions = {
+      hostname: ip,
+      port: 80,
+      path: '/cgi/login.cgi',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      },
+      timeout: 8000
+    };
+
+    const req = http.request(loginOptions, (res) => {
+      const cookies = res.headers['set-cookie'] || [];
+      const cookieStr = cookies.map(c => c.split(';')[0]).join('; ');
+
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        if (!cookieStr) {
+          return reject(new Error('세션 쿠키를 획득하지 못했습니다. ID/PW 설정을 확인하세요.'));
+        }
+
+        console.log(`[Supermicro JNLP] 로그인 성공 (세션 획득) -> JNLP 다운로드 시도`);
+
+        const downloadOptions = {
+          hostname: ip,
+          port: 80,
+          path: '/cgi/launch_win.cgi', // X9 가상 콘솔 JNLP 반환 경로
+          method: 'GET',
+          headers: {
+            'Cookie': cookieStr
+          },
+          timeout: 8000
+        };
+
+        const dlReq = http.request(downloadOptions, (dlRes) => {
+          if (dlRes.statusCode !== 200) {
+            return reject(new Error(`JNLP 다운로드 실패 (HTTP 상태코드: ${dlRes.statusCode})`));
+          }
+
+          const tempPath = path.join(app.getPath('temp'), `supermicro_${device.id}.jnlp`);
+          const fileStream = fs.createWriteStream(tempPath);
+          dlRes.pipe(fileStream);
+
+          fileStream.on('finish', () => {
+            fileStream.close();
+            console.log(`[Supermicro JNLP] 다운로드 완료 -> 임시 저장 경로: ${tempPath}`);
+            resolve(tempPath);
+          });
+        });
+
+        dlReq.on('error', (err) => reject(new Error(`다운로드 중 네트워크 오류: ${err.message}`)));
+        dlReq.end();
+      });
+    });
+
+    req.on('error', (err) => reject(new Error(`로그인 중 네트워크 오류: ${err.message}`)));
+    req.write(postData);
+    req.end();
+  });
+}
+
 // [KVM] 외부 뷰어/JNLP 실행
 ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) => {
   try {
@@ -639,6 +713,7 @@ ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) 
         }
 
         let jnlpUrl;
+        let localJnlpPath = null;
 
         // Dell iDRAC: REST API 직접 로그인 → ST1/ST2 토큰 포함 JNLP URL
         if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
@@ -657,12 +732,24 @@ ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) 
             console.warn(`[JNLP] REST 예외: ${e.message}, 토큰 없이 시도`);
             jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
           }
+        } else if (device.username && (device.vendor || '').toLowerCase() === 'supermicro') {
+          // Supermicro: 백엔드에서 자동 로그인 후 JNLP 파일 로컬 다운로드 및 우회 실행
+          try {
+            localJnlpPath = await supermicroDownloadJnlp(device);
+          } catch (e) {
+            return { success: false, error: `Supermicro 백엔드 로그인 및 JNLP 다운로드 실패:\n${e.message}` };
+          }
         } else {
           jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
         }
 
-        spawn(`"${javaws}"`, [jnlpUrl], { shell: true, detached: true, stdio: 'ignore' });
-        console.log(`[JNLP] javaws 실행: ${javaws} ${jnlpUrl}`);
+        if (localJnlpPath) {
+          spawn(`"${javaws}"`, [`"${localJnlpPath}"`], { shell: true, detached: true, stdio: 'ignore' });
+          console.log(`[JNLP] javaws 실행 (로컬 파일): ${javaws} ${localJnlpPath}`);
+        } else {
+          spawn(`"${javaws}"`, [jnlpUrl], { shell: true, detached: true, stdio: 'ignore' });
+          console.log(`[JNLP] javaws 실행 (원격 URL): ${javaws} ${jnlpUrl}`);
+        }
         break;
       }
       case 'ipmiview': {
