@@ -62,6 +62,7 @@ docs/
   - Supermicro X9 세대 등 웹 브라우저 SSL 거부 및 리다이렉트가 발생하는 환경을 위한 JNLP 실행 개선
   - 백엔드(Node.js)에서 직접 `cgi/login.cgi`에 로그인하여 세션 쿠키를 획득하는 백그라운드 인증 로직 구축
   - 인증된 세션 쿠키를 기반으로 `cgi/launch_win.cgi`에 접근하여 `launch.jnlp`를 임시 폴더에 자동 다운로드
+  - 다운로드 시 HTTP/HTTPS 동적 탐색 지원 및 HTTPS 장애 시 HTTP 자동 폴백(상호 백업) 장치 마련 (보안 무시 옵션 기본 적용)
   - 다운로드된 로컬 JNLP 파일을 로컬 Java 보안 정책 완화 하에 `javaws.exe`로 즉각 구동
 - **상태**: ✅ 완료
 

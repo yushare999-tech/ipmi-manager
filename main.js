@@ -619,7 +619,7 @@ ipcMain.handle('ipmi:open-autologin', async (_, device) => {
   return { success: true };
 });
 
-// Supermicro JNLP 백그라운드 로그인 및 다운로드 헬퍼 함수
+// Supermicro JNLP 백그라운드 로그인 및 다운로드 헬퍼 함수 (HTTP/HTTPS 동적 대응)
 function supermicroDownloadJnlp(device) {
   return new Promise((resolve, reject) => {
     const username = device.username;
@@ -627,21 +627,28 @@ function supermicroDownloadJnlp(device) {
     const ip = device.ipmi_ip;
     const postData = `name=${encodeURIComponent(username)}&pwd=${encodeURIComponent(password)}`;
 
-    console.log(`[Supermicro JNLP] 백그라운드 로그인 시도: http://${ip}/cgi/login.cgi`);
+    // 장비 설정에 따라 기본 프로토콜 판단 (https 설정이 꺼져있지 않다면 기본 https 사용)
+    const useHttps = device.https !== false;
+    const protocol = useHttps ? 'https' : 'http';
+    const port = useHttps ? 443 : 80;
+    const agent = useHttps ? https : http;
+
+    console.log(`[Supermicro JNLP] 백그라운드 로그인 시도: ${protocol}://${ip}:${port}/cgi/login.cgi`);
 
     const loginOptions = {
       hostname: ip,
-      port: 80,
+      port: port,
       path: '/cgi/login.cgi',
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': Buffer.byteLength(postData)
       },
+      rejectUnauthorized: false, // 구형 TLS/SSL 사설 인증서 오류 무시
       timeout: 8000
     };
 
-    const req = http.request(loginOptions, (res) => {
+    const req = agent.request(loginOptions, (res) => {
       const cookies = res.headers['set-cookie'] || [];
       const cookieStr = cookies.map(c => c.split(';')[0]).join('; ');
 
@@ -652,20 +659,21 @@ function supermicroDownloadJnlp(device) {
           return reject(new Error('세션 쿠키를 획득하지 못했습니다. ID/PW 설정을 확인하세요.'));
         }
 
-        console.log(`[Supermicro JNLP] 로그인 성공 (세션 획득) -> JNLP 다운로드 시도`);
+        console.log(`[Supermicro JNLP] 로그인 성공 (세션 획득) -> JNLP 다운로드 시도: ${protocol}://${ip}:${port}/cgi/launch_win.cgi`);
 
         const downloadOptions = {
           hostname: ip,
-          port: 80,
+          port: port,
           path: '/cgi/launch_win.cgi', // X9 가상 콘솔 JNLP 반환 경로
           method: 'GET',
           headers: {
             'Cookie': cookieStr
           },
+          rejectUnauthorized: false, // SSL 에러 무시
           timeout: 8000
         };
 
-        const dlReq = http.request(downloadOptions, (dlRes) => {
+        const dlReq = agent.request(downloadOptions, (dlRes) => {
           if (dlRes.statusCode !== 200) {
             return reject(new Error(`JNLP 다운로드 실패 (HTTP 상태코드: ${dlRes.statusCode})`));
           }
@@ -686,7 +694,17 @@ function supermicroDownloadJnlp(device) {
       });
     });
 
-    req.on('error', (err) => reject(new Error(`로그인 중 네트워크 오류: ${err.message}`)));
+    req.on('error', (err) => {
+      // 만약 HTTPS 시도 중 오류가 났다면 자동으로 HTTP로 즉시 재시도
+      if (useHttps) {
+        console.warn(`[Supermicro JNLP] HTTPS 로그인 실패 (${err.message}). HTTP로 재시도합니다...`);
+        const fallbackDevice = { ...device, https: false };
+        supermicroDownloadJnlp(fallbackDevice).then(resolve).catch(reject);
+      } else {
+        reject(new Error(`로그인 중 네트워크 오류: ${err.message}`));
+      }
+    });
+
     req.write(postData);
     req.end();
   });
