@@ -102,7 +102,7 @@ const SettingsHTML = `<!DOCTYPE html>
         /* Config Grid */
         .content-grid {
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 380px 1fr;
             gap: 2rem;
         }
 
@@ -459,6 +459,25 @@ const SettingsHTML = `<!DOCTYPE html>
             grid-column: 1 / -1;
         }
 
+        /* Inline Proxy Form */
+        .inline-proxy-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.2rem;
+        }
+
+        @media (max-width: 750px) {
+            .inline-proxy-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
         .code-block {
             background: #040407;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -496,37 +515,17 @@ const SettingsHTML = `<!DOCTYPE html>
 
         <!-- Main Content Grid -->
         <div class="content-grid">
-            <!-- Left Side: Config & Profiles -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <!-- Js-Proxy Card -->
-                <div class="card">
-                    <h2 class="card-title"><span>Js-Proxy 연동 설정</span></h2>
-                    <div class="form-group">
-                        <label for="js_proxy_url">API Base URL</label>
-                        <input type="text" id="js_proxy_url" placeholder="예: https://js-proxy.jscomz.net/api/devices">
-                    </div>
-                    <div class="form-group">
-                        <label for="js_proxy_token">인증 토큰 (Bearer Token)</label>
-                        <input type="password" id="js_proxy_token" placeholder="Bearer 인증 토큰 입력">
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                        <button class="btn" style="flex: 1" id="btn-save-proxy" onclick="saveProxyConfig()">💾 저장</button>
-                        <button class="btn btn-secondary" style="flex: 1" id="btn-test-proxy" onclick="testProxyConnection()">🔄 테스트</button>
-                    </div>
+            <!-- Left Side: Profiles ONLY -->
+            <div class="card">
+                <div class="card-title">
+                    <span>실행 프로필 (Profiles)</span>
+                    <button class="btn btn-mini" onclick="openAddProfileModal()">➕ 추가</button>
                 </div>
-
-                <!-- Profiles Card -->
-                <div class="card">
-                    <div class="card-title">
-                        <span>실행 프로필 (Profiles)</span>
-                        <button class="btn btn-mini" onclick="openAddProfileModal()">➕ 추가</button>
-                    </div>
-                    <div class="info-banner" style="background: rgba(181, 0, 255, 0.02); border-color: rgba(181, 0, 255, 0.1)">
-                        자바 런타임 및 iKVM.jar 파일 버전을 프로필별로 분리 관리합니다. 각 항목의 파일 정상 존재 여부가 실시간 확인됩니다.
-                    </div>
-                    <div class="list-container" id="profile-container">
-                        <!-- Profiles render dynamically -->
-                    </div>
+                <div class="info-banner" style="background: rgba(181, 0, 255, 0.02); border-color: rgba(181, 0, 255, 0.1)">
+                    자바 런타임 및 iKVM.jar 파일 버전을 프로필별로 분리 관리합니다. 각 항목의 파일 정상 존재 여부가 실시간 확인됩니다.
+                </div>
+                <div class="list-container" id="profile-container">
+                    <!-- Profiles render dynamically -->
                 </div>
             </div>
 
@@ -544,10 +543,28 @@ const SettingsHTML = `<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Bottom: Integration Guide -->
+            <!-- Bottom: Js-Proxy Settings & Integration Guide -->
             <div class="card guide-section">
-                <h2 class="card-title"><span>외부 서비스 연동 가이드 (Integration Guide)</span></h2>
-                <div class="rule-desc" style="margin-bottom: 0.5rem;">
+                <h2 class="card-title"><span>Js-Proxy 연동 설정 (IP 기준 조회 API)</span></h2>
+                
+                <!-- Js-Proxy Form Moved Here -->
+                <div class="inline-proxy-form">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="js_proxy_url">Js-Proxy API URL</label>
+                        <input type="text" id="js_proxy_url" placeholder="예: https://js-proxy.jscomz.net/api/devices">
+                    </div>
+                    <div class="form-group" style="flex: 1.2;">
+                        <label for="js_proxy_token">인증 토큰 (Bearer Token)</label>
+                        <input type="password" id="js_proxy_token" placeholder="Bearer 인증 토큰 입력">
+                    </div>
+                    <div style="display: flex; gap: 0.4rem;">
+                        <button class="btn" id="btn-save-proxy" onclick="saveProxyConfig()">💾 저장</button>
+                        <button class="btn btn-secondary" id="btn-test-proxy" onclick="testProxyConnection()">🔄 테스트</button>
+                    </div>
+                </div>
+
+                <h2 class="card-title" style="margin-top: 1.5rem; border-bottom: none;"><span>외부 서비스 연동 가이드 (Integration Guide)</span></h2>
+                <div class="rule-desc" style="margin-bottom: 0.8rem;">
                     사내 자산 관리 대시보드나 웹 콘솔 페이지에서 사용자 로컬에 구동 중인 Go 데몬을 호출하여 KVM을 원클릭 실행시킬 수 있습니다. 데몬이 켜져 있지 않을 때 자연스럽게 웹 브라우저 접속으로 연결해주는 안전한 비동기 호출 샘플 코드입니다.
                 </div>
                 <pre class="code-block"><code><span class="code-keyword">function</span> <span class="code-primary">connectToKvm</span>(ip, fallbackUrl) {
@@ -649,7 +666,7 @@ const SettingsHTML = `<!DOCTYPE html>
 
     <script>
         let configData = { rules: [], profiles: [], js_proxy_url: '', js_proxy_token: '' };
-        let profileStatus = {}; // 프로필 ID별 실시간 파일 검증 상태 보관
+        let profileStatus = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             loadConfig();
@@ -663,7 +680,6 @@ const SettingsHTML = `<!DOCTYPE html>
                     document.getElementById('js_proxy_url').value = data.js_proxy_url || '';
                     document.getElementById('js_proxy_token').value = data.js_proxy_token || '';
                     
-                    // 각 프로필별로 실시간 경로 진단 수행
                     const diagPromises = configData.profiles.map(p => {
                         return fetch('/api/diagnose?profile_id=' + p.id)
                             .then(r => r.json())
@@ -683,7 +699,6 @@ const SettingsHTML = `<!DOCTYPE html>
                 .catch(err => alert('설정 로드 실패: ' + err));
         }
 
-        // 프로필 목록 렌더링
         function renderProfiles() {
             const container = document.getElementById('profile-container');
             container.innerHTML = '';
@@ -722,7 +737,6 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
-        // 규칙 목록 렌더링
         function renderRules() {
             const container = document.getElementById('rule-container');
             container.innerHTML = '';
@@ -784,7 +798,6 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
-        // Proxy 설정 및 테스트
         function saveProxyConfig() {
             configData.js_proxy_url = document.getElementById('js_proxy_url').value.trim();
             configData.js_proxy_token = document.getElementById('js_proxy_token').value.trim();
@@ -819,7 +832,6 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
-        // 프로필 팝업 제어
         function openAddProfileModal() {
             document.getElementById('profile-modal-title').innerText = '실행 프로필 추가';
             document.getElementById('profile_id').value = '';
@@ -884,7 +896,6 @@ const SettingsHTML = `<!DOCTYPE html>
             saveAllConfig('프로필이 삭제되었습니다.');
         }
 
-        // 규칙 팝업 제어
         function openAddRuleModal() {
             document.getElementById('rule-modal-title').innerText = '새 라우팅 규칙 추가';
             document.getElementById('rule_id').value = '';

@@ -48,86 +48,121 @@ func init() {
 	rulesConfigPath = filepath.Join(appData, "ipmi-manager", "rules-config.json")
 }
 
-// GetDefaultProfiles 기본 실행 프로필 생성
+// GetDefaultProfiles 기본 실행 프로필 생성 (Node 버전 기본 탑재 사양 적용)
 func GetDefaultProfiles() []Profile {
-	// 기본 적으로 JRE 8u291 경로와 IPMIView 내장 iKVM 경로 추정치 지정
 	return []Profile{
 		{
 			ID:          "profile_default",
-			Name:        "기본 Java 8 환경 (Default)",
+			Name:        "기본 Java JRE 8 환경 (Default)",
 			JavaPath:    "C:\\Program Files (x86)\\Java\\jre1.8.0_291\\bin\\javaws.exe",
 			IkvmJarPath: "C:\\Users\\kuri\\MyProJ\\ipmi-manager\\IPMIVIEW\\2.14.0\\extracted\\D_\\IPMI20\\FILES FOR IPMI VIEW\\iKVM.jar",
 			IsDefault:   true,
-			Description: "기본 지정된 자바 8 및 내장 iKVM 뷰어 프로필",
+			Description: "기본 자바 8 및 내장 Supermicro iKVM.jar(v2.14.0) 구동용 프로필",
 		},
 	}
 }
 
-// GetDefaultRules 기본 내장 매칭 규칙 반환 (WEB, ikvm, jnlp 용어 통일)
+// GetDefaultRules Node.js 버전 제어 로직 기준 기본 매칭 규칙 구성
 func GetDefaultRules() []Rule {
 	return []Rule{
 		{
-			ID:           "rule_default_supermicro_ikvm",
+			ID:           "rule_supermicro_x9_ikvm",
+			Vendor:       "supermicro",
+			ModelPattern: "x9",
+			ConnectType:  "ikvm",
+			ProfileID:    "profile_default",
+			Priority:     1,
+			Description:  "Supermicro X9 세대 장비 iKVM.jar 직접 구동",
+		},
+		{
+			ID:           "rule_supermicro_x10_ikvm",
 			Vendor:       "supermicro",
 			ModelPattern: "x10",
 			ConnectType:  "ikvm",
 			ProfileID:    "profile_default",
-			Priority:     1,
-			Description:  "Supermicro X10 세대 이상 iKVM.jar 직접 구동",
+			Priority:     2,
+			Description:  "Supermicro X10 세대 장비 iKVM.jar 직접 구동 (UAC 우회)",
 		},
 		{
-			ID:           "rule_default_supermicro_ikvm_x11",
+			ID:           "rule_supermicro_x11_ikvm",
 			Vendor:       "supermicro",
 			ModelPattern: "x11",
 			ConnectType:  "ikvm",
 			ProfileID:    "profile_default",
-			Priority:     2,
-			Description:  "Supermicro X11 세대 iKVM.jar 직접 구동",
+			Priority:     3,
+			Description:  "Supermicro X11 세대 장비 iKVM.jar 직접 구동",
 		},
 		{
-			ID:           "rule_default_dell_idrac8",
+			ID:           "rule_dell_idrac8_r630",
 			Vendor:       "dell",
 			ModelPattern: "r630",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     3,
-			Description:  "Dell iDRAC 8 장비 JNLP (자바 웹 스타트) 구동",
+			Priority:     4,
+			Description:  "Dell iDRAC 8 (R630) - REST 세션 토큰 연동 JNLP 구동",
 		},
 		{
-			ID:           "rule_default_dell_idrac8_r730",
+			ID:           "rule_dell_idrac8_r730",
 			Vendor:       "dell",
 			ModelPattern: "r730",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     4,
-			Description:  "Dell iDRAC 8 (R730) 장비 JNLP 구동",
+			Priority:     5,
+			Description:  "Dell iDRAC 8 (R730) - REST 세션 토큰 연동 JNLP 구동",
 		},
 		{
-			ID:           "rule_default_dell_idrac9",
+			ID:           "rule_dell_idrac9_r640",
 			Vendor:       "dell",
 			ModelPattern: "r640",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
-			Priority:     5,
-			Description:  "Dell iDRAC 9 (R640) HTML5 웹 콘솔 직접 로그인",
+			Priority:     6,
+			Description:  "Dell iDRAC 9 (R640) - 내장 HTML5 웹 콘솔 직접 연결",
 		},
 		{
-			ID:           "rule_default_dell_idrac9_r740",
+			ID:           "rule_dell_idrac9_r740",
 			Vendor:       "dell",
 			ModelPattern: "r740",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
-			Priority:     6,
-			Description:  "Dell iDRAC 9 (R740) HTML5 웹 콘솔 직접 로그인",
+			Priority:     7,
+			Description:  "Dell iDRAC 9 (R740) - 내장 HTML5 웹 콘솔 직접 연결",
 		},
 		{
-			ID:           "rule_default_fallback",
+			ID:           "rule_hp_ilo3_jnlp",
+			Vendor:       "hp",
+			ModelPattern: "ilo3",
+			ConnectType:  "jnlp",
+			ProfileID:    "profile_default",
+			Priority:     8,
+			Description:  "HP iLO 3 장비 JNLP (자바 웹 스타트) 구동",
+		},
+		{
+			ID:           "rule_hp_ilo4_jnlp",
+			Vendor:       "hp",
+			ModelPattern: "ilo4",
+			ConnectType:  "jnlp",
+			ProfileID:    "profile_default",
+			Priority:     9,
+			Description:  "HP iLO 4 장비 JNLP (자바 웹 스타트) 구동",
+		},
+		{
+			ID:           "rule_hp_ilo5_web",
+			Vendor:       "hp",
+			ModelPattern: "ilo5",
+			ConnectType:  "WEB",
+			ProfileID:    "profile_default",
+			Priority:     10,
+			Description:  "HP iLO 5 장비 HTML5 웹 콘솔 직접 연결",
+		},
+		{
+			ID:           "rule_fallback_default",
 			Vendor:       "*",
 			ModelPattern: "*",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
 			Priority:     99,
-			Description:  "매칭되는 규칙이 없을 때 기본 WEB 방식으로 폴백",
+			Description:  "매칭 조건이 없거나 예외 발생 시 기본 WEB 방식으로 폴백",
 		},
 	}
 }
@@ -144,7 +179,7 @@ func LoadRulesConfig() (RulesConfig, error) {
 	if _, err := os.Stat(rulesConfigPath); os.IsNotExist(err) {
 		config.Profiles = GetDefaultProfiles()
 		config.Rules = GetDefaultRules()
-		config.JsProxyURL = "https://js-proxy.jscomz.net/api/devices" // 기본 URL 지정
+		config.JsProxyURL = "https://js-proxy.jscomz.net/api/devices" // 실제 API 엔드포인트 기본값 지정
 		config.JsProxyToken = ""
 		err = SaveRulesConfig(config)
 		if err != nil {
@@ -173,7 +208,6 @@ func LoadRulesConfig() (RulesConfig, error) {
 func SaveRulesConfig(config RulesConfig) error {
 	SortRules(config.Rules)
 
-	// 최저 1개 이상의 기본 프로필 유지 보장
 	if len(config.Profiles) == 0 {
 		config.Profiles = GetDefaultProfiles()
 	}
