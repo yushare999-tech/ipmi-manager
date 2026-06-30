@@ -621,6 +621,8 @@ function openKvmWithAutoLogin(device) {
 ipcMain.handle('config:save', async (_, config) => {
   try {
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
+      // 장비 목록 변경 시 즉각 Java 예외 목록 재동기화
+      syncAllDevicesToJavaExceptions();
     return { success: true };
   } catch (e) { return { success: false, error: e.message }; }
 });
@@ -767,6 +769,9 @@ ipcMain.handle('dialog:open-file', async (_, options) => {
 
 // ─── 앱 생명주기 ─────────────────────────────────────────────────
 app.whenReady().then(() => {
+  // 저장된 모든 장비의 IP를 Java 예외 사이트에 일괄 자동 등록
+  syncAllDevicesToJavaExceptions();
+
   // 다운로드 완료 시 실행 확인 팝업 기능 추가
   session.defaultSession.on('will-download', (event, item, webContents) => {
     // 다운로드 저장 경로가 사전에 정의되지 않은 경우 기본 다운로드 폴더로 강제 지정하여 다운로드 중단을 방지
@@ -811,3 +816,24 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
 });
+
+
+// 저장된 모든 장비의 IP를 Java 예외 목록에 일괄 동기화하는 함수
+function syncAllDevicesToJavaExceptions() {
+  try {
+    const config = readConfig();
+    if (config && Array.isArray(config.devices)) {
+      let registeredCount = 0;
+      for (const device of config.devices) {
+        if (device.ipmi_ip) {
+          javaManager.addJavaExceptionSite(device.ipmi_ip);
+          registeredCount++;
+        }
+      }
+      console.log(`[Java] 총 ${registeredCount}개 장비의 IP를 Java 예외 목록에 일괄 자동 등록 완료`);
+    }
+  } catch (e) {
+    console.error('[Java] 예외 사이트 일괄 동기화 실패:', e);
+  }
+}
+
