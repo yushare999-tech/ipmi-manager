@@ -397,25 +397,34 @@ async function openIpmiWithAutoLogin(device) {
   kvmWindows[winId] = win;
 
   // Dell iDRAC REST API 직접 로그인 시도
+  let restLoginAttempted = false;
+  let restLoginUrl = null;
+
   if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
     log('Dell iDRAC REST API 로그인 시도');
     try {
       const loginResult = await idracLogin(device);
       if (loginResult.success && loginResult.tokenString) {
-        const dashUrl = `${proto}://${device.ipmi_ip}/index.html?${loginResult.tokenString}`;
-        log(`REST 로그인 성공! 대시보드로 직접 오픈: ${dashUrl}`);
-        win.loadURL(dashUrl);
-        return;
+        // Dell iDRAC 세션 세팅을 위해 프로토콜을 https로 강제 고정합니다.
+        restLoginUrl = `https://${device.ipmi_ip}/index.html?${loginResult.tokenString}`;
+        log(`REST 로그인 성공! 대시보드로 직접 오픈 예정: ${restLoginUrl}`);
+        restLoginAttempted = true;
+      } else {
+        log(`REST 로그인 실패 (${loginResult.error}), 일반 주입 방식으로 폴백`);
       }
-      log(`REST 로그인 실패 (${loginResult.error}), 일반 주입 방식으로 폴백`);
     } catch (e) {
       log(`REST 로그인 예외: ${e.message}, 일반 주입 방식으로 폴백`);
     }
   }
 
   const loginUrl = buildLoginUrl(device);
-  win.loadURL(loginUrl);
-  log(`loginUrl 로드 시작 (인터랙티브 방식): ${loginUrl}`);
+  if (restLoginAttempted && restLoginUrl) {
+    win.loadURL(restLoginUrl);
+    log(`REST 성공 URL 로드 시작: ${restLoginUrl}`);
+  } else {
+    win.loadURL(loginUrl);
+    log(`loginUrl 로드 시작 (인터랙티브 방식): ${loginUrl}`);
+  }
 
   let dashboardLoaded = false;
   let loginDone = false;
