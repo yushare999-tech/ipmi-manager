@@ -407,6 +407,7 @@ module.exports = {
   detectJavaInstallations,
   addJavaExceptionSite,
   applyLegacyJavaConfig,
+  patchJavaSecurity,
   launchJnlp,
   getLegacyJavaDownloadInfo,
   JAVA_COMPAT_INFO,
