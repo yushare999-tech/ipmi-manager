@@ -8,7 +8,7 @@
  *   - 2026-06-26: 대시보드 감지 후 자동 reload + iDRAC ST1/ST2 토큰 JNLP 개선
  */
 
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, session } = require('electron');
 const path    = require('path');
 const https   = require('https');
 const { spawn, exec } = require('child_process');
