@@ -288,17 +288,31 @@ function patchJavaSecurity(javawsPath) {
         return resolve({ success: true, message: '이미 제한이 해제되어 있거나 패치할 항목이 없습니다.', file: targetFile });
       }
 
-      // 임시 파일에 쓰기
+      // 1. 패치된 java.security 내용을 담을 임시 파일 작성
       const tempFile = path.join(os.tmpdir(), 'java.security.patched');
       fs.writeFileSync(tempFile, lines.join('\r\n'), 'utf8');
 
-      // UAC 관리자 권한 PowerShell 실행하여 덮어쓰기
       const escapedTarget = targetFile.replace(/'/g, "''");
       const escapedTemp = tempFile.replace(/'/g, "''");
 
-      const psCommand = `Start-Process powershell -ArgumentList "-NoProfile -WindowStyle Hidden -Command & { Copy-Item -Path '${escapedTarget}' -Destination '${escapedTarget}.bak' -Force; Copy-Item -Path '${escapedTemp}' -Destination '${escapedTarget}' -Force }" -Verb RunAs -Wait`;
+      // 2. 이스케이프 문제를 방지하기 위한 임시 파워쉘 스크립트(.ps1) 작성
+      const tempScript = path.join(os.tmpdir(), 'java_patch.ps1');
+      const scriptContent = `
+$ErrorActionPreference = 'Stop'
+Copy-Item -Path '${escapedTarget}' -Destination '${escapedTarget}.bak' -Force
+Copy-Item -Path '${escapedTemp}' -Destination '${escapedTarget}' -Force
+`.trim();
+      
+      fs.writeFileSync(tempScript, scriptContent, 'utf8');
+
+      // 3. 임시 스크립트를 UAC 관리자 권한으로 실행
+      const psCommand = `Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File \\"\${tempScript}\\"" -Verb RunAs -Wait`;
 
       exec(`powershell -NoProfile -Command "${psCommand.replace(/"/g, '\\"')}"`, (err) => {
+        // 임시 파일들 즉시 정리
+        try { fs.unlinkSync(tempScript); } catch (e) {}
+        try { fs.unlinkSync(tempFile); } catch (e) {}
+
         if (err) {
           return reject(new Error(`관리자 권한 실행 중 오류 발생: ${err.message}`));
         }
@@ -307,7 +321,6 @@ function patchJavaSecurity(javawsPath) {
         try {
           const postContent = fs.readFileSync(targetFile, 'utf8');
           if (postContent.includes('TLSv1') && targetFile.includes('disabledAlgorithms')) {
-            // 여전히 제한 문구가 포함되어 있다면 패치 실패 (UAC 거부 등)
             return reject(new Error('보안 설정이 수정되지 않았습니다. 관리자 권한(UAC) 승인이 필요합니다.'));
           }
           resolve({ success: true, message: 'Java 보안 제한 해제 성공! (기존 파일은 .bak로 백업됨)', file: targetFile });
