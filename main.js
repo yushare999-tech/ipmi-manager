@@ -319,7 +319,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
 
       const clickSubmitScript = `
         (function() {
-          ${querySelectorAllAllHelper}
+          \${querySelectorAllAllHelper}
           var selectors = ${bSelectors};
           var btn = null;
           for (var i = 0; i < selectors.length; i++) {
@@ -332,6 +332,17 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
           if (btn) {
             btn.focus();
             btn.click();
+            if ('${vendorKey}' === 'dell') {
+              var elWin = btn.ownerDocument.defaultView || window;
+              if (elWin && typeof elWin.frmSubmit === 'function') {
+                elWin.frmSubmit();
+                return true;
+              }
+            }
+            return true;
+          }
+          if ('${vendorKey}' === 'dell' && typeof window.frmSubmit === 'function') {
+            window.frmSubmit();
             return true;
           }
           return false;
