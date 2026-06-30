@@ -12,7 +12,7 @@ import (
 )
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.11"
+const Version = "1.5.13"
 
 func main() {
 	// Bypass SSL/TLS security warnings, self-signed certificate errors and allow legacy TLS 1.0/1.1
