@@ -36,8 +36,8 @@ const (
 	swpNoSize               = 0x0001
 	swpNoMove               = 0x0002
 	swpShowWindow           = 0x0040
-	hwndTopmost             = ^uintptr(0)  // HWND_TOPMOST  = -1
-	hwndNoTopmost           = ^uintptr(1)  // HWND_NOTOPMOST = -2
+	hwndTopmost             = ^uintptr(0) // HWND_TOPMOST  = -1
+	hwndNoTopmost           = ^uintptr(1) // HWND_NOTOPMOST = -2
 	monitorDefaultToNearest = 0x00000002
 )
 
@@ -55,7 +55,6 @@ type winMONITORINFO struct {
 	RcWork    winRECT // work area excludes taskbar
 	DwFlags   uint32
 }
-
 
 // Version Web Viewer Version (Auto incremented by build script)
 const Version = "1.5.15"
@@ -171,13 +170,13 @@ func main() {
 
 	// Parse CLI arguments
 	targetURL := flag.String("url", "", "IPMI Web Console URL")
-	username  := flag.String("user", "", "IPMI Username")
-	password  := flag.String("pass", "", "IPMI Password")
-	vendor    := flag.String("vendor", "", "Hardware Vendor (dell, supermicro, hp, etc.)")
-	ipFlag    := flag.String("ip", "", "Device IP for deduplication")
+	username := flag.String("user", "", "IPMI Username")
+	password := flag.String("pass", "", "IPMI Password")
+	vendor := flag.String("vendor", "", "Hardware Vendor (dell, supermicro, hp, etc.)")
+	ipFlag := flag.String("ip", "", "Device IP for deduplication")
 	debugMode := flag.Bool("debug", false, "Enable Edge DevTools (Inspect Element)")
 	minimized := flag.Bool("minimized", false, "Start window minimized to taskbar")
-	hidden    := flag.Bool("hidden", false, "Start window completely hidden")
+	hidden := flag.Bool("hidden", false, "Start window completely hidden")
 	flag.Parse()
 
 	// Determine the IP key: prefer --ip flag, fallback to extracting from URL
@@ -193,7 +192,7 @@ func main() {
 	// bring that window to the front and exit immediately.
 	winTitle := "IPMI Viewer - " + deviceIP
 	safeName := strings.ReplaceAll(deviceIP, ".", "-")
-	safeName  = strings.ReplaceAll(safeName, ":", "-")
+	safeName = strings.ReplaceAll(safeName, ":", "-")
 	mutexName, _ := syscall.UTF16PtrFromString("Global\\IPMI-Viewer-" + safeName)
 	hMutex, _, mutexErr := procCreateMutexW.Call(0, 1, uintptr(unsafe.Pointer(mutexName)))
 	if mutexErr == syscall.ERROR_ALREADY_EXISTS {
@@ -279,8 +278,8 @@ func main() {
 					const winW, winH = 640, 480
 					workW := mi.RcWork.Right - mi.RcWork.Left
 					workH := mi.RcWork.Bottom - mi.RcWork.Top
-					posX := mi.RcWork.Left + (workW-winW)/2
-					posY := mi.RcWork.Top + (workH-winH)/2
+					posX := mi.RcWork.Left + (workW-winW)/2 + (workW / 2)
+					posY := mi.RcWork.Top + (workH-winH)/2 + (workH / 2)
 
 					// 5. Move & resize window to center of active monitor
 					procShowWindow.Call(hwnd, swShowNormal)
