@@ -166,6 +166,7 @@ function openKvmWindow(device) {
   kvmWin.loadURL(buildKvmUrl(device));
   kvmWin.once('ready-to-show', () => kvmWin.show());
   kvmWin.on('closed', () => delete kvmWindows[winId]);
+  kvmWin.$device = device;
   kvmWindows[winId] = kvmWin;
 }
 
@@ -217,10 +218,9 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
   `;
 
   try {
-    // 0. 웹 콘텐츠 자체에 포커스
     webContents.focus();
 
-    // [디버그 로그 보강] 현재 로드된 페이지의 모든 Form 및 Input 태그 정보 수집
+    // 현재 페이지의 Form 및 Input 진단
     const diagScript = `
       (function() {
         ${querySelectorAllAllHelper}
@@ -255,76 +255,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
       generic: `['input']`
     };
     const vendorKey = (device.vendor || 'generic').toLowerCase();
-    const selectors = userSelectors[vendorKey] || userSelectors.generic;
-
-    // 1. ID 입력 필드 포커싱 + 하이브리드 값 주입 및 이벤트 디스패치
-    const focusUserScript = `
-      (function() {
-        ${querySelectorAllAllHelper}
-        var selectors = ${selectors};
-        var userEl = null;
-        var matchedSelector = '';
-        for (var i = 0; i < selectors.length; i++) {
-          var elements = querySelectorAllAll(selectors[i]);
-          for (var j = 0; j < elements.length; j++) {
-            var el = elements[j];
-            if (selectors[i] === 'input') {
-              var t = (el.type || '').toLowerCase();
-              var n = (el.name || el.id || '').toLowerCase();
-              if ((t === 'text' || t === 'email') && (n.includes('user') || n.includes('name') || n.includes('login') || n.includes('id'))) {
-                userEl = el;
-                matchedSelector = 'input[text/email & keyword]';
-                break;
-              }
-            } else {
-              userEl = el;
-              matchedSelector = selectors[i];
-              break;
-            }
-          }
-          if (userEl) break;
-        }
-        if (!userEl && selectors.includes('input')) {
-          userEl = querySelectorAllAll('input[type="text"]')[0];
-          matchedSelector = 'fallback input[type="text"]';
-        }
-        if (userEl) {
-          userEl.focus();
-          // 하이브리드 보완: JS로 직접 값을 채우고 이벤트를 미리 트리거 (안전장치)
-          var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
-          var proto = getProto(userEl);
-          var desc = Object.getOwnPropertyDescriptor(proto, 'value');
-          var setter = desc ? desc.set : null;
-          if (setter) {
-            setter.call(userEl, ${JSON.stringify(device.username)});
-          } else {
-            userEl.value = ${JSON.stringify(device.username)};
-          }
-          userEl.dispatchEvent(new Event('input', { bubbles: true }));
-          userEl.dispatchEvent(new Event('change', { bubbles: true }));
-          // 가상 키보드 이벤트 디스패치로 암호화 리스너 강제 발화 유도
-          userEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          userEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          return { success: true, selector: matchedSelector, id: userEl.id, name: userEl.name };
-        }
-        return { success: false };
-      })()
-    `;
-
-    const userResult = await webContents.executeJavaScript(focusUserScript);
-    if (!userResult || !userResult.success) {
-      log(`[디버그] ID 입력 필드 매칭 실패 (검색 셀렉터: ${selectors})`);
-      return false;
-    }
-
-    log(`[디버그] ID 매칭 성공! 셀렉터: "${userResult.selector}" (ID: "${userResult.id}", Name: "${userResult.name}")`);
-    // 브라우저 포커스 정착을 위한 미세 대기
-    await new Promise(r => setTimeout(r, 80));
-    
-    // 2. 물리적 입력 시뮬레이션 적용 (텍스트 선택 후 덮어쓰기)
-    webContents.selectAll();
-    webContents.delete();
-    await webContents.insertText(device.username);
+    const uSelectors = userSelectors[vendorKey] || userSelectors.generic;
 
     const passSelectors = {
       dell: `['#password', 'input[name="password"]', 'input[type="password"]']`,
@@ -334,56 +265,94 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     };
     const pSelectors = passSelectors[vendorKey] || passSelectors.generic;
 
-    // 3. PW 입력 필드 포커싱 + 하이브리드 값 주입 및 이벤트 디스패치
-    const focusPassScript = `
+    // 단일 동기 자바스크립트 내에서 포커싱, 값 주입, 캐릭터별 키 이벤트 디스패치를 완벽히 수행 (순서 뒤바뀜 원천 방지)
+    const fillScript = `
       (function() {
         ${querySelectorAllAllHelper}
-        var selectors = ${pSelectors};
-        var passEl = null;
-        var matchedSelector = '';
-        for (var i = 0; i < selectors.length; i++) {
-          var elements = querySelectorAllAll(selectors[i]);
-          if (elements.length > 0) {
-            passEl = elements[0];
-            matchedSelector = selectors[i];
-            break;
+        
+        function fillField(selectors, value) {
+          var el = null;
+          var matched = '';
+          for (var i = 0; i < selectors.length; i++) {
+            var elements = querySelectorAllAll(selectors[i]);
+            for (var j = 0; j < elements.length; j++) {
+              var target = elements[j];
+              if (selectors[i] === 'input') {
+                var t = (target.type || '').toLowerCase();
+                var n = (target.name || target.id || '').toLowerCase();
+                if ((t === 'text' || t === 'email' || t === 'password') && 
+                    (n.includes('user') || n.includes('name') || n.includes('login') || n.includes('id') || n.includes('pwd') || t === 'password')) {
+                  el = target;
+                  matched = 'input[keyword/type]';
+                  break;
+                }
+              } else {
+                el = target;
+                matched = selectors[i];
+                break;
+              }
+            }
+            if (el) break;
           }
-        }
-        if (passEl) {
-          passEl.focus();
-          // 하이브리드 보완: JS로 직접 값을 채우고 이벤트를 미리 트리거 (안전장치)
-          var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
-          var proto = getProto(passEl);
-          var desc = Object.getOwnPropertyDescriptor(proto, 'value');
-          var setter = desc ? desc.set : null;
-          if (setter) {
-            setter.call(passEl, ${JSON.stringify(device.password || '')});
-          } else {
-            passEl.value = ${JSON.stringify(device.password || '')};
+          if (!el && selectors.includes('input')) {
+            el = querySelectorAllAll(selectors[0].includes('password') ? 'input[type="password"]' : 'input[type="text"]')[0];
+            matched = 'fallback';
           }
-          passEl.dispatchEvent(new Event('input', { bubbles: true }));
-          passEl.dispatchEvent(new Event('change', { bubbles: true }));
-          passEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          passEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          return { success: true, selector: matchedSelector, id: passEl.id, name: passEl.name };
+          
+          if (el) {
+            el.focus();
+            
+            // 1차 값 대입 (안전장치)
+            var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
+            var proto = getProto(el);
+            var desc = Object.getOwnPropertyDescriptor(proto, 'value');
+            var setter = desc ? desc.set : null;
+            if (setter) {
+              setter.call(el, value);
+            } else {
+              el.value = value;
+            }
+            
+            // 2차 각 글자별 키보드 이벤트 순차 디스패치 (iDRAC 암호화 리스너 강제 발화)
+            el.dispatchEvent(new Event('focus', { bubbles: true }));
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            for (var k = 0; k < value.length; k++) {
+              var char = value[k];
+              var code = char.charCodeAt(0);
+              el.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: char, char: char, keyCode: code }));
+              el.dispatchEvent(new KeyboardEvent('keypress', { bubbles: true, key: char, char: char, keyCode: code }));
+              el.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: char, char: char, keyCode: code }));
+            }
+            
+            el.blur();
+            return { success: true, selector: matched, id: el.id, name: el.name };
+          }
+          return { success: false };
         }
-        return { success: false };
+
+        var userResult = fillField(${JSON.stringify(uSelectors)}, ${JSON.stringify(device.username)});
+        if (!userResult.success) return { step: 'user', success: false };
+        
+        var passResult = fillField(${JSON.stringify(pSelectors)}, ${JSON.stringify(device.password || '')});
+        if (!passResult.success) return { step: 'pass', success: false };
+        
+        return { 
+          success: true, 
+          userId: userResult.id, userName: userResult.name, 
+          passId: passResult.id, passName: passResult.name 
+        };
       })()
     `;
 
-    const passResult = await webContents.executeJavaScript(focusPassScript);
-    if (!passResult || !passResult.success) {
-      log(`[디버그] PW 입력 필드 매칭 실패 (검색 셀렉터: ${pSelectors})`);
+    const fillResult = await webContents.executeJavaScript(fillScript);
+    if (!fillResult || !fillResult.success) {
+      log(`[디버그] 필드 입력 실패 단계: ${fillResult ? fillResult.step : 'unknown'}`);
       return false;
     }
 
-    log(`[디버그] PW 매칭 성공! 셀렉터: "${passResult.selector}" (ID: "${passResult.id}", Name: "${passResult.name}")`);
-    await new Promise(r => setTimeout(r, 80));
-    
-    // 4. 물리적 입력 시뮬레이션 적용
-    webContents.selectAll();
-    webContents.delete();
-    await webContents.insertText(device.password || '');
+    log(`[디버그] 동기식 주입 성공! ID(ID: "${fillResult.userId}", Name: "${fillResult.userName}"), PW(ID: "${fillResult.passId}", Name: "${fillResult.passName}")`);
 
     // 5. 자동 제출 처리
     if (autoSubmit) {
@@ -476,6 +445,7 @@ async function openIpmiWithAutoLogin(device) {
   win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
   win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
   win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; if (loginTimer) clearInterval(loginTimer); });
+  win.$device = device;
   kvmWindows[winId] = win;
 
   // Dell iDRAC REST API 직접 로그인 시도
@@ -825,6 +795,26 @@ app.whenReady().then(() => {
         const filePath = item.getSavePath();
         const fileName = item.getFilename();
         const focusWindow = BrowserWindow.getFocusedWindow() || mainWindow;
+        
+        // JNLP 실행 전 해당 장비의 IP 및 Hostname을 자바 예외 사이트에 강제 재등록
+        try {
+          const win = BrowserWindow.fromWebContents(webContents);
+          const dev = win ? win.$device : null;
+          if (dev) {
+            console.log(`[JNLP 실행 전 자바 설정 강제 갱신] 장비: ${dev.name}, IP: ${dev.ipmi_ip}, Hostname: ${dev.hostname || '없음'}`);
+            // IP 등록
+            javaManager.addJavaExceptionSite(dev.ipmi_ip);
+            // 호스트명 등록 (JNLP 내부에 호스트명으로 정의되어 있을 경우 대비)
+            if (dev.hostname) {
+              javaManager.addJavaExceptionSite(dev.hostname);
+            }
+            // 자바 보안 우회 및 레거시 TLS 설정 즉각 주입
+            javaManager.applyLegacyJavaConfig();
+          }
+        } catch (e) {
+          console.error('[JNLP 실행 전 자바 설정 갱신 실패]:', e);
+        }
+
         
         const { response } = await dialog.showMessageBox(focusWindow, {
           type: 'question',
