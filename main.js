@@ -217,6 +217,9 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
   `;
 
   try {
+    // 0. 웹 콘텐츠 자체에 포커스를 주어 키보드 입력이 가능하게 활성화
+    webContents.focus();
+
     const userSelectors = {
       dell: `['#user', 'input[name="user"]', 'input[type="text"]']`,
       hp: `['#username', 'input[name="username"]', 'input[autocomplete="username"]', 'input[type="text"]']`,
@@ -227,6 +230,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     const vendorKey = (device.vendor || 'generic').toLowerCase();
     const selectors = userSelectors[vendorKey] || userSelectors.generic;
 
+    // 1. ID 입력 필드 포커싱 + 하이브리드 값 주입 및 이벤트 디스패치
     const focusUserScript = `
       (function() {
         ${querySelectorAllAllHelper}
@@ -255,6 +259,21 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
         }
         if (userEl) {
           userEl.focus();
+          // 하이브리드 보완: JS로 직접 값을 채우고 이벤트를 미리 트리거 (안전장치)
+          var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
+          var proto = getProto(userEl);
+          var desc = Object.getOwnPropertyDescriptor(proto, 'value');
+          var setter = desc ? desc.set : null;
+          if (setter) {
+            setter.call(userEl, ${JSON.stringify(device.username)});
+          } else {
+            userEl.value = ${JSON.stringify(device.username)};
+          }
+          userEl.dispatchEvent(new Event('input', { bubbles: true }));
+          userEl.dispatchEvent(new Event('change', { bubbles: true }));
+          // 가상 키보드 이벤트 디스패치로 암호화 리스너 강제 발화 유도
+          userEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
+          userEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
           return true;
         }
         return false;
@@ -264,7 +283,11 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     const userFocused = await webContents.executeJavaScript(focusUserScript);
     if (!userFocused) return false;
 
-    log('ID 입력 필드 포커싱 성공 → 타이핑 입력 시뮬레이션');
+    log('ID 입력 필드 포커싱 및 1차 값 주입 완료');
+    // 브라우저 포커스 정착을 위한 미세 대기
+    await new Promise(r => setTimeout(r, 80));
+    
+    // 2. 물리적 입력 시뮬레이션 적용 (텍스트 선택 후 덮어쓰기)
     webContents.selectAll();
     webContents.delete();
     await webContents.insertText(device.username);
@@ -278,6 +301,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     };
     const pSelectors = passSelectors[vendorKey] || passSelectors.generic;
 
+    // 3. PW 입력 필드 포커싱 + 하이브리드 값 주입 및 이벤트 디스패치
     const focusPassScript = `
       (function() {
         ${querySelectorAllAllHelper}
@@ -292,6 +316,20 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
         }
         if (passEl) {
           passEl.focus();
+          // 하이브리드 보완: JS로 직접 값을 채우고 이벤트를 미리 트리거 (안전장치)
+          var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
+          var proto = getProto(passEl);
+          var desc = Object.getOwnPropertyDescriptor(proto, 'value');
+          var setter = desc ? desc.set : null;
+          if (setter) {
+            setter.call(passEl, ${JSON.stringify(device.password || '')});
+          } else {
+            passEl.value = ${JSON.stringify(device.password || '')};
+          }
+          passEl.dispatchEvent(new Event('input', { bubbles: true }));
+          passEl.dispatchEvent(new Event('change', { bubbles: true }));
+          passEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
+          passEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
           return true;
         }
         return false;
@@ -301,11 +339,15 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     const passFocused = await webContents.executeJavaScript(focusPassScript);
     if (!passFocused) return false;
 
-    log('PW 입력 필드 포커싱 성공 → 타이핑 입력 시뮬레이션');
+    log('PW 입력 필드 포커싱 및 1차 값 주입 완료');
+    await new Promise(r => setTimeout(r, 80));
+    
+    // 4. 물리적 입력 시뮬레이션 적용
     webContents.selectAll();
     webContents.delete();
     await webContents.insertText(device.password || '');
 
+    // 5. 자동 제출 처리
     if (autoSubmit) {
       log('자동 제출 처리');
       const submitBtnSelectors = {
@@ -319,7 +361,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
 
       const clickSubmitScript = `
         (function() {
-          \${querySelectorAllAllHelper}
+          ${querySelectorAllAllHelper}
           var selectors = ${bSelectors};
           var btn = null;
           for (var i = 0; i < selectors.length; i++) {
