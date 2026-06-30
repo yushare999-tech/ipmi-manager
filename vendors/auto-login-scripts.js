@@ -4,6 +4,7 @@
  * 작성일: 2026-06-25
  * 변경이력:
  *   - 2026-06-25: 최초 작성 (Dell iDRAC, HP iLO, SuperMicro, Generic)
+ *   - 2026-06-30: iframe 내 크로스 컨텍스트 대응을 위한 Object.getPrototypeOf 기반 setter 취득 적용 및 focus/blur 이벤트 보완
  */
 
 /**
@@ -35,9 +36,6 @@ function getLoginScript(vendor, username, password, autoSubmit = false) {
 }
 
 // ─── Dell iDRAC ──────────────────────────────────────────────────
-// iDRAC6/7/8: #user / #password / form submit
-// iDRAC9: React 기반 SPA, 셀렉터 다름
-// autoSubmit이 true인 경우에만 자동 클릭/제출 수행
 function getDellScript(u, p, autoSubmit) {
   return `
 (function() {
@@ -68,32 +66,45 @@ function getDellScript(u, p, autoSubmit) {
     var passEl = passes[0];
 
     if (userEl && passEl) {
-      // React/Vue 등 프레임워크 대응: nativeInputValueSetter 방식
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
       
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(userEl, ${u});
+      // User Input Fill
+      var userProto = getProto(userEl);
+      var userSetterDesc = Object.getOwnPropertyDescriptor(userProto, 'value');
+      var userSetter = userSetterDesc ? userSetterDesc.set : null;
+      
+      userEl.focus();
+      if (userSetter) {
+        userSetter.call(userEl, ${u});
       } else {
         userEl.value = ${u};
       }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
+      userEl.blur();
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(passEl, ${p});
+      // Password Input Fill
+      var passProto = getProto(passEl);
+      var passSetterDesc = Object.getOwnPropertyDescriptor(passProto, 'value');
+      var passSetter = passSetterDesc ? passSetterDesc.set : null;
+
+      passEl.focus();
+      if (passSetter) {
+        passSetter.call(passEl, ${p});
       } else {
         passEl.value = ${p};
       }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
+      passEl.blur();
 
       if (${autoSubmit}) {
-        // Submit 버튼 탐색 후 클릭, 없으면 form submit
         var btn = querySelectorAllAll('button[type="submit"]')
           .concat(querySelectorAllAll('input[type="submit"]'))
           .concat(querySelectorAllAll('#btnOK'))
           .concat(querySelectorAllAll('.btn-primary'))[0];
         if (btn) {
+          btn.focus();
           btn.click();
         } else if (userEl.form) {
           userEl.form.submit();
@@ -104,7 +115,6 @@ function getDellScript(u, p, autoSubmit) {
     return false;
   }
 
-  // 즉시 시도 후 안되면 재시도
   if (!tryFill()) {
     var attempts = 0;
     var timer = setInterval(function() {
@@ -116,7 +126,6 @@ function getDellScript(u, p, autoSubmit) {
 }
 
 // ─── HP iLO ──────────────────────────────────────────────────────
-// iLO4/5: #username / #password
 function getHpScript(u, p, autoSubmit) {
   return `
 (function() {
@@ -149,23 +158,37 @@ function getHpScript(u, p, autoSubmit) {
     var passEl = passes[0];
 
     if (userEl && passEl) {
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
       
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(userEl, ${u});
+      // User Input Fill
+      var userProto = getProto(userEl);
+      var userSetterDesc = Object.getOwnPropertyDescriptor(userProto, 'value');
+      var userSetter = userSetterDesc ? userSetterDesc.set : null;
+
+      userEl.focus();
+      if (userSetter) {
+        userSetter.call(userEl, ${u});
       } else {
         userEl.value = ${u};
       }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
+      userEl.blur();
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(passEl, ${p});
+      // Password Input Fill
+      var passProto = getProto(passEl);
+      var passSetterDesc = Object.getOwnPropertyDescriptor(passProto, 'value');
+      var passSetter = passSetterDesc ? passSetterDesc.set : null;
+
+      passEl.focus();
+      if (passSetter) {
+        passSetter.call(passEl, ${p});
       } else {
         passEl.value = ${p};
       }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
+      passEl.blur();
 
       if (${autoSubmit}) {
         var btn = querySelectorAllAll('button[type="submit"]')
@@ -173,6 +196,7 @@ function getHpScript(u, p, autoSubmit) {
           .concat(querySelectorAllAll('.btn-primary'))
           .concat(querySelectorAllAll('input[type="submit"]'))[0];
         if (btn) {
+          btn.focus();
           btn.click();
         } else if (userEl.form) {
           userEl.form.submit();
@@ -194,7 +218,6 @@ function getHpScript(u, p, autoSubmit) {
 }
 
 // ─── SuperMicro ───────────────────────────────────────────────────
-// name="name" / name="pwd"
 function getSupermicroScript(u, p, autoSubmit) {
   return `
 (function() {
@@ -225,29 +248,44 @@ function getSupermicroScript(u, p, autoSubmit) {
     var passEl = passes[0];
 
     if (userEl && passEl) {
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
       
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(userEl, ${u});
+      // User Input Fill
+      var userProto = getProto(userEl);
+      var userSetterDesc = Object.getOwnPropertyDescriptor(userProto, 'value');
+      var userSetter = userSetterDesc ? userSetterDesc.set : null;
+
+      userEl.focus();
+      if (userSetter) {
+        userSetter.call(userEl, ${u});
       } else {
         userEl.value = ${u};
       }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
+      userEl.blur();
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(passEl, ${p});
+      // Password Input Fill
+      var passProto = getProto(passEl);
+      var passSetterDesc = Object.getOwnPropertyDescriptor(passProto, 'value');
+      var passSetter = passSetterDesc ? passSetterDesc.set : null;
+
+      passEl.focus();
+      if (passSetter) {
+        passSetter.call(passEl, ${p});
       } else {
         passEl.value = ${p};
       }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
+      passEl.blur();
 
       if (${autoSubmit}) {
         var btn = querySelectorAllAll('input[type="submit"]')
           .concat(querySelectorAllAll('button[type="submit"]'))
           .concat(querySelectorAllAll('#login_word'))[0];
         if (btn) {
+          btn.focus();
           btn.click();
         } else if (userEl.form) {
           userEl.form.submit();
@@ -295,29 +333,47 @@ function getAsusScript(u, p, autoSubmit) {
     var passEl = passes[0];
 
     if (userEl && passEl) {
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
       
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(userEl, ${u});
+      // User Input Fill
+      var userProto = getProto(userEl);
+      var userSetterDesc = Object.getOwnPropertyDescriptor(userProto, 'value');
+      var userSetter = userSetterDesc ? userSetterDesc.set : null;
+
+      userEl.focus();
+      if (userSetter) {
+        userSetter.call(userEl, ${u});
       } else {
         userEl.value = ${u};
       }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
+      userEl.blur();
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(passEl, ${p});
+      // Password Input Fill
+      var passProto = getProto(passEl);
+      var passSetterDesc = Object.getOwnPropertyDescriptor(passProto, 'value');
+      var passSetter = passSetterDesc ? passSetterDesc.set : null;
+
+      passEl.focus();
+      if (passSetter) {
+        passSetter.call(passEl, ${p});
       } else {
         passEl.value = ${p};
       }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
+      passEl.blur();
       
       if (${autoSubmit}) {
         var btn = querySelectorAllAll('input[type="submit"]')
           .concat(querySelectorAllAll('button[type="submit"]'))[0];
-        if (btn) btn.click();
-        else if (userEl.form) userEl.form.submit();
+        if (btn) {
+          btn.focus();
+          btn.click();
+        } else if (userEl.form) {
+          userEl.form.submit();
+        }
       }
       return true;
     }
@@ -366,35 +422,52 @@ function getGenericScript(u, p, autoSubmit) {
         userEl = el;
       }
     });
-    // fallback: 첫번째 text input
     if (!userEl) userEl = querySelectorAllAll('input[type="text"]')[0];
 
     if (userEl && passEl) {
-      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
       
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(userEl, ${u});
+      // User Input Fill
+      var userProto = getProto(userEl);
+      var userSetterDesc = Object.getOwnPropertyDescriptor(userProto, 'value');
+      var userSetter = userSetterDesc ? userSetterDesc.set : null;
+
+      userEl.focus();
+      if (userSetter) {
+        userSetter.call(userEl, ${u});
       } else {
         userEl.value = ${u};
       }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
+      userEl.blur();
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(passEl, ${p});
+      // Password Input Fill
+      var passProto = getProto(passEl);
+      var passSetterDesc = Object.getOwnPropertyDescriptor(passProto, 'value');
+      var passSetter = passSetterDesc ? passSetterDesc.set : null;
+
+      passEl.focus();
+      if (passSetter) {
+        passSetter.call(passEl, ${p});
       } else {
         passEl.value = ${p};
       }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
+      passEl.blur();
 
       if (${autoSubmit}) {
         var btn = querySelectorAllAll('button[type="submit"]')
           .concat(querySelectorAllAll('input[type="submit"]'))
           .concat(querySelectorAllAll('.btn-primary'))
           .concat(querySelectorAllAll('.login-btn'))[0];
-        if (btn) btn.click();
-        else if (userEl.form) userEl.form.submit();
+        if (btn) {
+          btn.focus();
+          btn.click();
+        } else if (userEl.form) {
+          userEl.form.submit();
+        }
       }
       return true;
     }

@@ -533,7 +533,43 @@ ipcMain.handle('dialog:open-file', async (_, options) => {
 });
 
 // ─── 앱 생명주기 ─────────────────────────────────────────────────
-app.whenReady().then(createMainWindow);
+app.whenReady().then(() => {
+  // 다운로드 완료 시 실행 확인 팝업 기능 추가
+  session.defaultSession.on('will-download', (event, item, webContents) => {
+    // 다운로드 저장 경로가 사전에 정의되지 않은 경우 기본 다운로드 폴더로 강제 지정하여 다운로드 중단을 방지
+    const currentPath = item.getSavePath();
+    if (!currentPath) {
+      const downloadsPath = app.getPath('downloads');
+      item.setSavePath(require('path').join(downloadsPath, item.getFilename()));
+    }
+
+    item.once('done', async (event, state) => {
+      console.log(`[Download] 완료 상태: ${state}, 저장 경로: ${item.getSavePath()}`);
+      if (state === 'completed') {
+        const filePath = item.getSavePath();
+        const fileName = item.getFilename();
+        const focusWindow = BrowserWindow.getFocusedWindow() || mainWindow;
+        
+        const { response } = await dialog.showMessageBox(focusWindow, {
+          type: 'question',
+          buttons: ['예', '아니오'],
+          defaultId: 0,
+          title: '다운로드 완료',
+          message: `파일 다운로드가 완료되었습니다.\n\n파일명: ${fileName}\n\n지금 이 파일을 실행하시겠습니까?`,
+          cancelId: 1
+        });
+
+        if (response === 0) {
+          shell.openPath(filePath).catch(err => {
+            dialog.showErrorBox('실행 실패', `파일을 실행하는 중 오류가 발생했습니다.\n경로: ${filePath}\n오류: ${err.message}`);
+          });
+        }
+      }
+    });
+  });
+
+  createMainWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
