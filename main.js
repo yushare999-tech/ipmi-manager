@@ -8,7 +8,7 @@
  *   - 2026-06-26: 대시보드 감지 후 자동 reload + iDRAC ST1/ST2 토큰 JNLP 개선
  */
 
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, session } = require('electron');
 const path    = require('path');
 const https   = require('https');
 const { spawn, exec } = require('child_process');
@@ -523,7 +523,35 @@ ipcMain.handle('dialog:open-file', async (_, options) => {
 });
 
 // ─── 앱 생명주기 ─────────────────────────────────────────────────
-app.whenReady().then(createMainWindow);
+app.whenReady().then(() => {
+  // 다운로드 완료 시 실행 확인 팝업 기능 추가
+  session.defaultSession.on('will-download', (event, item, webContents) => {
+    item.once('done', async (event, state) => {
+      if (state === 'completed') {
+        const filePath = item.getSavePath();
+        const fileName = item.getFilename();
+        const focusWindow = BrowserWindow.getFocusedWindow() || mainWindow;
+        
+        const { response } = await dialog.showMessageBox(focusWindow, {
+          type: 'question',
+          buttons: ['예', '아니오'],
+          defaultId: 0,
+          title: '다운로드 완료',
+          message: `파일 다운로드가 완료되었습니다.\n\n파일명: ${fileName}\n\n지금 이 파일을 실행하시겠습니까?`,
+          cancelId: 1
+        });
+
+        if (response === 0) {
+          shell.openPath(filePath).catch(err => {
+            dialog.showErrorBox('실행 실패', `파일을 실행하는 중 오류가 발생했습니다.\n경로: ${filePath}\n오류: ${err.message}`);
+          });
+        }
+      }
+    });
+  });
+
+  createMainWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
