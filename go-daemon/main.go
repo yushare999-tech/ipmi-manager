@@ -447,11 +447,13 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	if !found {
 		logger.Warningf("[Connect] 장비 조회 실패 (%s). 기본 정보로 WEB 방식 강제 기동합니다.", ip)
 		fallbackDevice := Device{IpmiIP: ip, HTTPS: true, Type: "ipmi"}
-		err = launchWeb(fallbackDevice)
+		viewerFound, err := launchWeb(fallbackDevice)
+		w.Header().Set("Content-Type", "application/json")
 		if err != nil {
-			http.Error(w, fmt.Sprintf(`{"error":"failed to launch WEB fallback: %s"}`, err.Error()), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(`{"success":false, "error":"failed to launch WEB fallback: %s"}`, err.Error())))
 		} else {
-			w.Write([]byte(`{"success":true, "message":"device not found. launched WEB fallback."}`))
+			w.Write([]byte(fmt.Sprintf(`{"success":true, "message":"device not found. launched WEB fallback.", "viewer_found":%t, "fallback":true}`, viewerFound)))
 		}
 		return
 	}
@@ -459,11 +461,13 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	// 4. 장비의 type이 "ipmi"가 아닐 경우 즉각 WEB 방식으로 연결 처리
 	if strings.ToLower(device.Type) != "ipmi" {
 		logger.Infof("[Router] 장비 type이 'ipmi'가 아님 (%s). WEB 방식으로 직접 연결 처리합니다.", device.Type)
-		err = launchWeb(device)
+		viewerFound, err := launchWeb(device)
+		w.Header().Set("Content-Type", "application/json")
 		if err != nil {
-			http.Error(w, fmt.Sprintf(`{"error":"failed to launch WEB: %s"}`, err.Error()), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(`{"success":false, "error":"failed to launch WEB: %s"}`, err.Error())))
 		} else {
-			w.Write([]byte(`{"success":true, "message":"non-ipmi type device. launched WEB console."}`))
+			w.Write([]byte(fmt.Sprintf(`{"success":true, "message":"non-ipmi type device. launched WEB console.", "viewer_found":%t, "fallback":false}`, viewerFound)))
 		}
 		return
 	}
@@ -501,12 +505,13 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 
 	// 7. 지정된 프로필 환경 경로로 구동 처리
 	runErr := error(nil)
+	viewerFound := false
 	if connectType == "ikvm" {
 		runErr = launchSupermicroIKVM(activeProfile.JavaPath, activeProfile.IkvmJarPath, device)
 	} else if connectType == "jnlp" {
 		runErr = launchJnlp(activeProfile.JavaPath, device)
 	} else if connectType == "WEB" {
-		runErr = launchWeb(device)
+		viewerFound, runErr = launchWeb(device)
 	} else {
 		runErr = fmt.Errorf("unknown connect type: %s", connectType)
 	}
@@ -514,16 +519,23 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	// 8. 구동 에러 발생 시 최후의 보루로 WEB 방식 자동 폴백 기동
 	if runErr != nil {
 		logger.Errorf("[Connect] 방식 기동 실패 (%v). WEB 방식으로 최종 폴백을 구동합니다.", runErr)
-		fallbackErr := launchWeb(device)
+		fallbackViewerFound, fallbackErr := launchWeb(device)
+		w.Header().Set("Content-Type", "application/json")
 		if fallbackErr != nil {
-			http.Error(w, fmt.Sprintf(`{"error":"failed to launch connect and fallback: %s"}`, fallbackErr.Error()), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf(`{"success":false, "error":"failed to launch connect and fallback: %s"}`, fallbackErr.Error())))
 			return
 		}
-		w.Write([]byte(`{"success":true, "message":"connect failed. fallback to WEB initiated."}`))
+		
+		// 에러 스트링 이스케이프 처리
+		errStr := strings.ReplaceAll(runErr.Error(), `"`, `\"`)
+		errStr = strings.ReplaceAll(errStr, `\`, `\\`)
+		w.Write([]byte(fmt.Sprintf(`{"success":true, "message":"connect failed. fallback to WEB initiated.", "viewer_found":%t, "fallback":true, "connect_error":"%s"}`, fallbackViewerFound, errStr)))
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf(`{"success":true, "message":"launch sequence initiated successfully via %s"}`, connectType)))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(fmt.Sprintf(`{"success":true, "message":"launch sequence initiated successfully via %s", "viewer_found":%t, "fallback":false}`, connectType, viewerFound)))
 }
 
 // launchJnlp JNLP (Java Web Start) 실행 처리
@@ -626,7 +638,8 @@ func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
 }
 
 // launchWeb 웹 브라우저 기동 (WEB 방식)
-func launchWeb(device Device) error {
+// 반환: (viewerFound bool, err error)
+func launchWeb(device Device) (bool, error) {
 	executablePath, _ := os.Executable()
 	execDir := filepath.Dir(executablePath)
 
@@ -671,13 +684,13 @@ func launchWeb(device Device) error {
 			logger.Infof("[WEB] [DEBUG] 디버그 옵션을 활성화하여 뷰어를 구동합니다. (인자: %v)", args)
 		}
 		cmd := exec.Command(viewerPath, args...)
-		return cmd.Start()
+		return true, cmd.Start()
 	}
 
 	// 뷰어를 찾을 수 없는 경우 최후의 폴백으로 기본 웹 브라우저 직접 기동
 	logger.Warningf("[WEB] 초경량 웹 뷰어(ipmi-viewer.exe)를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
 	cmd := exec.Command("cmd", "/c", "start", "", loginUrl)
-	return cmd.Start()
+	return false, cmd.Start()
 }
 
 
