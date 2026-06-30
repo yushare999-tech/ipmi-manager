@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -585,8 +584,7 @@ func launchJnlp(javaPath string, device Device) error {
 	}
 
 	logger.Infof("[JNLP] javaws 실행 주소: %s", jnlpURL)
-	cmd := exec.Command(javaPath, jnlpURL)
-	return cmd.Start()
+	return launchAsUser(javaPath, []string{jnlpURL}, "")
 }
 
 // launchSupermicroIKVM Supermicro iKVM.jar 직접 기동
@@ -632,9 +630,7 @@ func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
 	}
 	_ = webPort
 
-	cmd := exec.Command(javaBin, cmdArgs...)
-	cmd.Dir = jarDir // Native DLL 로딩을 위해 작업 디렉토리를 JAR 폴더로 설정
-	return cmd.Start()
+	return launchAsUser(javaBin, cmdArgs, jarDir)
 }
 
 // launchWeb 웹 브라우저 기동 (WEB 방식)
@@ -683,14 +679,10 @@ func launchWeb(device Device) (bool, error) {
 			args = append(args, "--debug")
 			logger.Infof("[WEB] [DEBUG] 디버그 옵션을 활성화하여 뷰어를 구동합니다. (인자: %v)", args)
 		}
-		cmd := exec.Command(viewerPath, args...)
-		return true, cmd.Start()
+		return true, launchAsUser(viewerPath, args, "")
 	}
 
 	// 뷰어를 찾을 수 없는 경우 최후의 폴백으로 기본 웹 브라우저 직접 기동
 	logger.Warningf("[WEB] 초경량 웹 뷰어(ipmi-viewer.exe)를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
-	cmd := exec.Command("cmd", "/c", "start", "", loginUrl)
-	return false, cmd.Start()
+	return false, launchAsUser("cmd", []string{"/c", "start", "", loginUrl}, "")
 }
-
-
