@@ -238,8 +238,7 @@ async function openIpmiWithAutoLogin(device) {
   kvmWindows[winId] = win;
 
   // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
-  win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
-    // 메인 프레임 로드 실패이고 HTTPS 주소인 경우에만 처리
+  const handleIpmiLoadFailure = (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
     if (isMainFrame !== false) {
       const targetUrl = validatedURL || win.webContents.getURL();
       if (targetUrl.startsWith('https://')) {
@@ -248,7 +247,9 @@ async function openIpmiWithAutoLogin(device) {
         win.loadURL(httpUrl);
       }
     }
-  });
+  };
+  win.webContents.on('did-fail-load', handleIpmiLoadFailure);
+  win.webContents.on('did-fail-provisional-load', handleIpmiLoadFailure);
 
   // Dell iDRAC REST API 직접 로그인 시도
   const isIdrac7 = (device.version || '').toLowerCase().includes('idrac7') || 
@@ -481,8 +482,7 @@ function openKvmWithAutoLogin(device) {
   kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
 
   // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
-  kvmWin.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
-    // 메인 프레임 로드 실패이고 HTTPS 주소인 경우에만 처리
+  const handleKvmLoadFailure = (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
     if (isMainFrame !== false) {
       const targetUrl = validatedURL || kvmWin.webContents.getURL();
       if (targetUrl.startsWith('https://')) {
@@ -491,7 +491,9 @@ function openKvmWithAutoLogin(device) {
         kvmWin.loadURL(httpUrl);
       }
     }
-  });
+  };
+  kvmWin.webContents.on('did-fail-load', handleKvmLoadFailure);
+  kvmWin.webContents.on('did-fail-provisional-load', handleKvmLoadFailure);
 
   if (!device.username) {
     log('계정 정보 없음 → 바로 KVM 오픈');
