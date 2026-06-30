@@ -46,13 +46,17 @@ const { ipcRenderer } = require('electron');
                        (device.model || '').toLowerCase().includes('r620') ||
                        (device.version || '').startsWith('1.');
 
-      if (!isIdrac7) {
+      // REST API 토큰으로 로그인된 경우 새로고침 시 세션이 만료되므로 새로고침을 생략해야 함
+      const hasRestToken = currentUrl.includes('st1=') || currentUrl.includes('st2=');
+
+      if (!isIdrac7 && !hasRestToken) {
         console.log('[Preload] 대시보드 진입 감지 → 1.5초 후 새로고침 실행');
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       } else {
-        console.log('[Preload] iDRAC 7 대시보드 진입 감지 → 세션 유실 방지를 위해 새로고침 생략');
+        const reason = hasRestToken ? 'REST 토큰 세션 유실 방지' : 'iDRAC 7 세션 유실 방지';
+        console.log(`[Preload] 대시보드 진입 감지 → ${reason}를 위해 새로고침 생략`);
       }
       return;
     }

@@ -44,6 +44,7 @@ npm start
 ipmi-manager/
 ├── main.js              # Electron 메인 프로세스 (SSL 우회, IPC 핸들러, 자동로그인)
 ├── preload.js           # 렌더러 ↔ 메인 보안 브릿지
+├── login-preload.js     # 자동 로그인 전용 프리로드 스크립트
 ├── renderer/
 │   ├── index.html       # 메인 UI
 │   ├── style.css        # 다크 테마 스타일
@@ -56,6 +57,9 @@ ipmi-manager/
 ```
 
 ## 변경 이력
+
+### v1.3.1 (2026-06-30)
+- **Dell R630 (iDRAC 8) 자동 로그인 시 무한 로그인-로그아웃 루프가 발생하는 버그 수정**: REST API 토큰(`ST1`, `ST2`)으로 대시보드 진입 시 자동 새로고침을 생략하도록 `login-preload.js` 개선.
 
 ### v1.3.0 (2026-06-30)
 - 장비 카드 내부에 계정(ID/PW) 정보 표시 및 비밀번호 토글(👁️/🙈) 기능 추가
