@@ -18,6 +18,7 @@ import (
 )
 
 var logger service.Logger
+var debugMode bool
 
 type program struct {
 	exit chan struct{}
@@ -47,7 +48,9 @@ func (p *program) Stop(s service.Service) error {
 func main() {
 	svcFlag := flag.String("service", "", "Control the system service: install, uninstall, start, stop")
 	runFlag := flag.Bool("run", false, "Run the daemon in foreground")
+	debugFlag := flag.Bool("debug", false, "Enable debug mode with verbose logging")
 	flag.Parse()
+	debugMode = *debugFlag
 
 	svcConfig := &service.Config{
 		Name:        "IPMIManagerDaemon",
@@ -371,6 +374,12 @@ func fetchDeviceFromJsProxy(apiURL, token, ip string) (Device, error) {
 			return device, fmt.Errorf("failed to parse JSON object: %w", err)
 		}
 	}
+
+	// used_protocol 필드 값에 HTTPS가 포함되어 있는지 확인하여 HTTPS 설정 자동화
+	device.HTTPS = strings.Contains(strings.ToUpper(device.UsedProtocol), "HTTPS")
+
+	logger.Infof("[Connect] Js-Proxy 조회 완료 - ID: %s, Name: %s, IP: %s, Vendor: %s, Model: %s, HTTPS: %t, UsedProtocol: %s",
+		device.ID, device.Name, device.IpmiIP, device.Vendor, device.Model, device.HTTPS, device.UsedProtocol)
 	
 	return device, nil
 }
@@ -654,14 +663,18 @@ func launchWeb(device Device) error {
 
 	// 초경량 웹 뷰어가 존재하면 자식 프로세스로 기동하여 계정 자동 완성 처리
 	if viewerPath != "" {
-		logger.Infof("[WEB] 초경량 Go 웹 뷰어 기동: %s (IP: %s)", viewerPath, device.IpmiIP)
-		cmd := exec.Command(
-			viewerPath,
-			"--url="+loginUrl,
-			"--user="+device.Username,
-			"--pass="+device.Password,
-			"--vendor="+device.Vendor,
-		)
+		logger.Infof("[WEB] 초경량 Go 웹 뷰어 기동: %s (IP: %s, URL: %s)", viewerPath, device.IpmiIP, loginUrl)
+		args := []string{
+			"--url=" + loginUrl,
+			"--user=" + device.Username,
+			"--pass=" + device.Password,
+			"--vendor=" + device.Vendor,
+		}
+		if debugMode {
+			args = append(args, "--debug")
+			logger.Infof("[WEB] [DEBUG] 디버그 옵션을 활성화하여 뷰어를 구동합니다. (인자: %v)", args)
+		}
+		cmd := exec.Command(viewerPath, args...)
 		return cmd.Start()
 	}
 

@@ -1,3 +1,7 @@
+param(
+    [switch]$debug
+)
+
 # IPMI Manager - Safe Auto-Versioning, Compilation, & Execution Script
 
 $VersionFile = "version.go"
@@ -95,4 +99,9 @@ Write-Host "  - Daemon: ipmi-daemon.exe" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Green
 
 # Execute the daemon in a new independent background window
-Start-Process -FilePath ".\ipmi-daemon.exe" -ArgumentList "-run"
+$ArgsList = @("-run")
+if ($debug) {
+    $ArgsList += "-debug"
+    Write-Host "Starting daemon in debug mode..." -ForegroundColor Cyan
+}
+Start-Process -FilePath ".\ipmi-daemon.exe" -ArgumentList $ArgsList

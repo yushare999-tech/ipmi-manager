@@ -12,16 +12,17 @@ import (
 
 // Device 장비 스펙 정의 (ipmi-config.json 및 Js-Proxy 연동 규격)
 type Device struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	IpmiIP   string `json:"ipmi_ip"`
-	Vendor   string `json:"vendor"`
-	Model    string `json:"model"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Note     string `json:"note"`
-	HTTPS    bool   `json:"https"`
-	Type     string `json:"type"` // 장비 제어 타입 (예: ipmi, ssh 등)
+	ID           string `json:"js_serial"`    // js_serial -> id
+	Name         string `json:"hostname"`     // hostname -> name
+	IpmiIP       string `json:"ip"`           // ip -> ipmi_ip
+	Vendor       string `json:"vendor"`
+	Model        string `json:"model"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	Note         string `json:"network_memo"` // network_memo -> note
+	HTTPS        bool   `json:"https"`
+	UsedProtocol string `json:"used_protocol"`
+	Type         string `json:"type"`         // 장비 제어 타입 (예: ipmi, ssh 등)
 }
 
 // Config 데이터 스펙
