@@ -1,6 +1,7 @@
 ﻿package main
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"log"
@@ -15,19 +16,154 @@ import (
 )
 
 var (
-	modUser32      = syscall.NewLazyDLL("user32.dll")
-	procShowWindow = modUser32.NewProc("ShowWindow")
-	procFindWindowW = modUser32.NewProc("FindWindowW")
+	modUser32            = syscall.NewLazyDLL("user32.dll")
+	modKernel32win       = syscall.NewLazyDLL("kernel32.dll")
+	procShowWindow       = modUser32.NewProc("ShowWindow")
+	procFindWindowW      = modUser32.NewProc("FindWindowW")
+	procSetForegroundWin = modUser32.NewProc("SetForegroundWindow")
+	procBringWindowToTop = modUser32.NewProc("BringWindowToTop")
+	procSetWindowPos     = modUser32.NewProc("SetWindowPos")
+	procGetCursorPos     = modUser32.NewProc("GetCursorPos")
+	procMonitorFromPoint = modUser32.NewProc("MonitorFromPoint")
+	procGetMonitorInfoW  = modUser32.NewProc("GetMonitorInfoW")
+	procCreateMutexW     = modKernel32win.NewProc("CreateMutexW")
 )
 
 const (
-	swHide            = 0
-	swShowMinimized   = 2
-	swShowNormal      = 1
+	swHide                  = 0
+	swShowMinimized         = 2
+	swShowNormal            = 1
+	swpNoSize               = 0x0001
+	swpNoMove               = 0x0002
+	swpShowWindow           = 0x0040
+	hwndTopmost             = ^uintptr(0)  // HWND_TOPMOST  = -1
+	hwndNoTopmost           = ^uintptr(1)  // HWND_NOTOPMOST = -2
+	monitorDefaultToNearest = 0x00000002
 )
 
+type winPOINT struct {
+	X, Y int32
+}
+
+type winRECT struct {
+	Left, Top, Right, Bottom int32
+}
+
+type winMONITORINFO struct {
+	CbSize    uint32
+	RcMonitor winRECT
+	RcWork    winRECT // work area excludes taskbar
+	DwFlags   uint32
+}
+
+
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.14"
+const Version = "1.5.15"
+
+// landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
+const landingPageHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IPMI Manager - Connecting</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:linear-gradient(135deg,#060d1f 0%,#0f1a2e 50%,#060d1f 100%);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100vh;overflow:hidden;color:#e2e8f0;
+  user-select:none;
+}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.logo-icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 0 18px rgba(56,189,248,0.35);
+}
+.logo-label{font-size:13px;font-weight:600;letter-spacing:3px;color:#64748b;text-transform:uppercase}
+h1{
+  font-size:22px;font-weight:700;margin:12px 0 4px;
+  background:linear-gradient(120deg,#38bdf8 30%,#818cf8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.sub{font-size:11px;color:#334155;letter-spacing:1px;margin-bottom:30px;text-transform:uppercase}
+.ip-chip{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#0f1d35;border:1px solid #1e3a5f;
+  border-radius:99px;padding:5px 16px;
+  font-size:12px;color:#7dd3fc;letter-spacing:0.5px;
+  margin-bottom:30px;font-family:monospace;
+}
+.dot{width:7px;height:7px;background:#22d3ee;border-radius:50%;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,238,.4)}50%{opacity:.5;box-shadow:0 0 0 5px rgba(34,211,238,0)}}
+.prog-wrap{width:260px}
+.prog-track{
+  height:4px;background:#0f1d35;border-radius:99px;overflow:hidden;
+  border:1px solid #1e3a5f;
+}
+.prog-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#38bdf8,#818cf8);
+  border-radius:99px;
+  transition:width 0.05s linear;
+  box-shadow:0 0 10px rgba(56,189,248,.6);
+}
+.prog-labels{display:flex;justify-content:space-between;margin-top:10px}
+.status-txt{font-size:10px;color:#334155;letter-spacing:.5px}
+.pct-txt{font-size:10px;color:#1e3a5f;font-family:monospace}
+.grid{
+  position:fixed;inset:0;
+  background-image:linear-gradient(rgba(56,189,248,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,.03) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<div class="logo-row">
+  <div class="logo-icon">??/div>
+  <div class="logo-label">IPMI Manager</div>
+</div>
+<h1>?쒕쾭 ?곌껐 以?/h1>
+<div class="sub">Secure Management Console</div>
+<div class="ip-chip">
+  <div class="dot"></div>
+  <span id="ip-text">Resolving host...</span>
+</div>
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-bar" id="bar"></div></div>
+  <div class="prog-labels">
+    <span class="status-txt" id="status">Initializing connection</span>
+    <span class="pct-txt" id="pct">0%%</span>
+  </div>
+</div>
+<script>
+(function(){
+  var target = window.__IPMI_TARGET__ || '';
+  var ip = target.replace(/https?:\/\//,'').split('/')[0].split('?')[0];
+  document.getElementById('ip-text').textContent = ip || 'Unknown';
+  var bar = document.getElementById('bar');
+  var statusEl = document.getElementById('status');
+  var pctEl = document.getElementById('pct');
+  var msgs = ['Initializing connection','Authenticating session','Loading console','Ready'];
+  var p = 0;
+  var iv = setInterval(function(){
+    p += 2;
+    bar.style.width = p + '%%';
+    pctEl.textContent = p + '%%';
+    if(p===25) statusEl.textContent = msgs[1];
+    if(p===60) statusEl.textContent = msgs[2];
+    if(p===90) statusEl.textContent = msgs[3];
+    if(p>=100){ clearInterval(iv); if(target) window.location.href = target; }
+  }, 25);
+})();
+</script>
+</body>
+</html>`
 
 func main() {
 	// Bypass SSL/TLS security warnings, self-signed certificate errors and allow legacy TLS 1.0/1.1
@@ -35,13 +171,54 @@ func main() {
 
 	// Parse CLI arguments
 	targetURL := flag.String("url", "", "IPMI Web Console URL")
-	username := flag.String("user", "", "IPMI Username")
-	password := flag.String("pass", "", "IPMI Password")
-	vendor := flag.String("vendor", "", "Hardware Vendor (dell, supermicro, hp, etc.)")
+	username  := flag.String("user", "", "IPMI Username")
+	password  := flag.String("pass", "", "IPMI Password")
+	vendor    := flag.String("vendor", "", "Hardware Vendor (dell, supermicro, hp, etc.)")
+	ipFlag    := flag.String("ip", "", "Device IP for deduplication")
 	debugMode := flag.Bool("debug", false, "Enable Edge DevTools (Inspect Element)")
 	minimized := flag.Bool("minimized", false, "Start window minimized to taskbar")
-	hidden := flag.Bool("hidden", false, "Start window completely hidden (no taskbar icon)")
+	hidden    := flag.Bool("hidden", false, "Start window completely hidden")
 	flag.Parse()
+
+	// Determine the IP key: prefer --ip flag, fallback to extracting from URL
+	deviceIP := *ipFlag
+	if deviceIP == "" && *targetURL != "" {
+		p, _ := url.Parse(*targetURL)
+		deviceIP = p.Hostname()
+	}
+
+	// ?? Duplicate Prevention ?????????????????????????????????????????????????
+	// Create a named Global mutex keyed by device IP.
+	// If the mutex already exists, an ipmi-viewer for this IP is already running:
+	// bring that window to the front and exit immediately.
+	winTitle := "IPMI Viewer - " + deviceIP
+	safeName := strings.ReplaceAll(deviceIP, ".", "-")
+	safeName  = strings.ReplaceAll(safeName, ":", "-")
+	mutexName, _ := syscall.UTF16PtrFromString("Global\\IPMI-Viewer-" + safeName)
+	hMutex, _, mutexErr := procCreateMutexW.Call(0, 1, uintptr(unsafe.Pointer(mutexName)))
+	if mutexErr == syscall.ERROR_ALREADY_EXISTS {
+		// An existing viewer for this IP is open ??activate it and quit
+		existingTitle, _ := syscall.UTF16PtrFromString(winTitle)
+		hwndExisting, _, _ := procFindWindowW.Call(0, uintptr(unsafe.Pointer(existingTitle)))
+		if hwndExisting != 0 {
+			procShowWindow.Call(hwndExisting, swShowNormal)
+			procSetWindowPos.Call(hwndExisting, hwndTopmost, 0, 0, 0, 0, swpNoSize|swpNoMove)
+			procSetForegroundWin.Call(hwndExisting)
+			procBringWindowToTop.Call(hwndExisting)
+			time.Sleep(100 * time.Millisecond)
+			procSetWindowPos.Call(hwndExisting, hwndNoTopmost, 0, 0, 0, 0, swpNoSize|swpNoMove)
+		}
+		// Close the duplicate handle and exit ??the original mutex holder stays open
+		if hMutex != 0 {
+			syscall.CloseHandle(syscall.Handle(hMutex))
+		}
+		return
+	}
+	// Hold the mutex for the lifetime of this viewer process
+	if hMutex != 0 {
+		defer syscall.CloseHandle(syscall.Handle(hMutex))
+	}
+	// ?????????????????????????????????????????????????????????????????????????
 
 	if *targetURL == "" {
 		log.Fatal("Error: --url parameter is required")
@@ -56,12 +233,12 @@ func main() {
 		*targetURL = "https://" + *targetURL
 	}
 
-	// Create WebView2 instance (1280x800, debug flag controls DevTools availability)
+	// Create WebView2 instance ??640횞480 default size
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:     *debugMode,
 		AutoFocus: true,
 		WindowOptions: webview2.WindowOptions{
-			Title: "IPMI Web Viewer v" + Version,
+			Title: winTitle, // unique per device IP
 		},
 	})
 	if w == nil {
@@ -69,30 +246,73 @@ func main() {
 	}
 	defer w.Destroy()
 
-	w.SetSize(1280, 800, webview2.HintNone)
+	w.SetSize(640, 480, webview2.HintNone)
 
-	// Apply window visibility state via Windows API
-	// go-webview2 does not expose HWND directly, so we find it by window title
-	if *hidden || *minimized {
-		go func() {
-			// Wait briefly for the window to be created before applying state
-			// Use a short polling approach since we can't hook into window creation
-			titlePtr, _ := syscall.UTF16PtrFromString("IPMI Web Viewer v" + Version)
-			for i := 0; i < 20; i++ {
-				hwnd, _, _ := procFindWindowW.Call(0, uintptr(unsafe.Pointer(titlePtr)))
-				if hwnd != 0 {
-					if *hidden {
-						procShowWindow.Call(hwnd, swHide)
-					} else if *minimized {
-						procShowWindow.Call(hwnd, swShowMinimized)
-					}
-					break
+	// Window state goroutine: find HWND after creation, center on active monitor, bring to front
+	go func() {
+		titlePtr, _ := syscall.UTF16PtrFromString(winTitle)
+		for i := 0; i < 40; i++ {
+			hwnd, _, _ := procFindWindowW.Call(0, uintptr(unsafe.Pointer(titlePtr)))
+			if hwnd != 0 {
+				if *hidden {
+					procShowWindow.Call(hwnd, swHide)
+				} else if *minimized {
+					procShowWindow.Call(hwnd, swShowMinimized)
+				} else {
+					// 1. Get current cursor position to detect active monitor
+					var pt winPOINT
+					procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
+
+					// 2. Get the monitor handle where the cursor is
+					hMon, _, _ := procMonitorFromPoint.Call(
+						uintptr(pt.X),
+						uintptr(pt.Y),
+						monitorDefaultToNearest,
+					)
+
+					// 3. Get monitor work area (excludes taskbar)
+					var mi winMONITORINFO
+					mi.CbSize = uint32(unsafe.Sizeof(mi))
+					procGetMonitorInfoW.Call(hMon, uintptr(unsafe.Pointer(&mi)))
+
+					// 4. Calculate center position on work area
+					const winW, winH = 640, 480
+					workW := mi.RcWork.Right - mi.RcWork.Left
+					workH := mi.RcWork.Bottom - mi.RcWork.Top
+					posX := mi.RcWork.Left + (workW-winW)/2
+					posY := mi.RcWork.Top + (workH-winH)/2
+
+					// 5. Move & resize window to center of active monitor
+					procShowWindow.Call(hwnd, swShowNormal)
+					procSetWindowPos.Call(
+						hwnd,
+						hwndTopmost,
+						uintptr(posX), uintptr(posY),
+						winW, winH,
+						swpShowWindow,
+					)
+
+					// 6. Bring to front, then restore normal Z-order
+					procSetForegroundWin.Call(hwnd)
+					procBringWindowToTop.Call(hwnd)
+					time.Sleep(100 * time.Millisecond)
+					procSetWindowPos.Call(hwnd, hwndNoTopmost, uintptr(posX), uintptr(posY), winW, winH, swpShowWindow)
 				}
-				// Sleep 50ms between attempts
-				time.Sleep(50 * time.Millisecond)
+				break
 			}
-		}()
-	}
+			time.Sleep(50 * time.Millisecond)
+
+		}
+	}()
+
+	// Escape credential values for safe JS embedding
+	escapedURL := strings.ReplaceAll(*targetURL, "'", "\\'")
+	escapedUser := strings.ReplaceAll(*username, "'", "\\'")
+	escapedPass := strings.ReplaceAll(*password, "'", "\\'")
+	escapedVendor := strings.ReplaceAll(*vendor, "'", "\\'")
+
+	// Inject global vars (used by landing page redirect + autologin on the IPMI page)
+	w.Init(fmt.Sprintf(`window.__IPMI_TARGET__='%s';`, escapedURL))
 
 	// Build JavaScript for auto-filling credentials and clicking login with console tracking
 	jsTemplate := `
@@ -208,15 +428,15 @@ func main() {
 	`
 
 	// Escape special characters and bind data
-	escapedUser := strings.ReplaceAll(*username, "'", "\\'")
-	escapedPass := strings.ReplaceAll(*password, "'", "\\'")
-	escapedVendor := strings.ReplaceAll(*vendor, "'", "\\'")
 	jsCode := fmt.Sprintf(jsTemplate, escapedUser, escapedPass, escapedVendor)
 
-	// Inject script to run on page load
+	// Inject autologin script (runs on every page load including the IPMI target page)
 	w.Init(jsCode)
 
-	// Navigate to target and run main loop
-	w.Navigate(*targetURL)
+	// Navigate to the landing page first (base64 encoded data URI ??no length limit issues)
+	landingB64 := base64.StdEncoding.EncodeToString([]byte(landingPageHTML))
+	w.Navigate("data:text/html;base64," + landingB64)
+
+	// Run main loop (landing page JS will redirect to targetURL after animation)
 	w.Run()
 }
