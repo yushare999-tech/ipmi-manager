@@ -198,6 +198,160 @@ function buildLoginUrl(device) {
 }
 
 // ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
+async function performInteractiveLogin(webContents, device, autoSubmit, log) {
+  const querySelectorAllAllHelper = `
+    function querySelectorAllAll(selector, doc) {
+      doc = doc || document;
+      var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+      var frames = doc.querySelectorAll('iframe, frame');
+      for (var i = 0; i < frames.length; i++) {
+        try {
+          var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+          if (frameDoc) {
+            elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+          }
+        } catch (e) {}
+      }
+      return elements;
+    }
+  `;
+
+  try {
+    const userSelectors = {
+      dell: `['#user', 'input[name="user"]', 'input[type="text"]']`,
+      hp: `['#username', 'input[name="username"]', 'input[autocomplete="username"]', 'input[type="text"]']`,
+      supermicro: `['input[name="name"]', 'input[name="username"]', 'input[type="text"]']`,
+      asus: `['input[type="text"]']`,
+      generic: `['input']`
+    };
+    const vendorKey = (device.vendor || 'generic').toLowerCase();
+    const selectors = userSelectors[vendorKey] || userSelectors.generic;
+
+    const focusUserScript = `
+      (function() {
+        ${querySelectorAllAllHelper}
+        var selectors = ${selectors};
+        var userEl = null;
+        for (var i = 0; i < selectors.length; i++) {
+          var elements = querySelectorAllAll(selectors[i]);
+          for (var j = 0; j < elements.length; j++) {
+            var el = elements[j];
+            if (selectors[i] === 'input') {
+              var t = (el.type || '').toLowerCase();
+              var n = (el.name || el.id || '').toLowerCase();
+              if ((t === 'text' || t === 'email') && (n.includes('user') || n.includes('name') || n.includes('login') || n.includes('id'))) {
+                userEl = el;
+                break;
+              }
+            } else {
+              userEl = el;
+              break;
+            }
+          }
+          if (userEl) break;
+        }
+        if (!userEl && selectors.includes('input')) {
+          userEl = querySelectorAllAll('input[type="text"]')[0];
+        }
+        if (userEl) {
+          userEl.focus();
+          return true;
+        }
+        return false;
+      })()
+    `;
+
+    const userFocused = await webContents.executeJavaScript(focusUserScript);
+    if (!userFocused) return false;
+
+    log('ID 입력 필드 포커싱 성공 → 타이핑 입력 시뮬레이션');
+    webContents.selectAll();
+    webContents.delete();
+    await webContents.insertText(device.username);
+
+    const passSelectors = {
+      dell: `['#password', 'input[name="password"]', 'input[type="password"]']`,
+      hp: `['#password', 'input[name="password"]', 'input[autocomplete="current-password"]', 'input[type="password"]']`,
+      supermicro: `['input[name="pwd"]', 'input[name="password"]', 'input[type="password"]']`,
+      asus: `['input[type="password"]']`,
+      generic: `['input[type="password"]']`
+    };
+    const pSelectors = passSelectors[vendorKey] || passSelectors.generic;
+
+    const focusPassScript = `
+      (function() {
+        ${querySelectorAllAllHelper}
+        var selectors = ${pSelectors};
+        var passEl = null;
+        for (var i = 0; i < selectors.length; i++) {
+          var elements = querySelectorAllAll(selectors[i]);
+          if (elements.length > 0) {
+            passEl = elements[0];
+            break;
+          }
+        }
+        if (passEl) {
+          passEl.focus();
+          return true;
+        }
+        return false;
+      })()
+    `;
+
+    const passFocused = await webContents.executeJavaScript(focusPassScript);
+    if (!passFocused) return false;
+
+    log('PW 입력 필드 포커싱 성공 → 타이핑 입력 시뮬레이션');
+    webContents.selectAll();
+    webContents.delete();
+    await webContents.insertText(device.password || '');
+
+    if (autoSubmit) {
+      log('자동 제출 처리');
+      const submitBtnSelectors = {
+        dell: `['button[type="submit"]', 'input[type="submit"]', '#btnOK', '.btn-primary']`,
+        hp: `['button[type="submit"]', '#btn-login', '.btn-primary', 'input[type="submit"]']`,
+        supermicro: `['input[type="submit"]', 'button[type="submit"]', '#login_word']`,
+        asus: `['input[type="submit"]', 'button[type="submit"]']`,
+        generic: `['button[type="submit"]', 'input[type="submit"]', '.btn-primary', '.login-btn']`
+      };
+      const bSelectors = submitBtnSelectors[vendorKey] || submitBtnSelectors.generic;
+
+      const clickSubmitScript = `
+        (function() {
+          ${querySelectorAllAllHelper}
+          var selectors = ${bSelectors};
+          var btn = null;
+          for (var i = 0; i < selectors.length; i++) {
+            var elements = querySelectorAllAll(selectors[i]);
+            if (elements.length > 0) {
+              btn = elements[0];
+              break;
+            }
+          }
+          if (btn) {
+            btn.focus();
+            btn.click();
+            return true;
+          }
+          return false;
+        })()
+      `;
+
+      const submitted = await webContents.executeJavaScript(clickSubmitScript);
+      if (!submitted) {
+        log('제출 버튼 클릭 실패 → Enter 키 직접 전송');
+        webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Enter' });
+        webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Enter' });
+      }
+    }
+    return true;
+  } catch (e) {
+    log(`인터랙티브 로그인 에러: ${e.message}`);
+    return false;
+  }
+}
+
 async function openIpmiWithAutoLogin(device) {
   const winId = `ipmi-${device.id}`;
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
@@ -228,7 +382,7 @@ async function openIpmiWithAutoLogin(device) {
   if (enableDevTools) win.webContents.openDevTools({ mode: 'detach' });
   win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
   win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
-  win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
+  win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; if (loginTimer) clearInterval(loginTimer); });
   kvmWindows[winId] = win;
 
   // Dell iDRAC REST API 직접 로그인 시도
@@ -250,44 +404,55 @@ async function openIpmiWithAutoLogin(device) {
 
   const loginUrl = buildLoginUrl(device);
   win.loadURL(loginUrl);
-  log(`loginUrl 로드 시작 (주입 방식): ${loginUrl}`);
+  log(`loginUrl 로드 시작 (인터랙티브 방식): ${loginUrl}`);
 
   let dashboardLoaded = false;
+  let loginDone = false;
+  let loginInProgress = false;
+  let loginTimer = null;
 
-  const injectLoginScript = () => {
-    if (dashboardLoaded) return;
+  const injectLoginScript = async () => {
+    if (win.isDestroyed()) return;
+    if (dashboardLoaded || loginDone) return;
+
     const currentUrl = win.webContents.getURL();
-    log(`[AutoLogin] URL 변경 감지: ${currentUrl}`);
+    log(`[AutoLogin] 상태 체크 - URL: ${currentUrl}`);
 
     const dashIndicators = ['index.html?st', 'dashboard', 'sys_summary', 'main.html', 'rfc3986'];
     const isDashboard = dashIndicators.some(kw => currentUrl.toLowerCase().includes(kw));
 
     if (isDashboard) {
       dashboardLoaded = true;
-      log('대시보드 감지! 1.5초 후 새로고침');
+      log('대시보드 진입 완료! 1.5초 후 새로고침');
+      if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
       setTimeout(() => { if (!win.isDestroyed()) win.webContents.reload(); }, 1500);
       return;
     }
 
-    if (device.username) {
-      log('로그인 스크립트 주입 시도');
-      const script = autoLoginScripts.getLoginScript(device.vendor, device.username, device.password || '', autoSubmit);
-      win.webContents.executeJavaScript(script)
-        .then(() => log('스크립트 주입 완료'))
-        .catch((e) => log(`스크립트 오류: ${e.message}`));
+    if (device.username && !loginInProgress) {
+      loginInProgress = true;
+      log('인터랙티브 로그인 시뮬레이션 시작');
+      const success = await performInteractiveLogin(win.webContents, device, autoSubmit, log);
+      if (success) {
+        log('인터랙티브 로그인 입력 완료.');
+        loginDone = true;
+        if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
+      } else {
+        loginInProgress = false;
+      }
     }
   };
 
+  loginTimer = setInterval(injectLoginScript, 800);
+
   win.webContents.on('did-finish-load',      injectLoginScript);
   win.webContents.on('did-navigate-in-page', injectLoginScript);
-  win.webContents.on('did-frame-finish-load', (event, isMainFrame) => { log(`did-frame-finish-load - isMainFrame: ${isMainFrame}`); injectLoginScript(); });
+  win.webContents.on('did-frame-finish-load', () => injectLoginScript());
   win.webContents.on('did-start-loading',    () => log('did-start-loading'));
   win.webContents.on('dom-ready',            () => log('dom-ready'));
   win.webContents.on('did-navigate',         (_, url) => { log(`did-navigate → ${url}`); injectLoginScript(); });
 }
 
-
-// KVM HTML5 자동 로그인 및 KVM 진입
 function openKvmWithAutoLogin(device) {
   const winId = device.id;
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
@@ -315,7 +480,6 @@ function openKvmWithAutoLogin(device) {
   });
 
   if (enableDevTools) kvmWin.webContents.openDevTools({ mode: 'detach' });
-
   kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
 
   if (!device.username) {
@@ -330,14 +494,18 @@ function openKvmWithAutoLogin(device) {
   const loginUrl = buildLoginUrl(device);
   const kvmUrl   = buildKvmUrl(device);
   let loginDone  = false;
+  let loginInProgress = false;
+  let loginTimer = null;
 
   log(`loginUrl 로드: ${loginUrl}`);
   kvmWin.loadURL(loginUrl);
 
-  const injectKvmLoginScript = () => {
+  const injectKvmLoginScript = async () => {
+    if (kvmWin.isDestroyed()) return;
     if (loginDone) return;
+
     const currentUrl = kvmWin.webContents.getURL();
-    log(`[AutoLogin KVM] URL 변경 감지: ${currentUrl}`);
+    log(`[AutoLogin KVM] 상태 체크 - URL: ${currentUrl}`);
 
     const isKvmConsole = currentUrl.toLowerCase().includes('console') 
                          || currentUrl.toLowerCase().includes('kvm')
@@ -346,6 +514,7 @@ function openKvmWithAutoLogin(device) {
     if (isKvmConsole) {
       log(`KVM 콘솔 화면 진입 완료`);
       loginDone = true;
+      if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
       return;
     }
 
@@ -355,36 +524,38 @@ function openKvmWithAutoLogin(device) {
                         || currentUrl === loginUrl + '/'
                         || (!currentUrl.toLowerCase().includes('console') && !currentUrl.toLowerCase().includes('kvm'));
 
-    if (isLoginPage && device.username) {
-      log('KVM 로그인 스크립트 주입');
-      const script = autoLoginScripts.getLoginScript(
-        device.vendor,
-        device.username,
-        device.password || '',
-        autoSubmit
-      );
-      kvmWin.webContents.executeJavaScript(script)
-        .then(() => log('스크립트 주입 완료'))
-        .catch((e) => log(`스크립트 오류: ${e.message}`));
-    } else {
+    if (isLoginPage && device.username && !loginInProgress) {
+      loginInProgress = true;
+      log('KVM 인터랙티브 로그인 시뮬레이션 시작');
+      const success = await performInteractiveLogin(kvmWin.webContents, device, autoSubmit, log);
+      if (success) {
+        log('KVM 인터랙티브 로그인 완료');
+        loginDone = true;
+        if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
+      } else {
+        loginInProgress = false;
+      }
+    } else if (!isLoginPage && !isKvmConsole && !loginInProgress) {
       log(`로그인 완료로 판단 (리다이렉션 발생). KVM URL로 이동: ${kvmUrl}`);
       loginDone = true;
+      if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
       setTimeout(() => { if (!kvmWin.isDestroyed()) kvmWin.loadURL(kvmUrl); }, 800);
     }
   };
 
+  loginTimer = setInterval(injectKvmLoginScript, 800);
+
   kvmWin.webContents.on('did-finish-load',      injectKvmLoginScript);
   kvmWin.webContents.on('did-navigate-in-page', injectKvmLoginScript);
-  kvmWin.webContents.on('did-frame-finish-load', (event, isMainFrame) => { log(`did-frame-finish-load - isMainFrame: ${isMainFrame}`); injectKvmLoginScript(); });
+  kvmWin.webContents.on('did-frame-finish-load', () => injectKvmLoginScript());
   kvmWin.webContents.on('did-start-loading',    () => log('did-start-loading'));
   kvmWin.webContents.on('dom-ready',            () => log('dom-ready'));
   kvmWin.webContents.on('did-navigate',         (_, url) => { log(`did-navigate → ${url}`); injectKvmLoginScript(); });
 
   kvmWin.once('ready-to-show', () => { log('ready-to-show → 창 표시'); kvmWin.show(); });
-  kvmWin.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
+  kvmWin.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; if (loginTimer) clearInterval(loginTimer); });
   kvmWindows[winId] = kvmWin;
 }
-
 ipcMain.handle('config:save', async (_, config) => {
   try {
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
