@@ -156,17 +156,38 @@ function openModal(device = null) {
   $('form-password').value = device?.password || '';
   $('form-note').value     = device?.note     || '';
   $('form-https').checked  = device?.https !== false;
+  
+  // 비밀번호 토글 상태 초기화 (항상 가림)
+  $('form-password').type = 'password';
+  $('btn-toggle-password').textContent = '👁️';
+
   $('device-modal').classList.remove('hidden');
 }
 
 function closeModal() {
   $('device-modal').classList.add('hidden');
   state.editingDeviceId = null;
+  
+  // 비밀번호 토글 상태 초기화 (항상 가림)
+  $('form-password').type = 'password';
+  $('btn-toggle-password').textContent = '👁️';
 }
 
 $('btn-add-device').addEventListener('click', () => openModal());
 $('modal-close').addEventListener('click', closeModal);
 $('btn-modal-cancel').addEventListener('click', closeModal);
+
+$('btn-toggle-password').addEventListener('click', () => {
+  const pwdInput = $('form-password');
+  const toggleBtn = $('btn-toggle-password');
+  if (pwdInput.type === 'password') {
+    pwdInput.type = 'text';
+    toggleBtn.textContent = '🙈';
+  } else {
+    pwdInput.type = 'password';
+    toggleBtn.textContent = '👁️';
+  }
+});
 
 $('btn-modal-save').addEventListener('click', async () => {
   const name = $('form-name').value.trim();

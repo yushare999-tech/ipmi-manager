@@ -176,33 +176,7 @@ function openKvmWindow(device) {
 // ─── 벤더별 KVM URL 빌더 ─────────────────────────────────────────
 function buildKvmUrl(device) {
   const proto = (device.https !== false) ? 'https' : 'http';
-  const base  = `${proto}://${device.ipmi_ip}`;
-  switch ((device.vendor || '').toLowerCase()) {
-    case 'dell':        return `${base}/console`;
-    case 'hp':
-    case 'hpe':         return `${base}/html5/kvm`;
-    case 'supermicro':  return `${base}/cgi/ipmi.cgi`;
-    case 'asus':
-    case 'asrock':      return `${base}/index.html`;
-    default:            return base;
-  }
-}
-
-// ─── 벤더별 IPMI 로그인 페이지 URL 빌더 ─────────────────────────
-function buildLoginUrl(device) {
-  const proto = (device.https !== false) ? 'https' : 'http';
-  const base  = `${proto}://${device.ipmi_ip}`;
-  switch ((device.vendor || '').toLowerCase()) {
-    case 'dell':        return `${base}/login.html`;
-    case 'hp':
-    case 'hpe':         return `${base}/ui/`;
-    case 'supermicro':  return `${base}/cgi/login.cgi`;
-    default:            return base;
-  }
-}
-
-// ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
-async function openIpmiWithAutoLogin(device) {
+  const base  = `${proto}://${device.ipmasync function openIpmiWithAutoLogin(device) {
   const winId = `ipmi-${device.id}`;
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
 
@@ -259,30 +233,36 @@ async function openIpmiWithAutoLogin(device) {
 
   let dashboardLoaded = false;
 
-  win.webContents.on('did-start-loading', () => log('did-start-loading'));
-  win.webContents.on('dom-ready',         () => log('dom-ready'));
-  win.webContents.on('did-finish-load',   () => {
+  const injectLoginScript = () => {
+    if (dashboardLoaded) return;
     const currentUrl = win.webContents.getURL();
-    log(`did-finish-load - currentUrl: ${currentUrl}`);
+    log(`[AutoLogin] URL 변경 감지: ${currentUrl}`);
 
-    const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
-    const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
-                        || currentUrl === loginUrl
-                        || currentUrl === loginUrl + '/';
+    // 대시보드 진입 감지 키워드
+    const dashIndicators = ['index.html?st', 'dashboard', 'sys_summary', 'main.html', 'rfc3986'];
+    const isDashboard = dashIndicators.some(kw => currentUrl.toLowerCase().includes(kw));
 
-    if (isLoginPage && device.username) {
-      log('→ 로그인 스크립트 주입');
+    if (isDashboard) {
+      dashboardLoaded = true;
+      log('→ 대시보드 감지! 1.5초 후 새로고침');
+      setTimeout(() => { if (!win.isDestroyed()) win.webContents.reload(); }, 1500);
+      return;
+    }
+
+    if (device.username) {
+      log('→ 로그인 스크립트 주입 시도');
       const script = autoLoginScripts.getLoginScript(device.vendor, device.username, device.password || '', autoSubmit);
       win.webContents.executeJavaScript(script)
         .then(() => log('→ 스크립트 주입 완료'))
         .catch((e) => log(`→ 스크립트 오류: ${e.message}`));
-    } else if (!isLoginPage && !dashboardLoaded) {
-      dashboardLoaded = true;
-      log('→ 대시보드 감지! 1.5초 후 새로고침');
-      setTimeout(() => { if (!win.isDestroyed()) win.webContents.reload(); }, 1500);
     }
-  });
-  win.webContents.on('did-navigate', (_, url) => log(`did-navigate → ${url}`));
+  };
+
+  win.webContents.on('did-finish-load',      injectLoginScript);
+  win.webContents.on('did-navigate-in-page', injectLoginScript); // SPA 페이지 내부 라우팅 대응
+  win.webContents.on('did-start-loading',    () => log('did-start-loading'));
+  win.webContents.on('dom-ready',            () => log('dom-ready'));
+  win.webContents.on('did-navigate',         (_, url) => { log(`did-navigate → ${url}`); injectLoginScript(); });
 }
 
 
@@ -328,6 +308,60 @@ function openKvmWithAutoLogin(device) {
   }
 
   // Step1: 로그인 페이지 먼저 로드 → 자동 로그인
+  const loginUrl = buildLoginUrl(device);
+  const kvmUrl   = buildKvmUrl(device);
+  let loginDone  = false;
+
+  log(`loginUrl 로드: ${loginUrl}`);
+  kvmWin.loadURL(loginUrl);
+
+  const injectKvmLoginScript = () => {
+    if (loginDone) return;
+    const currentUrl = kvmWin.webContents.getURL();
+    log(`[AutoLogin KVM] URL 변경 감지: ${currentUrl}`);
+
+    // KVM 화면(콘솔) 진입 조건 감지
+    const isKvmConsole = currentUrl.toLowerCase().includes('console') 
+                         || currentUrl.toLowerCase().includes('kvm')
+                         || currentUrl.toLowerCase().includes('viewer');
+
+    if (isKvmConsole) {
+      log(`→ KVM 콘솔 화면 진입 완료`);
+      loginDone = true;
+      return;
+    }
+
+    // 로그인 페이지 인디케이터
+    const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
+    const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
+                        || currentUrl === loginUrl
+                        || currentUrl === loginUrl + '/'
+                        || (!currentUrl.toLowerCase().includes('console') && !currentUrl.toLowerCase().includes('kvm'));
+
+    if (isLoginPage && device.username) {
+      log('→ KVM 로그인 스크립트 주입');
+      const script = autoLoginScripts.getLoginScript(
+        device.vendor,
+        device.username,
+        device.password || '',
+        autoSubmit
+      );
+      kvmWin.webContents.executeJavaScript(script)
+        .then(() => log('→ 스크립트 주입 완료'))
+        .catch((e) => log(`→ 스크립트 오류: ${e.message}`));
+    } else {
+      log(`→ 로그인 완료로 판단 (리다이렉션 발생). KVM URL로 이동: ${kvmUrl}`);
+      loginDone = true;
+      setTimeout(() => { if (!kvmWin.isDestroyed()) kvmWin.loadURL(kvmUrl); }, 800);
+    }
+  };
+
+  kvmWin.webContents.on('did-finish-load',      injectKvmLoginScript);
+  kvmWin.webContents.on('did-navigate-in-page', injectKvmLoginScript);
+  kvmWin.webContents.on('did-start-loading',    () => log('did-start-loading'));
+  kvmWin.webContents.on('dom-ready',            () => log('dom-ready'));
+  kvmWin.webContents.on('did-navigate',         (_, url) => { log(`did-navigate → ${url}`); injectKvmLoginScript(); });
+}�� 자동 로그인
   const loginUrl = buildLoginUrl(device);
   const kvmUrl   = buildKvmUrl(device);
   let loginDone  = false;
