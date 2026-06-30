@@ -40,12 +40,49 @@ type RulesConfig struct {
 
 var rulesConfigPath string
 
-func init() {
+// FindConfigFile은 SYSTEM(서비스) 계정 등에서 실행 중일 때 실제 윈도우 사용자의 AppData 폴더를 스캔하여 설정 파일을 찾는 지능형 폴백 함수입니다.
+func FindConfigFile(filename string) string {
+	// 1. 기본 환경변수 경로 우선 확인
 	appData := os.Getenv("APPDATA")
+	if appData != "" {
+		p := filepath.Join(appData, "ipmi-manager", filename)
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+
+	// 2. 서비스 모드(SYSTEM 계정) 등으로 인해 기본 경로에 없을 시, C:\Users 하위 사용자 폴더 스캔 폴백
+	usersDir := "C:\\Users"
+	files, err := ioutil.ReadDir(usersDir)
+	if err != nil {
+		return ""
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		// 시스템 기본 폴더 및 서비스 임시 계정 스킵
+		name := strings.ToLower(file.Name())
+		if name == "public" || name == "default" || name == "default user" || name == "all users" || name == "systemprofile" {
+			continue
+		}
+
+		targetPath := filepath.Join(usersDir, file.Name(), "AppData", "Roaming", "ipmi-manager", filename)
+		if _, err := os.Stat(targetPath); err == nil {
+			return targetPath
+		}
+	}
+
+	// 3. 찾을 수 없는 경우 기본 경로 제공 (신규 생성 용도)
 	if appData == "" {
 		appData = "."
 	}
-	rulesConfigPath = filepath.Join(appData, "ipmi-manager", "rules-config.json")
+	return filepath.Join(appData, "ipmi-manager", filename)
+}
+
+func init() {
+	rulesConfigPath = FindConfigFile("rules-config.json")
 }
 
 // GetDefaultProfiles 기본 실행 프로필 생성 (Node 버전 기본 탑재 사양 적용)

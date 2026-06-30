@@ -97,12 +97,8 @@ func main() {
 // readConfig Electron AppData 경로에 있는 ipmi-config.json 로드
 func readConfig() (AppConfig, error) {
 	var config AppConfig
-	appData := os.Getenv("APPDATA")
-	if appData == "" {
-		return config, fmt.Errorf("APPDATA environment variable not found")
-	}
-
-	configPath := filepath.Join(appData, "ipmi-manager", "ipmi-config.json")
+	configPath := FindConfigFile("ipmi-config.json")
+	
 	file, err := os.Open(configPath)
 	if err != nil {
 		return config, err
