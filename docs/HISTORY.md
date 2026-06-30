@@ -56,6 +56,17 @@ docs/
 
 ---
 
+### [v1.3.2] 2026-06-30 — SSL 접속 실패 시 HTTP 자동 폴백 구현 및 Supermicro X9 검증
+- **작업자**: 삼식이 (AI) + kuri
+- **내용**:
+  - Supermicro X9 세대 (`10.96.19.35`) 장비의 Java KVM 다운로드 및 실행 흐름 성공적 검증 완료
+  - 구형 SSL/TLS 규격을 사용하는 레거시 장비 접속 시 `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` 에러로 인한 Electron 블랙아웃 현상 식별
+  - `main.js`의 `openIpmiWithAutoLogin` 및 `openKvmWithAutoLogin`에 `did-fail-load` 핸들러 추가
+  - SSL 연결 실패 코드 감지 시 자동으로 `https` -> `http`로 치환하여 재접속하는 스마트 폴백(Fallback) 로직 적용
+- **상태**: ✅ 완료
+
+---
+
 ### [v1.3.1] 2026-06-30 — Dell R630 iDRAC 8 로그인 무한 루프 버그 수정
 - **작업자**: 삼식이 (AI) + kuri
 - **내용**:

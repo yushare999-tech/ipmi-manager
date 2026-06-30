@@ -58,6 +58,10 @@ ipmi-manager/
 
 ## 변경 이력
 
+### v1.3.2 (2026-06-30)
+- **구형 장비의 SSL 접속 실패 시 HTTP 자동 폴백(Fallback) 기능 추가**: `ERR_SSL_VERSION_OR_CIPHER_MISMATCH` 등 최신 크롬 엔진이 거부하는 구형 SSL/TLS 규격 탐지 시 자동으로 `http://`로 재접속 처리.
+- **Supermicro X9 세대 KVM 실행 검증**: `10.96.19.35` 장비의 로그인 및 가상 콘솔(JNLP) 실행 프로세스 완료.
+
 ### v1.3.1 (2026-06-30)
 - **Dell R630 (iDRAC 8) 자동 로그인 시 무한 로그인-로그아웃 루프가 발생하는 버그 수정**: REST API 토큰(`ST1`, `ST2`)으로 대시보드 진입 시 자동 새로고침을 생략하도록 `login-preload.js` 개선.
 
