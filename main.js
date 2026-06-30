@@ -217,14 +217,41 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
   `;
 
   try {
-    // 0. 웹 콘텐츠 자체에 포커스를 주어 키보드 입력이 가능하게 활성화
+    // 0. 웹 콘텐츠 자체에 포커스
     webContents.focus();
+
+    // [디버그 로그 보강] 현재 로드된 페이지의 모든 Form 및 Input 태그 정보 수집
+    const diagScript = `
+      (function() {
+        ${querySelectorAllAllHelper}
+        var inputs = querySelectorAllAll('input');
+        var info = inputs.map(function(el) {
+          return {
+            id: el.id,
+            name: el.name,
+            type: el.type,
+            visible: el.offsetWidth > 0 && el.offsetHeight > 0,
+            placeholder: el.placeholder
+          };
+        });
+        var forms = querySelectorAllAll('form').map(function(f) {
+          return { id: f.id, name: f.name, action: f.action };
+        });
+        return { inputs: info, forms: forms, url: window.location.href };
+      })()
+    `;
+    
+    const pageDiag = await webContents.executeJavaScript(diagScript).catch(() => null);
+    if (pageDiag) {
+      log(`[디버그][DOM 진단] URL: ${pageDiag.url}`);
+      log(`[디버그][DOM 진단] 발견된 Form: ${JSON.stringify(pageDiag.forms)}`);
+      log(`[디버그][DOM 진단] 발견된 Input: ${JSON.stringify(pageDiag.inputs)}`);
+    }
 
     const userSelectors = {
       dell: `['#user', 'input[name="user"]', 'input[type="text"]']`,
       hp: `['#username', 'input[name="username"]', 'input[autocomplete="username"]', 'input[type="text"]']`,
       supermicro: `['input[name="name"]', 'input[name="username"]', 'input[type="text"]']`,
-      asus: `['input[type="text"]']`,
       generic: `['input']`
     };
     const vendorKey = (device.vendor || 'generic').toLowerCase();
@@ -236,6 +263,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
         ${querySelectorAllAllHelper}
         var selectors = ${selectors};
         var userEl = null;
+        var matchedSelector = '';
         for (var i = 0; i < selectors.length; i++) {
           var elements = querySelectorAllAll(selectors[i]);
           for (var j = 0; j < elements.length; j++) {
@@ -245,10 +273,12 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
               var n = (el.name || el.id || '').toLowerCase();
               if ((t === 'text' || t === 'email') && (n.includes('user') || n.includes('name') || n.includes('login') || n.includes('id'))) {
                 userEl = el;
+                matchedSelector = 'input[text/email & keyword]';
                 break;
               }
             } else {
               userEl = el;
+              matchedSelector = selectors[i];
               break;
             }
           }
@@ -256,6 +286,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
         }
         if (!userEl && selectors.includes('input')) {
           userEl = querySelectorAllAll('input[type="text"]')[0];
+          matchedSelector = 'fallback input[type="text"]';
         }
         if (userEl) {
           userEl.focus();
@@ -274,16 +305,19 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
           // 가상 키보드 이벤트 디스패치로 암호화 리스너 강제 발화 유도
           userEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
           userEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          return true;
+          return { success: true, selector: matchedSelector, id: userEl.id, name: userEl.name };
         }
-        return false;
+        return { success: false };
       })()
     `;
 
-    const userFocused = await webContents.executeJavaScript(focusUserScript);
-    if (!userFocused) return false;
+    const userResult = await webContents.executeJavaScript(focusUserScript);
+    if (!userResult || !userResult.success) {
+      log(`[디버그] ID 입력 필드 매칭 실패 (검색 셀렉터: ${selectors})`);
+      return false;
+    }
 
-    log('ID 입력 필드 포커싱 및 1차 값 주입 완료');
+    log(`[디버그] ID 매칭 성공! 셀렉터: "${userResult.selector}" (ID: "${userResult.id}", Name: "${userResult.name}")`);
     // 브라우저 포커스 정착을 위한 미세 대기
     await new Promise(r => setTimeout(r, 80));
     
@@ -296,7 +330,6 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
       dell: `['#password', 'input[name="password"]', 'input[type="password"]']`,
       hp: `['#password', 'input[name="password"]', 'input[autocomplete="current-password"]', 'input[type="password"]']`,
       supermicro: `['input[name="pwd"]', 'input[name="password"]', 'input[type="password"]']`,
-      asus: `['input[type="password"]']`,
       generic: `['input[type="password"]']`
     };
     const pSelectors = passSelectors[vendorKey] || passSelectors.generic;
@@ -307,10 +340,12 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
         ${querySelectorAllAllHelper}
         var selectors = ${pSelectors};
         var passEl = null;
+        var matchedSelector = '';
         for (var i = 0; i < selectors.length; i++) {
           var elements = querySelectorAllAll(selectors[i]);
           if (elements.length > 0) {
             passEl = elements[0];
+            matchedSelector = selectors[i];
             break;
           }
         }
@@ -330,16 +365,19 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
           passEl.dispatchEvent(new Event('change', { bubbles: true }));
           passEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
           passEl.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter', keyCode: 13 }));
-          return true;
+          return { success: true, selector: matchedSelector, id: passEl.id, name: passEl.name };
         }
-        return false;
+        return { success: false };
       })()
     `;
 
-    const passFocused = await webContents.executeJavaScript(focusPassScript);
-    if (!passFocused) return false;
+    const passResult = await webContents.executeJavaScript(focusPassScript);
+    if (!passResult || !passResult.success) {
+      log(`[디버그] PW 입력 필드 매칭 실패 (검색 셀렉터: ${pSelectors})`);
+      return false;
+    }
 
-    log('PW 입력 필드 포커싱 및 1차 값 주입 완료');
+    log(`[디버그] PW 매칭 성공! 셀렉터: "${passResult.selector}" (ID: "${passResult.id}", Name: "${passResult.name}")`);
     await new Promise(r => setTimeout(r, 80));
     
     // 4. 물리적 입력 시뮬레이션 적용
@@ -349,12 +387,10 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
 
     // 5. 자동 제출 처리
     if (autoSubmit) {
-      log('자동 제출 처리');
       const submitBtnSelectors = {
         dell: `['button[type="submit"]', 'input[type="submit"]', '#btnOK', '.btn-primary']`,
         hp: `['button[type="submit"]', '#btn-login', '.btn-primary', 'input[type="submit"]']`,
         supermicro: `['input[type="submit"]', 'button[type="submit"]', '#login_word']`,
-        asus: `['input[type="submit"]', 'button[type="submit"]']`,
         generic: `['button[type="submit"]', 'input[type="submit"]', '.btn-primary', '.login-btn']`
       };
       const bSelectors = submitBtnSelectors[vendorKey] || submitBtnSelectors.generic;
@@ -364,47 +400,51 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
           ${querySelectorAllAllHelper}
           var selectors = ${bSelectors};
           var btn = null;
+          var matchedSelector = '';
           for (var i = 0; i < selectors.length; i++) {
             var elements = querySelectorAllAll(selectors[i]);
             if (elements.length > 0) {
               btn = elements[0];
+              matchedSelector = selectors[i];
               break;
             }
           }
           if (btn) {
             btn.focus();
             btn.click();
+            var subMethod = 'click';
             if ('${vendorKey}' === 'dell') {
               var elWin = btn.ownerDocument.defaultView || window;
               if (elWin && typeof elWin.frmSubmit === 'function') {
                 elWin.frmSubmit();
-                return true;
+                subMethod = 'frmSubmit()';
               }
             }
-            return true;
+            return { success: true, selector: matchedSelector, method: subMethod };
           }
           if ('${vendorKey}' === 'dell' && typeof window.frmSubmit === 'function') {
             window.frmSubmit();
-            return true;
+            return { success: true, selector: 'global window.frmSubmit', method: 'frmSubmit()' };
           }
-          return false;
+          return { success: false };
         })()
       `;
 
-      const submitted = await webContents.executeJavaScript(clickSubmitScript);
-      if (!submitted) {
-        log('제출 버튼 클릭 실패 → Enter 키 직접 전송');
+      const submittedResult = await webContents.executeJavaScript(clickSubmitScript);
+      if (submittedResult && submittedResult.success) {
+        log(`[디버그] 제출 매칭 성공! 셀렉터: "${submittedResult.selector}", 실행 방식: "${submittedResult.method}"`);
+      } else {
+        log(`[디버그] 제출 버튼 클릭 실패 → Enter 키 직접 전송`);
         webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Enter' });
         webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Enter' });
       }
     }
     return true;
   } catch (e) {
-    log(`인터랙티브 로그인 에러: ${e.message}`);
+    log(`[디버그] 인터랙티브 로그인 에러: ${e.message}`);
     return false;
   }
 }
-
 async function openIpmiWithAutoLogin(device) {
   const winId = `ipmi-${device.id}`;
   if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
