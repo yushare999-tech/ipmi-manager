@@ -350,6 +350,10 @@ function applyLegacyJavaConfig() {
     'deployment.security.TLSv1': 'true',                   // TLS 1.0 허용
     'deployment.security.TLSv1.1': 'true',                 // TLS 1.1 허용
     'deployment.security.SSLv2Hello': 'true',              // SSL v2 Hello 허용
+    'deployment.security.jsse.hostmismatch': 'true',       // 호스트 이름 불일치 경고 무시 (IP 접속 대응)
+    'deployment.security.validation.ocsp': 'false',        // OCSP 검증 비활성화 (오프라인/사설망 속도 향상)
+    'deployment.security.validation.crl': 'false',         // CRL 검증 비활성화
+    'deployment.security.revocation.check': 'NO_CHECK',    // 인증서 만료/서명 유효성 검사 경고창 소멸 핵심 설정
   };
 
   for (const [key, val] of Object.entries(settings)) {
