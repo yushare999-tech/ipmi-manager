@@ -1,0 +1,1136 @@
+/**
+ * IPMI Manager - Electron 메인 프로세스
+ * 작성일: 2026-06-25
+ * 변경이력:
+ *   - 2026-06-25: 최초 작성 (SSL 우회, KVM 창 열기, Java IPC 통합)
+ *   - 2026-06-25: IPMI 자동 로그인 기능 추가 (벤더별 폼 자동 주입)
+ *   - 2026-06-26: Dev 모드 DevTools 자동 오픈 + 타이밍 로그 추가 (검수용)
+ *   - 2026-06-26: 대시보드 감지 후 자동 reload + iDRAC ST1/ST2 토큰 JNLP 개선
+ */
+
+const { app, BrowserWindow, ipcMain, shell, dialog, session } = require('electron');
+const path    = require('path');
+const https   = require('https');
+const http    = require('http');
+const { spawn, exec } = require('child_process');
+const fs      = require('fs');
+const javaManager      = require('./vendors/java-manager');
+const autoLoginScripts = require('./vendors/auto-login-scripts');
+
+// ─── Chromium SSL/TLS 보안 완화 설정 (구형 iDRAC 6/7 및 레거시 IPMI 장비 대응) ───
+app.commandLine.appendSwitch('ignore-certificate-errors', 'true');
+app.commandLine.appendSwitch('ignore-ssl-errors', 'true');
+app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
+app.commandLine.appendSwitch('disable-web-security', 'true');
+app.commandLine.appendSwitch('ssl-version-min', 'tls1');
+app.commandLine.appendSwitch('ssl-version-fallback-min', 'tls1');
+app.commandLine.appendSwitch('min-tls-version', 'tls1');
+app.commandLine.appendSwitch('openssl-legacy-provider');
+app.commandLine.appendSwitch('cipher-suite-blacklist', 'none'); // 모든 암호화 스위트 차단 해제
+
+const logPath = path.join(__dirname, 'ikvm_error.log');
+
+// 로그 파일에 타임스탬프와 함께 기록하는 헬퍼 함수
+function logToErrorFile(message) {
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync(logPath, `[${timestamp}] ${message}\n`, 'utf8');
+  console.log(`[LOG] ${message}`);
+}
+
+// ─── iDRAC REST API 직접 로그인 (ST1/ST2 토큰 획득) ────────────────
+// POST /data/login → XML 또는 JSON 응답으로 ST1/ST2 토큰 반환
+function idracLogin(device) {
+  return new Promise((resolve, reject) => {
+    const postData = `user=${encodeURIComponent(device.username)}&password=${encodeURIComponent(device.password || '')}`;
+    const options = {
+      hostname: device.ipmi_ip,
+      port: 443,
+      path: '/data/login',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData),
+      },
+      rejectUnauthorized: false,
+      // 구형 iDRAC 6/7 SSL/TLS 규격 호환을 위한 보안 강도 최하향 설정
+      ciphers: 'DEFAULT:@SECLEVEL=0',
+      minVersion: 'TLSv1',
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          let authResult = -1;
+          let tokenString = '';  // "ST1=xxx,ST2=yyy" 형태
+
+          const trimmed = data.trim();
+
+          if (trimmed.startsWith('<?xml') || trimmed.startsWith('<root>')) {
+            // ─── XML 응답 (iDRAC 6/7/8) ───────────────────────────
+            const authMatch    = trimmed.match(/<authResult>(\d+)<\/authResult>/);
+            const forwardMatch = trimmed.match(/ST1=([a-f0-9]+),ST2=([a-f0-9]+)/i);
+
+            authResult  = authMatch    ? parseInt(authMatch[1])    : -1;
+            tokenString = forwardMatch ? `ST1=${forwardMatch[1]},ST2=${forwardMatch[2]}` : '';
+
+            console.log(`[iDRAC] XML 파싱 - authResult:${authResult}, token:${tokenString ? '획득' : '없음'}`);
+          } else {
+            // ─── JSON 응답 (iDRAC 9+) ─────────────────────────────
+            const json = JSON.parse(trimmed);
+            authResult = json.authResult ?? json.status ?? -1;
+            if (json.ST1) tokenString = `ST1=${json.ST1}${json.ST2 ? `,ST2=${json.ST2}` : ''}`;
+
+            console.log(`[iDRAC] JSON 파싱 - authResult:${authResult}, token:${tokenString ? '획득' : '없음'}`);
+          }
+
+          if (authResult === 0 && tokenString) {
+            const [st1Part, st2Part] = tokenString.split(',');
+            const st1 = st1Part?.replace('ST1=', '') || '';
+            const st2 = st2Part?.replace('ST2=', '') || '';
+            resolve({ success: true, st1, st2, tokenString });
+          } else if (authResult === 0) {
+            resolve({ success: true, st1: '', st2: '', tokenString: '' });
+          } else {
+            resolve({ success: false, error: `인증 실패 (authResult:${authResult})` });
+          }
+        } catch (e) {
+          reject(new Error(`iDRAC 응답 파싱 실패: ${e.message}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('iDRAC 로그인 타임아웃')); });
+    req.write(postData);
+    req.end();
+  });
+}
+
+// 설정 파일 경로
+const CONFIG_PATH = path.join(app.getPath('userData'), 'ipmi-config.json');
+
+function readConfig() {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) {
+      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    }
+  } catch (e) {
+    console.error('[Config] 로드 실패:', e);
+  }
+  return {};
+}
+
+// Dev 모드 여부 (npm run dev 시 --dev 플래그)
+const isDev = process.argv.includes('--dev');
+
+let mainWindow;
+let kvmWindows = {};
+
+// ─── 메인 창 생성 ────────────────────────────────────────────────
+function createMainWindow() {
+  console.log(`============================================`);
+  console.log(`  IPMI Manager v${app.getVersion()} Starting...`);
+  console.log(`============================================`);
+
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    minWidth: 960,
+    minHeight: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: false,
+    },
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
+    show: false,
+    backgroundColor: '#0f1117',
+    titleBarStyle: 'default',
+  });
+
+  mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  mainWindow.once('ready-to-show', () => mainWindow.show());
+  mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+// ─── KVM 창 열기 (HTML5 내장 브라우저) ───────────────────────────
+function openKvmWindow(device) {
+  const winId = device.id;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const kvmWin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    title: `KVM - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+    },
+    show: false,
+  });
+
+  // 인증서 오류 무시
+  kvmWin.webContents.on('certificate-error', (event) => {
+    event.preventDefault();
+    // callback(true) 대신 이벤트 기본 동작 막기
+  });
+  // certificate-error에서 콜백 방식으로 처리
+  kvmWin.webContents.session.setCertificateVerifyProc((request, callback) => {
+    callback(0); // 0 = 인증서 오류 무시
+  });
+
+  // HTTP Basic / Digest 인증(401) 대응
+  kvmWin.webContents.on('login', (event, details, authInfo, callback) => {
+    event.preventDefault();
+    if (device.username) {
+      callback(device.username, device.password || '');
+    } else {
+      callback();
+    }
+  });
+
+  kvmWin.loadURL(buildKvmUrl(device));
+  kvmWin.once('ready-to-show', () => kvmWin.show());
+  kvmWin.on('closed', () => delete kvmWindows[winId]);
+  kvmWin.$device = device;
+  kvmWindows[winId] = kvmWin;
+}
+
+// ─── 벤더별 KVM URL 빌더 ─────────────────────────────────────────
+function buildKvmUrl(device) {
+  const proto = (device.https !== false) ? 'https' : 'http';
+  const base  = `${proto}://${device.ipmi_ip}`;
+  switch ((device.vendor || '').toLowerCase()) {
+    case 'dell':        return `${base}/console`;
+    case 'hp':
+    case 'hpe':         return `${base}/html5/kvm`;
+    case 'supermicro':  return `${base}/cgi/ipmi.cgi`;
+    case 'asus':
+    case 'asrock':      return `${base}/index.html`;
+    default:            return base;
+  }
+}
+
+// ─── 벤더별 IPMI 로그인 페이지 URL 빌더 ─────────────────────────
+function buildLoginUrl(device) {
+  const proto = (device.https !== false) ? 'https' : 'http';
+  const base  = `${proto}://${device.ipmi_ip}`;
+  switch ((device.vendor || '').toLowerCase()) {
+    case 'dell':        return `${base}/login.html`;
+    case 'hp':
+    case 'hpe':         return `${base}/ui/`;
+    case 'supermicro':  return `${base}/cgi/login.cgi`;
+    default:            return base;
+  }
+}
+
+// ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
+async function openIpmiWithAutoLogin(device) {
+  const winId = `ipmi-${device.id}`;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0  = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][IPMI][${Date.now()-t0}ms] ${msg}`);
+  const proto = device.https !== false ? 'https' : 'http';
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
+
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    title: `IPMI - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+      preload: path.join(__dirname, 'login-preload.js') // 전용 프리로드 연결
+    },
+    show: false,
+  });
+
+  // 장비 로그인 정보를 윈도우 인스턴스에 직접 바인딩 (프리로드 연동용)
+  win.$device = device;
+  win.$autoSubmit = autoSubmit;
+
+  if (enableDevTools) win.webContents.openDevTools({ mode: 'detach' });
+  win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+  win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
+  win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
+  kvmWindows[winId] = win;
+
+  // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
+  const handleIpmiLoadFailure = (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    if (isMainFrame !== false) {
+      const targetUrl = validatedURL || win.webContents.getURL();
+      if (targetUrl.startsWith('https://')) {
+        const httpUrl = targetUrl.replace('https://', 'http://');
+        log(`[로딩 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
+        win.loadURL(httpUrl);
+      }
+    }
+  };
+  win.webContents.on('did-fail-load', handleIpmiLoadFailure);
+  win.webContents.on('did-fail-provisional-load', handleIpmiLoadFailure);
+
+  // Dell iDRAC REST API 직접 로그인 시도
+  const isIdrac7 = (device.version || '').toLowerCase().includes('idrac7') || 
+                   (device.model || '').toLowerCase().includes('r620') ||
+                   (device.version || '').startsWith('1.'); // iDRAC 7 이하 대역 판별
+
+  if (device.username && (device.vendor || '').toLowerCase() === 'dell' && !isIdrac7) {
+    log('Dell iDRAC REST API 로그인 시도');
+    try {
+      const loginResult = await idracLogin(device);
+      if (loginResult.success && loginResult.tokenString) {
+        const dashUrl = `https://${device.ipmi_ip}/index.html?${loginResult.tokenString}`;
+        log(`REST 로그인 성공! 대시보드로 직접 오픈 예정: ${dashUrl}`);
+        win.loadURL(dashUrl);
+        return;
+      }
+      log(`REST 로그인 실패 (${loginResult.error}), 일반 주입 방식으로 폴백`);
+    } catch (e) {
+      log(`REST 로그인 예외: ${e.message}, 일반 주입 방식으로 폴백`);
+    }
+  }
+
+  const loginUrl = buildLoginUrl(device);
+  win.loadURL(loginUrl);
+  log(`loginUrl 로드 시작 (프리로드 자동화): ${loginUrl}`);
+}
+
+function openKvmWithAutoLogin(device) {
+  const winId = device.id;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0 = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][KVM][${Date.now()-t0}ms] ${msg}`);
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
+
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
+  const kvmWin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    title: `KVM - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+      preload: path.join(__dirname, 'login-preload.js') // 전용 프리로드 연결
+    },
+    show: false,
+  });
+
+  // 장비 로그인 정보를 윈도우 인스턴스에 직접 바인딩 (프리로드 연동용)
+  kvmWin.$device = device;
+  kvmWin.$autoSubmit = autoSubmit;
+
+  if (enableDevTools) kvmWin.webContents.openDevTools({ mode: 'detach' });
+  kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+
+  if (!device.username) {
+    log('계정 정보 없음 → 바로 KVM 오픈');
+    kvmWin.loadURL(buildKvmUrl(device));
+    kvmWin.once('ready-to-show', () => kvmWin.show());
+    kvmWin.on('closed', () => delete kvmWindows[winId]);
+    kvmWindows[winId] = kvmWin;
+    return;
+  }
+
+  const loginUrl = buildLoginUrl(device);
+  log(`loginUrl 로드 (프리로드 자동화): ${loginUrl}`);
+  kvmWin.loadURL(loginUrl);
+
+  // HTTP Basic / Digest 인증(401) 대응
+  kvmWin.webContents.on('login', (event, details, authInfo, callback) => {
+    event.preventDefault();
+    log(`[HTTP Auth] KVM 401 인증 감지 -> 자동 주입: ${device.username}`);
+    callback(device.username, device.password || '');
+  });
+
+  kvmWin.once('ready-to-show', () => { log('ready-to-show → 창 표시'); kvmWin.show(); });
+  kvmWin.on('closed', () => {
+    log('창 닫힘');
+    delete kvmWindows[winId];
+    // CLI 기동 모드(메인 대시보드 없음)인 경우, 뷰어가 닫히면 앱 자동 종료
+    if (!mainWindow && Object.keys(kvmWindows).length === 0) {
+      app.quit();
+    }
+  });
+  kvmWindows[winId] = kvmWin;
+}
+
+function openKvmWindow(device) {
+  const winId = device.id;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const kvmWin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    title: `KVM - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+    },
+    show: false,
+  });
+
+  // 인증서 오류 무시
+  kvmWin.webContents.on('certificate-error', (event) => {
+    event.preventDefault();
+    // callback(true) 대신 이벤트 기본 동작 막기
+  });
+  // certificate-error에서 콜백 방식으로 처리
+  kvmWin.webContents.session.setCertificateVerifyProc((request, callback) => {
+    callback(0); // 0 = 인증서 오류 무시
+  });
+
+  kvmWin.loadURL(buildKvmUrl(device));
+  kvmWin.once('ready-to-show', () => kvmWin.show());
+  kvmWin.on('closed', () => delete kvmWindows[winId]);
+  kvmWin.$device = device;
+  kvmWindows[winId] = kvmWin;
+}
+
+// ─── HP iLO 세대 판별 헬퍼 ──────────────────────────────────────
+function getIloGeneration(device) {
+  const model = (device.model || '').toLowerCase();
+  const version = (device.version || '').toLowerCase();
+  
+  if (model.includes('ilo5') || version.includes('ilo5') || model.includes('gen10') || version.startsWith('2.7') || version.startsWith('2.8')) {
+    return 5;
+  }
+  if (model.includes('ilo4') || version.includes('ilo4') || model.includes('gen9') || model.includes('gen8') || version.startsWith('2.')) {
+    return 4;
+  }
+  if (model.includes('ilo3') || version.includes('ilo3') || version.startsWith('1.')) {
+    return 3;
+  }
+  
+  const match = model.match(/ilo\s*(\d+)/);
+  if (match) return parseInt(match[1]);
+  
+  return 4; // 기본 권장값 (iLO 4)
+}
+
+// ─── Dell iDRAC 9 세대 판별 헬퍼 ──────────────────────────────────
+function isIdrac9(device) {
+  const model = (device.model || '').toLowerCase();
+  const version = (device.version || '').toLowerCase();
+  
+  return model.includes('r640') || model.includes('r740') || model.includes('r440') || 
+         model.includes('r540') || model.includes('idrac9') || version.includes('idrac9') ||
+         version.startsWith('3.') || version.startsWith('4.') || version.startsWith('5.');
+}
+
+// ─── 벤더별 KVM URL 빌더 ─────────────────────────────────────────
+function buildKvmUrl(device) {
+  const proto = (device.https !== false) ? 'https' : 'http';
+  const base  = `${proto}://${device.ipmi_ip}`;
+  const vendor = (device.vendor || '').toLowerCase();
+
+  if (vendor === 'hp' || vendor === 'hpe') {
+    const gen = getIloGeneration(device);
+    if (gen >= 4) {
+      return `${base}/html5/kvm`; // iLO 4/5 HTML5 KVM 지원
+    } else {
+      return base; // iLO 3 이하는 가상 콘솔 웹 미지원으로 루트 페이지 진입
+    }
+  }
+
+  switch (vendor) {
+    case 'dell':        
+      if (isIdrac9(device)) {
+        return `${base}/restgui/index.html`; // iDRAC 9 대시보드
+      }
+      return `${base}/console`; // iDRAC 7/8 HTML5 KVM 콘솔
+    case 'supermicro':  return `${base}/cgi/ipmi.cgi`;
+    case 'asus':
+    case 'asrock':      return `${base}/index.html`;
+    default:            return base;
+  }
+}
+
+// ─── 벤더별 IPMI 로그인 페이지 URL 빌더 ─────────────────────────
+function buildLoginUrl(device) {
+  const proto = (device.https !== false) ? 'https' : 'http';
+  const base  = `${proto}://${device.ipmi_ip}`;
+  const vendor = (device.vendor || '').toLowerCase();
+
+  if (vendor === 'hp' || vendor === 'hpe') {
+    // iLO 4의 /html/login.html로 직접 들어가면 특정 구형 펌웨어 버전에서 세션 유실로 화면이 깨지거나 빈 화면이 뜰 수 있음.
+    // 크롬 브라우저와 마찬가지로 루트 메인 페이지로 안전하게 진입하여 프레임셋이 완벽히 구성되도록 처리.
+    return base;
+  }
+
+  switch (vendor) {
+    case 'dell':        
+      if (isIdrac9(device)) {
+        return `${base}/restgui/start.html`; // iDRAC 9 로그인 페이지
+      }
+      return `${base}/login.html`; // iDRAC 7/8 로그인 페이지
+    case 'supermicro':  return base; // cgi/login.cgi 직접 호출 시 세션/프레임 유실로 화면이 깨지거나 빈 페이지가 뜨므로 메인 페이지로 진입
+    default:            return base;
+  }
+}
+
+// ─── IPMI 페이지 자동 로그인 창 열기 ────────────────────────────
+async function openIpmiWithAutoLogin(device) {
+  const winId = `ipmi-${device.id}`;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0  = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][IPMI][${Date.now()-t0}ms] ${msg}`);
+  const proto = device.https !== false ? 'https' : 'http';
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
+
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    title: `IPMI - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+      preload: path.join(__dirname, 'login-preload.js') // 전용 프리로드 연결
+    },
+    show: false,
+  });
+
+  // 장비 로그인 정보를 윈도우 인스턴스에 직접 바인딩 (프리로드 연동용)
+  win.$device = device;
+  win.$autoSubmit = autoSubmit;
+
+  if (enableDevTools) win.webContents.openDevTools({ mode: 'detach' });
+  win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+  win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
+  win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
+  kvmWindows[winId] = win;
+
+  // Dell iDRAC REST API 직접 로그인 시도 (iDRAC 7/8 세대만 시도하고, iDRAC 9은 제외하여 일반 웹 로그인 유도)
+  if (device.username && (device.vendor || '').toLowerCase() === 'dell' && !isIdrac9(device)) {
+    log('Dell iDRAC REST API 로그인 시도');
+    try {
+      const loginResult = await idracLogin(device);
+      if (loginResult.success && loginResult.tokenString) {
+        const dashUrl = `https://${device.ipmi_ip}/index.html?${loginResult.tokenString}`;
+        log(`REST 로그인 성공! 대시보드로 직접 오픈 예정: ${dashUrl}`);
+        win.loadURL(dashUrl);
+        return;
+      }
+      log(`REST 로그인 실패 (${loginResult.error}), 일반 주입 방식으로 폴백`);
+    } catch (e) {
+      log(`REST 로그인 예외: ${e.message}, 일반 주입 방식으로 폴백`);
+    }
+  }
+
+  const loginUrl = buildLoginUrl(device);
+  win.loadURL(loginUrl);
+  log(`loginUrl 로드 시작 (프리로드 자동화): ${loginUrl}`);
+}
+
+function openKvmWithAutoLogin(device) {
+  const winId = device.id;
+  if (kvmWindows[winId]) { kvmWindows[winId].focus(); return; }
+
+  const t0 = Date.now();
+  const log = (msg) => console.log(`[AutoLogin][KVM][${Date.now()-t0}ms] ${msg}`);
+
+  log(`시작 - 장비: ${device.name} (${device.vendor})`);
+
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
+  const kvmWin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    title: `KVM - ${device.name} (${device.ipmi_ip})`,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+    },
+    show: false,
+  });
+
+  if (enableDevTools) kvmWin.webContents.openDevTools({ mode: 'detach' });
+  kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
+
+  // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
+  const handleKvmLoadFailure = (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    if (isMainFrame !== false) {
+      const targetUrl = validatedURL || kvmWin.webContents.getURL();
+      if (targetUrl.startsWith('https://')) {
+        const httpUrl = targetUrl.replace('https://', 'http://');
+        log(`[로딩 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
+        kvmWin.loadURL(httpUrl);
+      }
+    }
+  };
+  kvmWin.webContents.on('did-fail-load', handleKvmLoadFailure);
+  kvmWin.webContents.on('did-fail-provisional-load', handleKvmLoadFailure);
+
+  if (!device.username) {
+    log('계정 정보 없음 → 바로 KVM 오픈');
+    kvmWin.loadURL(buildKvmUrl(device));
+    kvmWin.once('ready-to-show', () => kvmWin.show());
+    kvmWin.on('closed', () => delete kvmWindows[winId]);
+    kvmWindows[winId] = kvmWin;
+    return;
+  }
+
+  const loginUrl = buildLoginUrl(device);
+  const kvmUrl   = buildKvmUrl(device);
+  let loginDone  = false;
+  let loginInProgress = false;
+  let loginTimer = null;
+
+  log(`loginUrl 로드: ${loginUrl}`);
+  kvmWin.loadURL(loginUrl);
+
+  const injectKvmLoginScript = async () => {
+    if (kvmWin.isDestroyed()) return;
+    if (loginDone) return;
+
+    const currentUrl = kvmWin.webContents.getURL();
+    log(`[AutoLogin KVM] 상태 체크 - URL: ${currentUrl}`);
+
+    const isKvmConsole = currentUrl.toLowerCase().includes('console') 
+                         || currentUrl.toLowerCase().includes('kvm')
+                         || currentUrl.toLowerCase().includes('viewer');
+
+    if (isKvmConsole) {
+      log(`KVM 콘솔 화면 진입 완료`);
+      loginDone = true;
+      if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
+      return;
+    }
+
+    const loginIndicators = ['login', 'signin', 'auth', 'cgi/login'];
+    const isLoginPage = loginIndicators.some(kw => currentUrl.toLowerCase().includes(kw))
+                        || currentUrl === loginUrl
+                        || currentUrl === loginUrl + '/'
+                        || (!currentUrl.toLowerCase().includes('console') && !currentUrl.toLowerCase().includes('kvm'));
+
+    if (isLoginPage && device.username && !loginInProgress) {
+      loginInProgress = true;
+      log('KVM 인터랙티브 로그인 시뮬레이션 시작');
+      const success = await performInteractiveLogin(kvmWin.webContents, device, autoSubmit, log);
+      if (success) {
+        log('KVM 인터랙티브 로그인 완료');
+        loginDone = true;
+        if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
+      } else {
+        loginInProgress = false;
+      }
+    } else if (!isLoginPage && !isKvmConsole && !loginInProgress) {
+      log(`로그인 완료로 판단 (리다이렉션 발생). KVM URL로 이동: ${kvmUrl}`);
+      loginDone = true;
+      if (loginTimer) { clearInterval(loginTimer); loginTimer = null; }
+      setTimeout(() => { if (!kvmWin.isDestroyed()) kvmWin.loadURL(kvmUrl); }, 800);
+    }
+  };
+
+  loginTimer = setInterval(injectKvmLoginScript, 800);
+
+  kvmWin.webContents.on('did-finish-load',      injectKvmLoginScript);
+  kvmWin.webContents.on('did-navigate-in-page', injectKvmLoginScript);
+  kvmWin.webContents.on('did-frame-finish-load', () => injectKvmLoginScript());
+  kvmWin.webContents.on('did-start-loading',    () => log('did-start-loading'));
+  kvmWin.webContents.on('dom-ready',            () => log('dom-ready'));
+  kvmWin.webContents.on('did-navigate',         (_, url) => { log(`did-navigate → ${url}`); injectKvmLoginScript(); });
+
+  kvmWin.once('ready-to-show', () => { log('ready-to-show → 창 표시'); kvmWin.show(); });
+  kvmWin.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; if (loginTimer) clearInterval(loginTimer); });
+  kvmWindows[winId] = kvmWin;
+}
+ipcMain.handle('config:save', async (_, config) => {
+  try {
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
+      // 장비 목록 변경 시 즉각 Java 예외 목록 재동기화
+      syncAllDevicesToJavaExceptions();
+    return { success: true };
+  } catch (e) { return { success: false, error: e.message }; }
+});
+
+ipcMain.handle('app:get-version', () => app.getVersion());
+
+
+// 프리로드 스크립트(login-preload.js)에 장비 로그인 정보를 제공하는 동기식 IPC 채널
+ipcMain.on('get-login-device', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win && win.$device) {
+    event.returnValue = {
+      device: win.$device,
+      autoSubmit: win.$autoSubmit !== false
+    };
+  } else {
+    event.returnValue = null;
+  }
+});
+
+// [설정] 로드
+ipcMain.handle('config:load', async () => {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+    return {};
+  } catch (_) { return {}; }
+});
+
+// [KVM] HTML5 창 열기 (기존 - 로그인 없음)
+ipcMain.handle('kvm:open-html5', async (_, device) => {
+  openKvmWindow(device);
+  return { success: true };
+});
+
+// [KVM] HTML5 창 열기 (자동 로그인 포함)
+ipcMain.handle('kvm:open-html5-autologin', async (_, device) => {
+  openKvmWithAutoLogin(device);
+  return { success: true };
+});
+
+// [IPMI] IPMI 페이지 자동 로그인
+ipcMain.handle('ipmi:open-autologin', async (_, device) => {
+  openIpmiWithAutoLogin(device);
+  return { success: true };
+});
+
+// [KVM] 외부 뷰어/JNLP 실행
+ipcMain.handle('kvm:launch-external', async (_, { device, method, javawsPath }) => {
+  try {
+    switch (method) {
+      case 'jnlp': {
+        const proto  = device.https !== false ? 'https' : 'http';
+        const javaws = javawsPath || 'C:\\Program Files\\Java\\jre1.8.0_441\\bin\\javaws.exe';
+        if (!fs.existsSync(javaws)) {
+          return { success: false, error: 'javaws.exe를 찾을 수 없습니다. Java 설정을 확인하세요.' };
+        }
+
+        // JNLP 실행 전 해당 장비의 IP를 Java 예외 목록에 자동 등록하고 레거시 설정을 적용합니다.
+        try {
+          console.log(`[JNLP] 예외 사이트 자동 등록 시도: ${device.ipmi_ip}`);
+          javaManager.addJavaExceptionSite(device.ipmi_ip);
+          javaManager.applyLegacyJavaConfig();
+        } catch (e) {
+          console.warn(`[JNLP] 예외 사이트 등록 중 오류 (무시됨): ${e.message}`);
+        }
+
+        let jnlpUrl;
+        let localJnlpPath = null;
+
+        // Dell iDRAC: REST API 직접 로그인 → ST1/ST2 토큰 포함 JNLP URL
+        if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
+          console.log(`[JNLP] Dell iDRAC REST 로그인 시도: ${device.ipmi_ip}`);
+          try {
+            const loginResult = await idracLogin(device);
+            if (loginResult.success && loginResult.tokenString) {
+              // iDRAC JNLP URL: viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&ST1=xxx,ST2=yyy
+              jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection&${loginResult.tokenString}`;
+              console.log(`[JNLP] ✅ 로그인 성공! token: ${loginResult.tokenString}`);
+            } else {
+              console.warn(`[JNLP] REST 로그인 실패 (${loginResult.error}), 토큰 없이 시도`);
+              jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+            }
+          } catch (e) {
+            console.warn(`[JNLP] REST 예외: ${e.message}, 토큰 없이 시도`);
+            jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+          }
+        } else if (device.username && (
+          (device.vendor || '').toLowerCase() === 'supermicro' ||
+          (device.model || '').toLowerCase().includes('x10drl') ||
+          (device.model || '').toLowerCase().includes('x9drl')
+        )) {
+          // Supermicro: 웹 로그인을 거치지 않고 내장된 IPMIView의 iKVM.jar를 직접 실행
+          let ikvmJar;
+          const modelLower = (device.model || '').toLowerCase();
+
+          if (modelLower.includes('x11') || modelLower.includes('x12')) {
+            // 추후 2.18.0 연동용 모델 예약 분기 (필요시 수정 가능)
+            ikvmJar = path.join(__dirname, 'IPMIVIEW', '2.18.0', 'extracted', 'D_', 'IPMI20', 'FILES FOR IPMI VIEW', 'iKVM.jar');
+          } else if (modelLower.includes('x10drl')) {
+            ikvmJar = path.join(__dirname, 'IPMIVIEW', '2.17.0', 'extracted', 'D_', 'IPMI20', 'FILES FOR IPMI VIEW', 'iKVM.jar');
+          } else {
+            ikvmJar = path.join(__dirname, 'IPMIVIEW', '2.14.0', 'extracted', 'D_', 'IPMI20', 'FILES FOR IPMI VIEW', 'iKVM.jar');
+          }
+
+          if (!fs.existsSync(ikvmJar)) {
+            return { success: false, error: `내장된 iKVM.jar 파일을 찾을 수 없습니다. 경로를 확인하세요:\n${ikvmJar}` };
+          }
+
+          // java.exe 경로 설정 (javaws.exe가 설치된 bin 폴더의 java.exe를 사용)
+          const javaBin = javaws.replace('javaws.exe', 'java.exe');
+          if (!fs.existsSync(javaBin)) {
+            return { success: false, error: 'java.exe를 찾을 수 없습니다. Java 설정을 확인하세요.' };
+          }
+
+          // 네이티브 DLL 로딩을 위해 작업 디렉토리를 JAR 파일 폴더로 강제 설정
+          const jarDir = path.dirname(ikvmJar);
+
+          // iKVM.jar (Aten 규격) 실행 인자는 총 7개가 요구됨:
+          // args[0]: IP, args[1]: USER, args[2]: PASS, args[3]: HOSTNAME, args[4]: KVM_PORT, args[5]: VM_PORT, args[6]: WEB_PORT
+          const hostName = device.name || device.ipmi_ip;
+          const kvmPort  = '5900'; // 실제 비디오 연결용 KVM 포트
+          const vmPort   = '623';  // 가상 미디어 포트
+          const webPort  = device.https !== false ? '443' : '80';
+
+          
+          const cmdArgs = [
+            '-Dsun.java2d.noddraw=true',
+            '-Dsun.java2d.d3d=false',
+            '-Dsun.java2d.uiScale=1.0',
+            '-jar', 
+            ikvmJar, 
+            device.ipmi_ip, 
+            device.username, 
+            device.password || '', 
+            hostName, 
+            kvmPort, 
+            vmPort, 
+            '2', // 접속/암호화 모드 플래그 (2 = SSL)
+            '0'  // 가상 미디어 활성화 플래그 (0 = 비활성화로 0 나누기 크래시 방지)
+          ];
+          const fullCmd = `"${javaBin}" ${cmdArgs.map(arg => arg.includes(' ') ? `"${arg}"` : arg).join(' ')}`;
+          
+          logToErrorFile(`[Supermicro KVM] iKVM.jar 직접 구동 시도: ${device.ipmi_ip} (KVM Port: ${kvmPort}, Web Port: ${webPort})`);
+          logToErrorFile(`[Supermicro KVM] 커맨드: ${fullCmd}`);
+          logToErrorFile(`[Supermicro KVM] 작업 디렉토리: ${jarDir}`);
+          
+          const outFd = fs.openSync(logPath, 'a');
+          const errFd = fs.openSync(logPath, 'a');
+
+          const child = spawn(javaBin, cmdArgs, {
+            detached: true,
+            stdio: ['ignore', outFd, errFd],
+            cwd: jarDir,
+            env: {
+              ...process.env,
+              __COMPAT_LAYER: 'DPIUNAWARE' // Windows OS 레벨에서 고DPI 인식 차단 (C++ DLL 0 나누기 크래시 원천 차단)
+            }
+          });
+
+          logToErrorFile(`[Supermicro KVM] 프로세스 생성 완료 (PID: ${child.pid})`);
+
+          child.on('error', (err) => {
+            logToErrorFile(`[Supermicro KVM] [PID: ${child.pid || 'N/A'}] 에러 발생: ${err.message}`);
+          });
+
+          child.on('exit', (code, signal) => {
+            logToErrorFile(`[Supermicro KVM] [PID: ${child.pid}] 프로세스 종료 (Exit Code: ${code}, Signal: ${signal})`);
+          });
+
+          child.unref();
+          fs.closeSync(outFd);
+          fs.closeSync(errFd);
+          return { success: true }; // JNLP 로직을 타지 않고 즉시 리턴
+        } else {
+          jnlpUrl = `${proto}://${device.ipmi_ip}/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection`;
+        }
+
+        const outFd = fs.openSync(logPath, 'a');
+        const errFd = fs.openSync(logPath, 'a');
+        let child;
+
+        if (localJnlpPath) {
+          const fullCmd = `"${javaws}" "${localJnlpPath}"`;
+          logToErrorFile(`[JNLP Launch] javaws 실행 (로컬 파일) 시도: ${device.ipmi_ip}`);
+          logToErrorFile(`[JNLP Launch] 커맨드: ${fullCmd}`);
+          
+          child = spawn(`"${javaws}"`, [`"${localJnlpPath}"`], { 
+            shell: true, 
+            detached: true, 
+            stdio: ['ignore', outFd, errFd] 
+          });
+        } else {
+          const fullCmd = `"${javaws}" "${jnlpUrl}"`;
+          logToErrorFile(`[JNLP Launch] javaws 실행 (원격 URL) 시도: ${device.ipmi_ip}`);
+          logToErrorFile(`[JNLP Launch] 커맨드: ${fullCmd}`);
+          
+          child = spawn(`"${javaws}"`, [jnlpUrl], { 
+            shell: true, 
+            detached: true, 
+            stdio: ['ignore', outFd, errFd] 
+          });
+        }
+
+        if (child) {
+          logToErrorFile(`[JNLP Launch] 프로세스 생성 완료 (PID: ${child.pid})`);
+          child.on('error', (err) => {
+            logToErrorFile(`[JNLP Launch] [PID: ${child.pid || 'N/A'}] 에러 발생: ${err.message}`);
+          });
+          child.on('exit', (code, signal) => {
+            logToErrorFile(`[JNLP Launch] [PID: ${child.pid}] 프로세스 종료 (Exit Code: ${code}, Signal: ${signal})`);
+          });
+          child.unref();
+        }
+
+        fs.closeSync(outFd);
+        fs.closeSync(errFd);
+        break;
+      }
+      case 'ipmiview': {
+        const candidates = [
+          'C:\\Program Files\\IPMI\\IPMIView\\IPMIView.exe',
+          'C:\\Program Files (x86)\\IPMI\\IPMIView\\IPMIView.exe',
+        ];
+        const found = candidates.find(p => fs.existsSync(p));
+        if (!found) return { success: false, error: 'IPMIView가 설치되지 않았습니다.' };
+        
+        const fullCmd = `"${found}" "${device.ipmi_ip}"`;
+        logToErrorFile(`[IPMIView Launch] IPMIView 실행 시도: ${device.ipmi_ip}`);
+        logToErrorFile(`[IPMIView Launch] 커맨드: ${fullCmd}`);
+
+        const outFd = fs.openSync(logPath, 'a');
+        const errFd = fs.openSync(logPath, 'a');
+
+        const child = spawn(`"${found}"`, [device.ipmi_ip], { 
+          shell: true, 
+          detached: true, 
+          stdio: ['ignore', outFd, errFd] 
+        });
+
+        logToErrorFile(`[IPMIView Launch] 프로세스 생성 완료 (PID: ${child.pid})`);
+
+        child.on('error', (err) => {
+          logToErrorFile(`[IPMIView Launch] [PID: ${child.pid || 'N/A'}] 에러 발생: ${err.message}`);
+        });
+        child.on('exit', (code, signal) => {
+          logToErrorFile(`[IPMIView Launch] [PID: ${child.pid}] 프로세스 종료 (Exit Code: ${code}, Signal: ${signal})`);
+        });
+
+        child.unref();
+        fs.closeSync(outFd);
+        fs.closeSync(errFd);
+        break;
+      }
+      default:
+        shell.openExternal(`https://${device.ipmi_ip}`);
+    }
+    return { success: true };
+  } catch (e) { return { success: false, error: e.message }; }
+});
+
+// [Java] 설치된 Java 목록 탐지
+ipcMain.handle('java:detect', async () => {
+  try {
+    const list = await javaManager.detectJavaInstallations();
+    return { success: true, list };
+  } catch (e) { return { success: false, error: e.message, list: [] }; }
+});
+
+// [Java] 예외 사이트 등록
+ipcMain.handle('java:add-exception', async (_, { siteUrl }) => {
+  try {
+    const result = javaManager.addJavaExceptionSite(siteUrl);
+    return { success: true, ...result };
+  } catch (e) { return { success: false, error: e.message }; }
+});
+
+// [Java] 레거시 보안 설정 적용
+ipcMain.handle('java:apply-legacy-config', async () => {
+  try {
+    const result = javaManager.applyLegacyJavaConfig();
+    return { success: true, ...result };
+  } catch (e) { return { success: false, error: e.message }; }
+});
+
+// [Java] java.security 패치 (제한 해제)
+ipcMain.handle('java:patch-security', async (_, { javawsPath }) => {
+  try {
+    const result = await javaManager.patchJavaSecurity(javawsPath);
+    return { success: true, ...result };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// [Java] 구버전 다운로드 정보
+ipcMain.handle('java:get-download-links', async () => {
+  return javaManager.getLegacyJavaDownloadInfo();
+});
+
+// [시스템] 외부 URL 열기
+ipcMain.handle('shell:open-url', async (_, url) => {
+  shell.openExternal(url);
+  return { success: true };
+});
+
+// [다이얼로그] 파일 열기
+ipcMain.handle('dialog:open-file', async (_, options) => {
+  return dialog.showOpenDialog(mainWindow, options);
+});
+
+// [Ping] 장비 IP 핑 체크
+ipcMain.handle('device:ping', async (_, ip) => {
+  return new Promise((resolve) => {
+    // Windows: -n 1 (1회), -w 800 (타임아웃 800ms)
+    exec(`ping -n 1 -w 800 ${ip}`, (err, stdout, stderr) => {
+      if (err) {
+        resolve({ success: false, online: false });
+      } else {
+        const online = stdout.includes('TTL=') || stdout.includes('ttl=');
+        resolve({ success: true, online });
+      }
+    });
+  });
+});
+
+// ─── 전역 HTTP Basic / Digest 인증(401) 자동 우회 및 로그인 처리 ─────
+app.on('login', (event, webContents, request, authInfo, callback) => {
+  event.preventDefault();
+  
+  // 1. webContents가 속한 윈도우 인스턴스에서 장비 정보 획득 시도
+  const win = BrowserWindow.fromWebContents(webContents);
+  let device = win ? win.$device : null;
+  
+  // 2. 만약 장비 정보가 없으면 전체 등록 장비 목록에서 IP 매칭 시도
+  if (!device) {
+    const config = readConfig();
+    const devices = config.devices || [];
+    device = devices.find(d => d.ipmi_ip === authInfo.host || request.url.includes(d.ipmi_ip));
+  }
+
+  if (device && device.username) {
+    logToErrorFile(`[Global HTTP Auth] 401 인증 우회 성공 (대상: ${authInfo.host}) -> 계정: ${device.username}`);
+    callback(device.username, device.password || '');
+  } else {
+    logToErrorFile(`[Global HTTP Auth] 자격 증명을 찾을 수 없음 (대상: ${authInfo.host})`);
+    callback();
+  }
+});
+
+// ─── CLI 인자 파싱 및 즉각 기동 처리 ─────────────────────────────────────
+function handleCommandLineArgs() {
+  const args = process.argv;
+  let deviceId = null;
+  let connectType = null;
+
+  for (const arg of args) {
+    if (arg.startsWith('--device-id=')) {
+      deviceId = arg.split('=')[1];
+    }
+    if (arg.startsWith('--connect-type=')) {
+      connectType = arg.split('=')[1];
+    }
+  }
+
+  if (deviceId) {
+    log(`[CLI 기동] 장비 ID: ${deviceId}, 연결 방식: ${connectType}`);
+    const config = readConfig();
+    const devices = config.devices || [];
+    const device = devices.find(d => d.id === deviceId);
+
+    if (device) {
+      if (connectType === 'web') {
+        log(`[CLI 기동] 웹 자동 로그인 기동 수행`);
+        openIpmiWithAutoLogin(device, true);
+      } else {
+        log(`[CLI 기동] HTML5 KVM 기동 수행`);
+        openKvmWithAutoLogin(device, true);
+      }
+      return true; // 즉각 기동 수행 완료
+    } else {
+      log(`[CLI 기동] 에러: 해당 ID의 장비를 찾을 수 없습니다 (${deviceId})`);
+    }
+  }
+  return false;
+}
+
+// ─── 앱 생명주기 ─────────────────────────────────────────────────
+app.whenReady().then(() => {
+
+  // 다운로드 완료 시 실행 확인 팝업 기능 추가
+  session.defaultSession.on('will-download', (event, item, webContents) => {
+    let filename = item.getFilename();
+    
+    // JNLP 파일의 경우 파일명 뒤에 쿼리 스트링이나 괄호 메타데이터가 꼬이는 현상 방지 (viewer.jnlp로 강제 교정)
+    if (filename.toLowerCase().includes('.jnlp')) {
+      filename = 'viewer.jnlp';
+    }
+
+    const downloadsPath = app.getPath('downloads');
+    item.setSavePath(require('path').join(downloadsPath, filename));
+
+    item.once('done', async (event, state) => {
+      console.log(`[Download] 완료 상태: ${state}, 저장 경로: ${item.getSavePath()}`);
+      if (state === 'completed') {
+        const filePath = item.getSavePath();
+        const fileName = item.getFilename();
+        const focusWindow = BrowserWindow.getFocusedWindow() || mainWindow;
+        
+        // JNLP 실행 전 해당 장비의 IP 및 Hostname을 자바 예외 사이트에 강제 재등록
+        try {
+          const win = BrowserWindow.fromWebContents(webContents);
+          const dev = win ? win.$device : null;
+          if (dev) {
+            console.log(`[JNLP 실행 전 자바 설정 강제 갱신] 장비: ${dev.name}, IP: ${dev.ipmi_ip}, Hostname: ${dev.hostname || '없음'}`);
+            // IP 등록
+            javaManager.addJavaExceptionSite(dev.ipmi_ip);
+            // 호스트명 등록 (JNLP 내부에 호스트명으로 정의되어 있을 경우 대비)
+            if (dev.hostname) {
+              javaManager.addJavaExceptionSite(dev.hostname);
+            }
+            // 자바 보안 우회 및 레거시 TLS 설정 즉각 주입
+            javaManager.applyLegacyJavaConfig();
+          }
+        } catch (e) {
+          console.error('[JNLP 실행 전 자바 설정 갱신 실패]:', e);
+        }
+
+        
+        const { response } = await dialog.showMessageBox(focusWindow, {
+          type: 'question',
+          buttons: ['예', '아니오'],
+          defaultId: 0,
+          title: '다운로드 완료',
+          message: `파일 다운로드가 완료되었습니다.\n\n파일명: ${fileName}\n\n지금 이 파일을 실행하시겠습니까?`,
+          cancelId: 1
+        });
+
+        if (response === 0) {
+          shell.openPath(filePath).catch(err => {
+            dialog.showErrorBox('실행 실패', `파일을 실행하는 중 오류가 발생했습니다.\n경로: ${filePath}\n오류: ${err.message}`);
+          });
+        }
+      }
+    });
+  });
+
+  // CLI 즉각 기동 인자가 있는 경우 메인 대시보드 창을 띄우지 않고 뷰어만 구동
+  const isCliHandled = handleCommandLineArgs();
+  if (!isCliHandled) {
+    createMainWindow();
+  }
+});
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+});
+
+
+// 저장된 모든 장비의 IP를 Java 예외 목록에 일괄 동기화하는 함수

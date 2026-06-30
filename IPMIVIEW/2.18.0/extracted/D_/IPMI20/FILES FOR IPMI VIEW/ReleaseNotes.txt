@@ -1,0 +1,484 @@
+-------------------------------------------------------------------------------
+IPMIView release notes
+Copyright(c) 2014-2020 by Super Micro Computer, Inc.      http://www.supermicro.com/
+-------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------- 
+ OS Compatibility list
+-------------------------------------------------------------------------------
+Red Hat Enterprise Linux (RHEL) 6.8 or later, 
+SUSE Linux Enterprise Server (SLES) 11 or later
+Ubuntu Server 14.04 or later
+Windows 7 and 10
+Windows Server 2008 R2 SP 1, 2012 R2
+
+-------------------------------------------------------------------------------
+ Blade Support list
+-------------------------------------------------------------------------------
+SuperBlade:
+B10DRI, B10DRC, B9DR6, B9DRG, B9DRGX, 
+B9DRT, B9QR7, B8DT6, B8DTG, B8DTT,
+B7DBE, B7DCL, BHDGT, BHDME, BHQG6,
+BHQIE, BHQME, B11DPT, B10DRE, B11QPI,
+B10KNM, B11DPE, B11SPE
+
+MicroBlade:
+B1DRI, B1SA4F, B1SD2, B1SL1, B2SS2, B2SS1, B2SD2
+
+-------------------------------------------------------------------------------
+OpenJDK version
+-------------------------------------------------------------------------------
+openjdk version "1.8.0_201-1-ojdkbuild"
+OpenJDK Runtime Environment (build 1.8.0_201-1-ojdkbuild-b09)
+
+-------------------------------------------------------------------------------
+Version 2.18.0 build 201007
+-------------------------------------------------------------------------------
+1. Support X12-AST2600-ROT, X12-AST2500 and H12Rot GUID
+2. Add new FW update panel to support X12 and later model
+3. Improve event log stability
+4. Fix switch and fan panels' title index in node status page of MicroBlade
+5. Update X12 devices icon
+6. Add MicroBlade UID icon status monitoring for CMM module
+7. Fix CMM slot number and FAN index in MicroBlade management page
+8. Fix the temperature panel display abnormally in sensor page
+9. Fix temperature and voltage panels' inactive components even if hide setting is enabled
+10. Update KVM to support X12 
+
+-------------------------------------------------------------------------------
+Version 2.17.0 build 200505
+-------------------------------------------------------------------------------
+1. Support fully parsing maintenance event log
+2. Rename "System Event Log" to "Health Event Log" in the Event Log tab
+3. Improve the UX of SEL time setting in the Event Log tab
+4. Add invalid date-time value pre-check when setting SEL time
+5. Improve language description in drop-down list of Language
+6. Update backward compatibility for ukvm and virtual medial mount
+7. Support X12-AST2500 GUID
+8. Update event log definition in IPMILib
+9. Fix certain typo
+10. Update MigLayout versoin from 4.2 to 5.2
+11. Fix the font display incompletely issue on Linux OS
+12. No sub-item pop-up to choose after checked the UTF-8 box of the Text Console on SLES12
+13. Fix "open in browser" hanging issue on Linux platform
+14. Fix SLES12 does not support Chinese font issue
+15. Add fan info component/page in node status page
+16. Add the model name of power supply in MicroBlade node status page
+17. Add the model name of node in MicroBlade node status page
+18. Click KVM screen can resize KVM resolution when KVM screen size is abnormal
+19. Update microblade kvm function
+20. Fix 0xDC sensor type can not be recognized issue in trap Viewer column in trap Viewer
+21. Fix Discrete Sensors panel layout can not be saved issue
+22. Add filter for domain name
+23. Modify the column index sorting method of quick trap panel
+24. Support sorting function with filter.
+25. Fix filter function will cause group list abnormal.
+26. Fix some component does not support traditional/simplified chinese and revise translation.
+
+-------------------------------------------------------------------------------
+Version 2.16.1 build 191104
+-------------------------------------------------------------------------------
+1. Support new blade type B11SCG
+2. Update B11SPE structure to fix sensor reading issue
+3. Fix IPMI Domain can't be sorted by online devices issue 
+4. Fix SuperBlade switch model SBM-XEM-X8SM 1.25V sensor reading issue
+5. Add new H12 support
+6. Update bundle java to OpenJDK 1.8.0_201
+7. Support FW auxiliary version displaying
+8. Support Nuvoton GUID
+9. Enhance device list UI and action behavior
+10. Fix trap receiver selection issue
+11. Support multi-language for action message
+12. Support X11Rot GUID
+13. Support new blade type B2SD2
+14. Update backward compatibility for KVM 
+
+-------------------------------------------------------------------------------
+Version 2.15.0 build 190109
+-------------------------------------------------------------------------------
+1. Fix trap event displaying issue
+2. Add FRU Product Asset Tag field
+3. Add microblade switch power consumption data
+4. Update main page image
+5. Update bundle java to 1.8
+6. Enhance KVM by implement stunnel multi-Instance to fix system administrator 
+   privilege required issue.
+7. Fix launch KVM of P8DTU fail on CentOS7 64bit issue
+8. Fix launch KVM fail due to stunnel instance startup fail
+9. Add blade type B2SC1 in microblade management
+10. Fix two or more KVMs could not be launched in Windows Systems at the same 
+    time
+11. Keep keyboard layout setting for KVM function 
+12. Fix SOL Window could not works in SUSE system
+13. Update MicroBlade node structure to support NVMe and Storage
+14. Add new blade type B11SRE
+15. Add workaround to avoid user privilege control issue on Windows platform
+16. Fix tab focus issue after close a node session
+17. Fix keyboard not work in SUSE system
+18. Fix stunnel service will not close on Windows platform issue
+
+-------------------------------------------------------------------------------
+Version 2.14.0 build 180213
+-------------------------------------------------------------------------------
+1. Fix X10 FW update issue
+2. Add blade type B11DPE, B11SPE, and B10KNM in microblade management
+3. Add board model name information
+4. Fix KVM launch fail when password contains double quote
+5. Fix microblade psu dc current reading issue
+
+-------------------------------------------------------------------------------
+Version 2.13.1 build 171024
+-------------------------------------------------------------------------------
+1. Use Chassis power status instead of ACPI power status in Device panel
+2. Fix discrete sensor did not display issue
+3. Add new guid support
+4. Fix fan2 display issue in PSU panel
+5. Rename IPM device as IPMI device
+6. Add blade type B10DRE in microblade management
+7. Add blade type B2SS2_MTF in microblade management
+8. Fix power consumption and other sensor reading issue
+9. Adjust main window layout size
+10. Add iKVM Auto-resize-window enable/disable property
+
+-------------------------------------------------------------------------------
+Version 2.13.0 build 170504
+-------------------------------------------------------------------------------
+1. Support P8DTU FW update
+2. Update board ID to 20161014 (ipmilib)
+3. Support multiple microblade backplane type
+4. Update DIMM ecc location (OEM SEL) for X10OBI
+5. Add watch dog sensor support for micro nodes
+6. Support Purley platform firmware update
+7. Support IPv6 platform firmware update
+8. Support IPv6 (address and hostname) when adding new device
+9. Support KVM with CA
+10. Implement chassis power status instead of ACPI power status in SOL Panel
+11. Update trap receiver to support acknowledge function
+12. Fix SOL does not work well issue
+
+-------------------------------------------------------------------------------
+Version 2.12.0 build 160804
+-------------------------------------------------------------------------------
+1. Support ipv6 BMC connection
+2. Update board ID
+3. Fix KVM connection fail issue(IssueID=72378)
+
+-------------------------------------------------------------------------------
+Version 2.11.1 build 160525
+-------------------------------------------------------------------------------
+1. Remove VBAT sensor for B1SD2 and update watchdog sensor
+2. Update kvm function to support stunnel
+   FW compatibility:
+       SMT_X10 v3.29, SMT_X11 v1.16
+3. Update IB Temp and 10G Temp in B10DRG and B10DRT
+4. Fix KVM console window title
+5. Set all microblade VBAT high limit to N/A
+6. Support CB3 deivce including FW update
+7. Support blade type B2SS1
+8. Fix VBAT sensor high limit displaying 
+9. Support dynamic kvm ssl port and change kvm library(iKVM.dll)
+
+-------------------------------------------------------------------------------
+Version 2.11.0 build 151223
+-------------------------------------------------------------------------------
+1. Add Microblade CMM informations
+2. Add new Grantley MRC code definition
+3. Add Microblade B2SS2 support
+4. Update Microblade KVM to improve stability
+
+-------------------------------------------------------------------------------
+Version 2.10.2 build 150909
+-------------------------------------------------------------------------------
+1. Update microblade node sensor length (IPMILib)
+2. Preserve option behavior is not same with web UI (IPMILib)
+3. Update X11 devices icon
+
+-------------------------------------------------------------------------------
+Version 2.10.2 build 150819
+-------------------------------------------------------------------------------
+1. Update bundle jre to 1.7
+2. Support FW update for X11 AST2400 devices
+
+-------------------------------------------------------------------------------
+Version 2.10.2 build 150713
+-------------------------------------------------------------------------------
+1. Update microblade nodeSensorInfo structure due to FW change
+
+-------------------------------------------------------------------------------
+Version 2.10.2 build 150622
+------------------------------------------------------------------------------- 
+1. Update DIMM ecc location (OEM SEL) for X10QRH
+2. Remove IPv6 information after pressing detect button
+3. Add OK button in "About" dialog
+4. Add scroll bar to "Sensor" frames
+5. Adjust superblade blade data size due to FW version
+
+-------------------------------------------------------------------------------
+Version 2.10.2 
+------------------------------------------------------------------------------- 
+1. Fix invoke browser by clicking Supermicro logo issue
+2. Fix User privilege error
+3. Update sel oem sensor type
+4. Update board ID
+5. Fix SuperBlade CMM CPU ID and Memory Speed display error
+6. Support SuperBlade type B10DRG
+7. Support SuperBlade type B10DRT_IBF2, B10DRI_N and B10DRC_N
+8. Add Power Consumption sensor display for X10DRT-P
+9. Add new fan mode PUE3 for X10 platform
+10. Add new blade type B1SA4F and B1SD2 for sensor readings
+11. Add microblade midplane informations
+12. Fix microblade node graceful shutdown function
+13. Support microblade cmm firmware update function
+14. Update sensor limits from non-critical to critical
+15. Remove group management power graceful control functions
+16. Fix Configuration Tip" dialog display error
+17. Fix microblade cmm display error
+
+-------------------------------------------------------------------------------
+Version 2.10.1 build 141121
+-------------------------------------------------------------------------------
+1. Support Microblade CMM
+2. Update Superblade gigabit switch structure
+3. Show the "Configuration Tip" dialog
+
+-------------------------------------------------------------------------------
+Version 2.9.32.1 build 140722
+-------------------------------------------------------------------------------
+1.Update for HP IPMI discovery and connection
+
+-------------------------------------------------------------------------------
+Version 2.9.32 build 140624
+-------------------------------------------------------------------------------
+1.Fix UIDLED issue
+2.Fix Session abnormal close issue
+3.Update group management to load individual username/password 
+4.Add B10DRI and B9QR7
+5.Set power cycle delaying time to 1 sec
+
+-------------------------------------------------------------------------------
+Version 2.9.31 build 140403
+-------------------------------------------------------------------------------
+1.Updated Supermicro new logo
+
+-------------------------------------------------------------------------------
+Version 2.9.30 build 140318
+-------------------------------------------------------------------------------
+1.Updated MicroBlade CMM and MicroBlade Node frimware version check 
+  (IssueID=51309)
+2.Added SDR Type 2 to support PS Status Compact SDR
+3.Updated CPU Core Voltage high and low limit for BHQGE and BHDGT
+
+-------------------------------------------------------------------------------
+Version 2.9.29 build 140206
+-------------------------------------------------------------------------------
+1.Updated KVM support for B1SA4-F 
+1.Updated AMI X9,B9 firmware update and version check (Verify stage failure)
+   
+-------------------------------------------------------------------------------
+Version 2.9.28 build 131220
+-------------------------------------------------------------------------------
+1.Updated for 920P check rule 
+2.Updated PMBus item names
+3.Fixed a workaround for 1K62P power status
+4.Updated input type (DC) for PMBus monitor
+
+-------------------------------------------------------------------------------
+Version 2.9.27 build 131122
+-------------------------------------------------------------------------------
+1.Updated iKVM native library (Linux 32bit) 
+2.Updated SOL initial commands for ATEN X9
+3.Updated 10G structure for SuperBlade (CMM V2.2.53 or later)(IssueID=49183)
+4.Update CPU number of memory ecc error (X8 MBs and Bromolow)
+
+-------------------------------------------------------------------------------
+Version 2.9.26 build 131104
+-------------------------------------------------------------------------------
+1.Updated BHQG6/E sensors high low limit
+2.Updated PMbus reading for 920P
+3.Updated SOL initial command for ATEN X10
+4.Updated board ID list
+
+-------------------------------------------------------------------------------
+Version 2.9.25 build 130828
+-------------------------------------------------------------------------------
+1.Updated iKVM v1.69 r14 (Power control function enabled)
+2.Updated OOB OEM SEL
+3.Updated board ID list
+4.Updated a workaround for unsigned linear data format for PMBus power 
+  consumption
+   
+-------------------------------------------------------------------------------
+Version 2.9.24 build 130725
+-------------------------------------------------------------------------------
+1.Fixed cannot open more then one KVM to multiple X9 Renesas BMC (AMI firmware)
+
+-------------------------------------------------------------------------------
+Version 2.9.23 build 130709
+-------------------------------------------------------------------------------
+1.Added UID control for X9DBS
+
+-------------------------------------------------------------------------------
+Version 2.9.22 build 130625
+-------------------------------------------------------------------------------
+1.Added B9DRG-E
+2.Added PMBus(B0,B2,B4,B6) and FRU (A0,A2,A4,A6) addresses for 1K66P
+3.Updated B9DR6, B9DRG and B9DRT sensor table for DIMM temp  
+4.Added SuperBlade OEM event (Shutdown the problematic blade after minutes of 
+  CPU over heating)
+
+-------------------------------------------------------------------------------
+Version 2.9.21 build 130610
+-------------------------------------------------------------------------------
+1.Fixed ATEN X10,X9 firmware update bug for checking BMC version
+
+-------------------------------------------------------------------------------
+Version 2.9.20 build 130530
+-------------------------------------------------------------------------------
+1.Updated version format in X10 firmware update function
+2.Updated X10 configuration for sensor (power failure issue), user and 
+  BMCSetting.
+3.Added Session Audit 02h and 03h event
+
+-------------------------------------------------------------------------------
+Version 2.9.19 build 130523
+-------------------------------------------------------------------------------
+1.Added X10 ASPEED firmware update preserve configure option
+2.Updated memory ecc location on Trap receiver
+3.Added Heavy IO fan mode
+4.Updated SOL setting for X10 ASPEED
+
+-------------------------------------------------------------------------------
+Version 2.9.18 build 130410
+-------------------------------------------------------------------------------
+1.Added X10 ASPEED firmware update function
+2.Updated parameters for ATEN X10 iKVM          
+3.Bug fixed for Linux path of properties file
+4.Removed splash window to speed start up
+
+-------------------------------------------------------------------------------
+Version 2.9.17 build 130123
+-------------------------------------------------------------------------------
+1.Added B9DRGX DIMM temp
+2.Added X10 ASPEED GUID
+
+-------------------------------------------------------------------------------
+Version 2.9.16 build 121221
+-------------------------------------------------------------------------------
+1.Updated GB 3 & 4 initialized and Error reading (SuperBlade)
+2.Fixed BBP discharge setting dialog minor bugs
+3.Added PUE Optimal fan mode
+
+-------------------------------------------------------------------------------
+Version 2.9.15 build 121211
+-------------------------------------------------------------------------------
+1.Added BBP (Battery Backup Power) management in sensors tab.
+  * FRU
+  * HW monitor
+  * Auto and User dishcarge setting
+
+-------------------------------------------------------------------------------
+Version 2.9.14 build 121115
+-------------------------------------------------------------------------------
+1.Fixed B9DRP wrong picture on BPN-SB-E202 system
+2.Added 3rd auxiliary Firmware Revision for X9 and B9 (Renesas BMC) board
+3.Modified GB 3¡B4 position. #3 at bottom, #4 at top
+
+-------------------------------------------------------------------------------
+Version 2.9.13 build 121026
+-------------------------------------------------------------------------------
+1.Updated DC current formula for power supply (SuperBlade)
+2.Updated HDD trap message in TrapReceiver
+3.Fixed OEM SEL wrong message in Group management
+4.Added B9DR6, B9DR7 and B9DRP DIMM temperature sensors
+
+-------------------------------------------------------------------------------
+Version 2.9.12 build 121012
+-------------------------------------------------------------------------------
+1.Updated trap receiver email content and multiple email receiver
+2.Added hostname and email password encryption in Trap Receiver
+3.Added exception handling for internal receiver thread
+4.Added B9DRP picture
+5.Minor user management bug fixed
+
+-------------------------------------------------------------------------------
+Version 2.9.11 build 120914
+-------------------------------------------------------------------------------
+1. Added IBFDR
+2. Added Fan Speed Mode
+3. Fixed cannot connect issue for some particular Linux environment
+4. Updated B9DRI VBAT & 1.1V sensors limit
+5. Updated B9DRI CPU temp high limit
+6. Added B9DRP
+7. New release package with bundled JRE
+
+-------------------------------------------------------------------------------
+Version 2.9.10 build 120725
+-------------------------------------------------------------------------------
+1. Added B9DR7 and B9DRGX
+2. Fixed AMI X9 KVM session token issue
+3. Updated ATEN KVM session issue
+
+-------------------------------------------------------------------------------
+Version 2.9.9 build 120531
+-------------------------------------------------------------------------------
+1. Bug fixed for E103 mid-plane 
+
+-------------------------------------------------------------------------------
+Version 2.9.8 build 120525
+-------------------------------------------------------------------------------
+1. Added B9DRT
+2. Fixed user's password length issue on both IPMI and Blade system
+3. Updated X9 OEM SEL (Mem Ecc for Romley EP,EX and EN)
+4. Added E104 mid-plane 
+
+-------------------------------------------------------------------------------
+Version 2.9.7 build 120427
+-------------------------------------------------------------------------------
+1. Added X9 OEM SEL
+2. Updated iKVM 1.69 r13 shared library for VM issue (enable *.ima uploader)
+3. Added X9 and B9 Renesas IPMI firmware update function
+4. Improved stability of ATEN firmware update function
+
+-------------------------------------------------------------------------------
+Version 2.9.6 build 120316
+-------------------------------------------------------------------------------
+1. Fixed incorrect CPU Vcore voltage of B8DTT in v2.9.5
+
+-------------------------------------------------------------------------------
+Version 2.9.5 build 120308
+-------------------------------------------------------------------------------
+1. Added B9DRE and B9DRG blades
+2. Added KVM panel for B9* and BH* blades
+3. Updated CPU sensor color when CPU temperature is high (in Group Management)
+4. Updated format for firmware version
+5. Fixed bug in calculating blade memory size
+
+-------------------------------------------------------------------------------
+Version 2.9.4 build 111230
+-------------------------------------------------------------------------------
+1. Updated PMBus information for reduntant charaters
+2. Fixed SOL screen scroll fresh issue
+
+-------------------------------------------------------------------------------
+Version 2.9.3 build 111215
+-------------------------------------------------------------------------------
+1. Updated SOL minor issue for text color
+2. Updated iKVM to v1.69 r13
+
+-------------------------------------------------------------------------------
+Version 2.9.2 build 111110
+-------------------------------------------------------------------------------
+1. Added 4*Gigabit Switches for ZTE SuperBlade customization
+
+-------------------------------------------------------------------------------
+Version 2.9.1 build 111027
+-------------------------------------------------------------------------------
+1. Fixed X9 AMI Virtual Media "cdrom service disabled" issue
+2. Updated Power supply PMBus/FRU status icon and description (on/off)
+
+
+-------------------------------------------------------------------------------
+Version 2.9.0 build 111025
+-------------------------------------------------------------------------------
+1. Added PSU PMBus/FRU health monitoring (in Sensors tab)
+2. Fixed reduntant event description in SEL exporting log

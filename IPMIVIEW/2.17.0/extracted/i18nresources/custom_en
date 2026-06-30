@@ -1,0 +1,3307 @@
+# NLS_MESSAGEFORMAT_NONE
+# NLS_MESSAGEFORMAT_NONE
+# NLS_ENCODING=UTF-8
+#Tue Mar 13 3:50:31 PDT 2001
+
+# ALLORFEATUREPANEL
+# ---------
+
+# ...................... =Complete Uninstall
+UninstallAllOrFeaturesAction.allLabel=Complete Uninstall
+
+# ...................... =Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+UninstallAllOrFeaturesAction.allDescription=Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+
+# ...................... =Uninstall Specific Features
+UninstallAllOrFeaturesAction.someLabel=Uninstall Specific Features
+
+# ...................... =Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+UninstallAllOrFeaturesAction.someDescription=Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+
+# ...................... =Please select one of the following options:
+UninstallAllOrFeaturesAction.instructions=Please select one of the following options:
+
+# ...................... =Uninstall Options
+UninstallAllOrFeaturesAction.stepTitle=Uninstall Options
+
+# ...................... =Uninstall
+UninstallAllOrFeaturesAction.panelTitle=Uninstall
+
+# MAINTENANCEMODEPANEL
+# ---------
+
+# ...................... =Select one of the following options:
+MaintenenceModeRuntimePanelSettings.instructions=Select one of the following options:
+
+# ...................... =Add Features
+MaintenenceModeRuntimePanelSettings.addLabel=Add Features
+
+# ...................... =Add features to the installed product
+MaintenenceModeRuntimePanelSettings.addDesc=Add features to the installed product
+
+# ...................... =Remove Features
+MaintenenceModeRuntimePanelSettings.remLabel=Remove Features
+
+# ...................... =Remove features from the installed product
+MaintenenceModeRuntimePanelSettings.remDesc=Remove features from the installed product
+
+# ...................... =Repair Product
+MaintenenceModeRuntimePanelSettings.repLabel=Repair Product
+
+# ...................... =Repair the installed product
+MaintenenceModeRuntimePanelSettings.repDesc=Repair the installed product
+
+# ...................... =Uninstall Product
+MaintenenceModeRuntimePanelSettings.uninstLabel=Uninstall Product
+
+# ...................... =Uninstall the product
+MaintenenceModeRuntimePanelSettings.uninstDesc=Uninstall the product
+
+# ...................... =Maintenance Mode
+MaintenenceModeRuntimePanelSettings.stepTitle=Maintenance Mode
+
+MaintModeAction.title=Maintenance Mode
+
+MaintModeAction.addImagePath=com/zerog/ia/installer/images/
+
+MaintModeAction.remImagePath=com/zerog/ia/installer/images/
+
+MaintModeAction.repImagePath=com/zerog/ia/installer/images/
+
+MaintModeAction.uninstImagePath=com/zerog/ia/installer/images/
+
+MaintModeAction.addImageName=addfeature.png
+
+MaintModeAction.remImageName=removefeature.png
+
+MaintModeAction.repImageName=repairproduct.png
+
+MaintModeAction.uninstImageName=uninstall.png
+
+# ...................... =Configure
+MaintenenceModeRuntimePanelSettings.panelTitle=Configure
+
+# ...................... =Maintenance Complete
+MaintModeFinal.completeLbl=Maintenance Complete
+
+# ALLORFEATURESACTIONCONSOLE
+# ---------
+
+# ......................  =Completely remove all features and components. 
+AllOrFeaturesActionConsole.allDescription=Completely remove all features and components.
+
+# ...................... Choose specific features that were installed by InstallAnywhere.
+AllOrFeaturesActionConsole.someDescription=Choose specific features that were installed by InstallAnywhere.
+
+# ...................... =Please choose one of the following options:
+AllOrFeaturesActionConsole.instructions=Please choose one of the following options
+
+# ...................... =Uninstall Options	
+AllOrFeaturesActionConsole.stepTitle=Uninstall Options
+
+# ...................... =ENTER THE NUMBER FOR YOUR CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT:
+AllOrFeaturesActionConsole.prompt=ENTER THE NUMBER FOR YOUR CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT:
+
+
+# BILLBOARD
+# ---------
+
+# ................ =billboardImage.gif
+Billboard.imageName=
+
+# ................ =com/zerog/ia/installer/images/
+Billboard.imagePath=
+
+
+# CHECKDISKSPACE
+# --------------
+
+# ...................... =There is now enough disk space to proceed with the installation.
+CheckDiskSpace.enoughMegs=There is now enough disk space to proceed with the installation.
+
+# .................... =but there are only XXX MB available at:
+CheckDiskSpace.megsFree=but there are only XXX MB available at:
+
+# ...................... =This installation requires XXX MB of free disk space,
+CheckDiskSpace.megsNeeded=This installation requires XXX MB of free disk space,
+
+# ..................... =Otherwise, you may choose 'Cancel' to cancel this installation.
+CheckDiskSpace.otherwise=Otherwise, you may choose 'Cancel' to cancel this installation.
+
+# ...................... =Please free at least XXX MB to proceed with the installation.
+CheckDiskSpace.pleaseFree=Please free at least XXX MB to proceed with the installation.
+
+# ......................... =Please free some disk space to proceed with the installation.
+CheckDiskSpace.pleaseFreeAlt=Please free some disk space to proceed with the installation.
+
+# ................... =Please click 'Install' to continue with the installation.
+CheckDiskSpace.proceed=Please click 'Install' to continue with the installation.
+
+# ................. =Ready To Proceed
+CheckDiskSpace.ready=Ready To Proceed
+
+# ................. =Not Enough Disk Space
+CheckDiskSpace.title=Not Enough Disk Space
+
+# ................... =Warning!
+CheckDiskSpace.warning=Warning!
+
+
+# CHECKDISKSPACECONSOLE
+# ---------------------
+
+# .............................. =PRESS <ENTER> TO RECALCULATE AVAILABLE DISK SPACE,\n   OR TYPE 'QUIT' TO EXIT THE INSTALLER
+CheckDiskSpaceConsole.errorPrompt=PRESS <ENTER> TO RECALCULATE AVAILABLE DISK SPACE,\u000A   OR TYPE 'QUIT' TO EXIT THE INSTALLER
+
+# .................................... =There is not enough disk space to perform this installation.\n   Please free some disk space and re-run this installer...
+CheckDiskSpaceConsole.silentExitMessage=There is not enough disk space to perform this installation.\u000A   Please free some disk space and re-run this installer...
+
+# ....................................... =PRESS <ENTER> TO BEGIN INSTALLATION
+CheckDiskSpaceConsole.enterToInstallString=PRESS <ENTER> TO BEGIN INSTALLATION
+
+# .......................... =Warning!
+CheckDiskSpaceConsole.warning=Warning!
+
+# ............................. =This installation requires XXX MB of free disk space,
+CheckDiskSpaceConsole.megsNeeded=This installation requires XXX MB of free disk space,
+
+# ........................... =but there are only XXX MB available at:
+CheckDiskSpaceConsole.megsFree=but there are only XXX MB available at:
+
+# ............................. =Please free at least XXX MB to proceed with the installation.
+CheckDiskSpaceConsole.pleaseFree=Please free at least XXX MB to proceed with the installation.
+
+# ................................ =Please free some disk space to proceed with the installation.
+CheckDiskSpaceConsole.pleaseFreeAlt=Please free some disk space to proceed with the installation.
+
+# ...................... =There is now enough disk space to proceed with the installation.
+CheckDiskSpaceConsole.enoughMegs=There is now enough disk space to proceed with the installation.
+
+# ........................ =Not Enough Disk Space
+CheckDiskSpaceConsole.title=Not Enough Disk Space
+
+
+# CHOOSEFILE (DONE)
+# ----------
+
+# ...................... =Please choose a file.
+ChooseFile.additionalText=Please choose a file.
+
+# ................. =Choose...
+ChooseFile.chooseStr=Ch&oose...
+
+# .............. =Please Choose a File:
+ChooseFile.prompt=Please Choose a &File:
+
+# .................. =Restore Default File
+ChooseFile.restoreStr=&Restore Default File
+
+# ................. =Choose a File
+ChooseFile.stepTitle=Choose a File
+
+# .................... =in the folder
+ChooseFile.macInsideStr=in the folder
+
+# ................ =on the disk
+ChooseFile.macOnStr=on the disk
+
+#..................=com/zerog/ia/installer/images/bigFile.gif
+ChooseFile.iconPath=com/zerog/ia/installer/images/bigFile.gif
+
+
+# CHOOSEFOLDER (DONE)
+# ------------
+
+# ........................ =Please choose a folder.
+ChooseFolder.additionalText=Please choose a folder.
+
+# ................... =Choose...
+ChooseFolder.chooseStr=Ch&oose...
+
+# ................ =Please Choose a Folder:
+ChooseFolder.prompt=Please Choose a &Folder:
+
+# .................... =Restore Default Folder
+ChooseFolder.restoreStr=&Restore Default Folder
+
+# ................... =Choose a Folder
+ChooseFolder.stepTitle=Choose a Folder
+
+# ................... =Choose a Remote IFS Folder
+ChooseIFSFolder.stepTitle=Choose a Remote IFS Folder
+# .................. =on the disk
+ChooseFolder.macOnStr=on the disk
+
+#................... =com/zerog/ia/installer/images/bigFolder.gif
+ChooseFolder.iconPath=com/zerog/ia/installer/images/bigFolder.gif
+
+
+# CHOOSEFOLDERINSTALLPANEL (DONE)
+# ------------------------
+
+# ....................................... =Error!
+ChooseFolderInstallPanel.alertDialog.label=Error!
+
+# ........................................... =You do not have write permissions to the chosen folder. Please choose a different folder.
+ChooseFolderInstallPanel.alertDialog.narrative=You do not have write permissions to the chosen folder. Please choose a different folder.
+
+# ....................................... =Choose Folder 
+ChooseFolderInstallPanel.alertDialog.title=Choose Folder
+
+
+# CHOOSEINSTALLSETACTION (DONE)
+# ----------------------
+
+# ................................ =Choose Install Set
+ChooseInstallSetAction.bundlesTitle=Choose Install Set
+
+# ......................... =Choose Install Set
+ChooseInstallSetAction.title=Choose Install Set
+
+# CHOOSEDBCONNECTIONACTION
+# ----------------------
+
+# ................................ =Provide database configuration details and authentication
+ChooseDBConnectionAction.description=Provide database configuration details and authentication
+
+# ......................... =Choose Database Connection
+ChooseDBConnectionAction.title=Choose Database Connection
+
+# CHOOSEDBCONNECTIONACTIONCONSOLE
+# ----------------------
+
+# ................................ =Provide database configuration details and authentication
+ChooseDBConnectionActionConsole.description=Provide database configuration details and authentication
+
+# ......................... =Choose Database Connection
+ChooseDBConnectionActionConsole.title=Choose Database Connection 
+
+
+# CHOOSEINSTALLSETACTIONCONSOLE
+# -----------------------------
+
+# ....................................... =Choose Product Features
+ChooseInstallSetActionConsole.bundlesTitle=Choose Product Features
+
+# ...................................... =Please choose the Install Set to be installed by this installer.
+ChooseInstallSetActionConsole.description=Please choose the Install Set to be installed by this installer.
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ................................. =ENTER THE NUMBER FOR THE INSTALL SET, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\n   
+ChooseInstallSetActionConsole.prompt=ENTER THE NUMBER FOR THE INSTALL SET, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\u000A
+
+# ............................................ =Please choose the Features to be installed by the installer.
+ChooseInstallSetActionConsole.bundleDescription=Please choose the Features to be installed by the installer.
+
+# ....................................... =ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE COMPONENTS\n   TO BE INSTALLED
+ChooseInstallSetActionConsole.bundlePrompt=ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE FEATURES\u000A   TO BE INSTALLED
+
+# ................................ =Choose Install Set
+ChooseInstallSetActionConsole.title=Choose Install Set
+
+# .................................... =Customize
+ChooseInstallSetActionConsole.customize=Customize
+
+
+# CHOOSEINSTALLSETACTIONCONSOLEUI
+# -------------------------------
+
+# ........................................... =Error setting product features for installation.
+ChooseInstallSetActionConsoleUI.bundleErrorStr=Error setting product features for installation.
+
+
+# CHOOSEJAVAVMACTION (DONE)
+# ------------------
+
+# ...................... =Please Choose a Java VM for Use by the Installed Application
+ChooseJavaVMAction.header=Please Choose a Java VM for Use by the Installed Application
+
+# ..................... =Choose Java Virtual Machine
+ChooseJavaVMAction.title=Choose Java Virtual Machine
+
+
+# CHOOSEJAVAVMACTIONCONSOLE
+# -------------------------
+
+# ........................................ =The provided path does not point to a valid Java Virtual Machine for this installation.  Please choose again.
+ChooseJavaVMActionConsole.invalidVM.message=The provided path does not point to a valid Java Virtual Machine for this installation.  Please choose again.
+
+# ............................. =Please Choose a Java VM for Use by the Installed Application
+ChooseJavaVMActionConsole.header=Please Choose a Java VM for Use by the Installed Application
+
+# ............................ =Choose Java Virtual Machine
+ChooseJavaVMActionConsole.title=Choose Java Virtual Machine
+
+# ................................... =ENTER THE NUMBER FOR THE JAVA VM, OR PRESS <ENTER> TO ACCEPT THE\n   CURRENT SELECTION
+ChooseJavaVMActionConsole.choicePrompt=ENTER THE NUMBER FOR THE JAVA VM, OR PRESS <ENTER> TO ACCEPT THE\u000A   CURRENT SELECTION
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ................................. =ENTER THE ABSOLUTE PATH TO THE JAVA VM EXECUTABLE OF YOUR CHOICE\n   
+ChooseJavaVMActionConsole.pathPrompt=ENTER THE ABSOLUTE PATH TO THE JAVA VM EXECUTABLE OF YOUR CHOICE\u000A   
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ...................................... =PATH TO THE JAVA EXECUTABLE IS:\n   
+ChooseJavaVMActionConsole.javaExeDirIsStr=PATH TO THE JAVA EXECUTABLE IS:\u000A   
+
+# ............................... =Unable to install the Java Virtual Machine included with this installer.
+ChooseJavaVMActionConsole.errorStr=Unable to install the Java Virtual Machine included with this installer.
+
+# .............................. =Use the Java VM installed with this application
+ChooseJavaVMActionConsole.install=Use the Java VM installed with this application
+
+# ............................. =Choose a Java VM already installed on this system
+ChooseJavaVMActionConsole.select=Choose a Java VM already installed on this system
+
+# ......................................... =Searching for system VMs, please wait...
+ChooseJavaVMActionConsole.searchingSystemVMs=Searching for system VMs, please wait...
+
+
+# CHOOSEJAVAVMACTIONPANEL (DONE)
+# -----------------------
+
+# .............................. =Choose Java Executable...
+ChooseJavaVMActionPanel.chooseStr=Ch&oose Java Executable...
+
+# .................................... =Open
+ChooseJavaVMActionPanel.fileDialog.open=Open
+
+# .............................. =Use the Java VM installed with this application
+ChooseJavaVMActionPanel.installCb=&Use the Java VM installed with this application
+
+# ........................... =Java Runtime Environment
+ChooseJavaVMActionPanel.jreStr=Java Runtime Environment
+
+# ....................................... =Searching In: 
+ChooseJavaVMActionPanel.searchingForVMsStr=Searching In: 
+
+# ............................ =Stop Searching
+ChooseJavaVMActionPanel.stopStr=&Stop Searching
+
+# .............................. =Search Another Location...
+ChooseJavaVMActionPanel.searchStr=&Search Another Location...
+
+# .......................................... =searching completed.
+ChooseJavaVMActionPanel.searchingCompletedStr=searching completed.
+
+# ............................. =Choose a Java VM already installed on this system
+ChooseJavaVMActionPanel.selectCb=Choose a &Java VM already installed on this system
+
+# ...................................... =Please select another JVM
+ChooseJavaVMActionPanel.badVMDialog.label=Please select another JVM
+
+# .......................................... =The selected application is not a valid Java Virtual Machine for this installation.
+ChooseJavaVMActionPanel.badVMDialog.narrative=The selected application is not a valid Java Virtual Machine for this installation.
+
+# ...................................... =Choose Java VM
+ChooseJavaVMActionPanel.badVMDialog.title=Choose Java VM
+
+# ..................................... =Error: A suitable Java Virtual Machines could not be found.
+ChooseJavaVMActionPanel.noVMDialog.label=Error: A suitable Java Virtual Machines could not be found.
+
+# ......................................... =This product requires that a Java Virtual Machine already be installed on your system.  Please see <http://java.sun.com> to download a virtual machine for your platform.
+ChooseJavaVMActionPanel.noVMDialog.narrative=This product requires that a Java Virtual Machine already be installed on your system.  Please see <http://java.sun.com> to download a virtual machine for your platform.
+
+# ..................................... =Choose Java VM
+ChooseJavaVMActionPanel.noVMDialog.title=Choose Java VM
+
+# ........................................=Stopping search, please wait...
+ChooseJavaVMActionPanel.stoppingSearch=Stopping search, please wait...
+
+ChooseSCMFeaturesConsole.visualName=Choose Optional SCM Features
+ChooseSCMFeaturesConsole.title=Choose Optional SCM Features
+ChooseSCMFeaturesConsole.instructions=CHoose SCM Features instructions
+
+# CONSOLEUTILS
+# ------------
+
+# ......................... =PRESS <ENTER> TO CONTINUE
+ConsoleUtils.enterToContinue=PRESS <ENTER> TO CONTINUE
+
+# ................. =Y
+ConsoleUtils.yesChar=Y
+
+# ................ =N
+ConsoleUtils.noChar=N
+
+# ....................... =IS THIS CORRECT?
+ConsoleUtils.isThisCorrect=IS THIS CORRECT?
+
+# ...................... =One of the supplied values was not valid.  Please choose again.
+ConsoleUtils.invalidInput=One of the supplied values was not valid.  Please choose again.
+
+#............... =back
+ConsoleUtils.back=back
+
+# CUSTOMIZEBUNDLES
+# ---------
+
+#......................................... =Description
+CustomizeBundles.uncheckInstructions=Uncheck features that you want to uninstall. Checked features will remain installed.
+
+#......................................... =Check features that you want to uninstall. Unchecked features will remain installed.
+CustomizeBundles.checkInstructions=Check features that you want to uninstall. Unchecked features will remain installed.
+
+# ............................ =Choose Product Features
+CustomizeBundles.title=Choose Product Features
+
+
+
+# CUSTOMIZEBUNDLESCONSOLE
+# ---------
+
+
+# ...................... =Please choose the Features to be installed by this installer.
+CustomizeBundlesConsole.instructions=Please choose the Features to be installed by this installer.
+
+# ...................... =Uncheck the features that you want to uninstall. Checked features will remain installed.
+CustomizeBundlesConsole.uncheckInstructions=Provide the Feature Number that you want to uninstall. Press <Enter> when you are done.
+
+# ...................... =Check the features that you want to uninstall. Unchecked features will remain installed.
+CustomizeBundlesConsole.checkInstructions=Provide the Feature Number that you want to uninstall. Press <Enter> when you are done.
+
+# ...................... =Choose Product Features
+CustomizeBundlesConsole.title=Choose Product Features
+
+# ......................  =ENTER A COMMA_SEPARATED LIST OF NUMBERS REPRESENTING THE FEATURES YOU WOULD LIKE TO SELECT, OR DESELECT. TO VIEW A FEATURE'S DESCRIPTION, ENTER '?<NUMBER>'.  PRESS <RETURN> WHEN YOU ARE DONE:
+CustomizeBundlesConsole.line.message=ENTER A COMMA_SEPARATED LIST OF NUMBERS REPRESENTING THE FEATURES YOU WOULD LIKE TO SELECT, OR DESELECT. TO VIEW A FEATURE'S DESCRIPTION, ENTER '?<NUMBER>'.  PRESS <RETURN> WHEN YOU ARE DONE:
+
+
+
+
+
+# CUSTOMIZEBUNDLESPANEL (DONE)
+# ---------------------
+
+# ............................... =Install Set:
+CustomizeBundlesPanel.currentISLbl=Install Set
+
+# ............................ =Choose Product Features
+CustomizeBundlesPanel.title=Choose Product Features
+
+#............................... =Description
+CustomizeBundlesPanel.description=Description
+
+
+
+# .............................. =kB
+CustomizeBundlesPanel.kiloByteStr=kB
+
+# ............................. =???
+CustomizeBundlesPanel.totalSpace=???
+
+# ................................ =Total Space Required for Install:
+CustomizeBundlesPanel.totalSpaceLbl=Total Space Required for Install:
+
+
+# DISKNEEDEDDIALOG
+# ---------------
+
+# .......................... =Insert New Media
+DiskNeededDialog.title=Insert New Media
+
+# .......................... =Please insert #NAME# or Select 'Browse...' to locate it manually.
+DiskNeededDialog.instructions=Please insert #NAME# or Select 'Browse...' to locate it manually.
+
+# ................... =Incorrect Media Volume
+DiskNeededDialog.error=Incorrect Media Volume
+# .................... =Browse
+DiskNeededDialog.locate=Browse
+
+# .................. =Cancel
+DiskNeededDialog.quit=Cancel
+
+# ...................... =OK
+DiskNeededDialog.continue=OK
+
+
+
+
+# DISKNEEDEDCONSOLEUI
+# ---------------
+
+# ............................. =Insert New Media
+DiskNeededConsoleUI.title=Insert New Media
+
+# ............................. =Please insert #NAME# or choose path to it manually.
+DiskNeededConsoleUI.instructions=Please insert #NAME# or choose path to it manually.
+
+# ............................. =Please insert #NAME#.
+DiskNeededConsoleUI.noBrowse=Please insert #NAME#.
+
+# ............................. =Disk is expected at: 
+DiskNeededConsoleUI.diskExpectedAt=Disk is expected at: 
+
+# ............................=Please insert #NAME# or type it's location.
+DiskNeededConsoleUI.insertDisk=Please insert #NAME# or type it's location.
+
+# ............................. =OK, XXX has been inserted.
+DiskNeededConsoleUI.ok=OK, XXX has been inserted.
+
+# ............................. =Choose path to installer data.
+DiskNeededConsoleUI.enterPath=Choose path to installer data.
+
+# ............................. =Cancel and quit the installation.
+DiskNeededConsoleUI.cancel=Cancel and quit the installation.
+
+# ............................. =ENTER CHOICE
+DiskNeededConsoleUI.choicePrompt=ENTER CHOICE
+
+# ............................. =ENTER PATH TO 'INSTALLERDATA' FOLDER ON DISK
+DiskNeededConsoleUI.enterPathPrompt=ENTER PATH TO 'INSTALLERDATA' FOLDER ON DISK
+
+
+# EDITENVIRONMENT
+# ---------------
+
+# .......................... =Your system environment has changed.  You will need to log out or reboot your system for these changes to take effect.
+EditEnvironment.RebootMessage=Your system environment has changed.  You will need to log out or reboot your system for these changes to take effect.
+
+# ........................ =System Environment Changed
+EditEnvironment.RebootTitle=System Environment Changed
+
+
+# EXITDIALOG
+# ----------
+
+# .............. =Quit
+ExitDialog.cancel=&Quit
+
+ExitDialog.Exit=Would you like to exit ?
+ExitDialog.ExitOption=Exit
+
+# ..................... =Installation Not Complete
+ExitDialog.install.label=Installation Not Complete
+
+# ....................... =Uninstall Not Complete
+ExitDialog.uninstall.label=Uninstall Not Complete
+
+# ....................... =Maintenance Not Complete
+ExitDialog.maintMode.label=Maintenance Not Complete
+
+# ......................... =If you cancel the installation now, $PRODUCT_NAME$ will not be installed.  To continue with the installation, click 'Resume'.  To cancel the installation, click 'Quit'.
+ExitDialog.install.narrative=If you cancel the installation now, $PRODUCT_NAME$ will not be installed.  To continue with the installation, click 'Resume'.  To cancel the installation, click 'Quit'.
+
+# ........................... =If you cancel the uninstall now, $PRODUCT_NAME$ will not be uninstalled.  To continue with the uninstall, click 'Resume'.  To cancel the uninstall, click 'Quit'.
+ExitDialog.uninstall.narrative=If you cancel the uninstall now, $PRODUCT_NAME$ will not be uninstalled.  To continue with the uninstall, click 'Resume'.  To cancel the uninstall, click 'Quit'.
+
+# ........................... =If you cancel the maintenance now, $PRODUCT_NAME$ will not be maintained as per options chosen.  To continue with the maintenance, click 'Resume'.  To cancel the maintenance, click 'Quit'.
+ExitDialog.maintMode.narrative=If you cancel the maintenance now, $PRODUCT_NAME$ will not be maintained as per options chosen.  To continue with the maintenance, click 'Resume'.  To cancel the maintenance, click 'Quit'.
+
+# .......... =Resume
+ExitDialog.ok=&Resume
+
+# ............. =Cancel Uninstall
+ExitDialog.uninstall.title=Cancel Uninstall
+
+# ............. =Cancel Installation
+ExitDialog.install.title=Cancel Installation
+
+# ............. =Cancel Maintenance
+ExitDialog.maintMode.title=Cancel Maintenance
+
+# FILEALREADYEXISTS
+# ----------------
+
+# ....................... =Yes to All
+FileAlreadyExists.yesAll=Yes to All
+
+# ....................... =No to All
+FileAlreadyExists.noAll=No to All
+
+# ....................... =Yes
+FileAlreadyExists.yes=Yes
+
+# ....................... =No
+FileAlreadyExists.no=No
+
+# ....................... =Overwrite Existing File?
+FileAlreadyExists.title=Overwrite Existing File?
+
+# ....................... =A file named \"XXX\" already exists at \"XXX\".
+FileAlreadyExists.overwriteMessage=A file named \"XXX\" already exists at \"XXX\".
+
+# ....................... =A newer file named \"XXX\" already exists at \"XXX\".
+FileAlreadyExists.newerMessage=A newer file named \"XXX\" already exists at \"XXX\".
+
+# ....................... =An older file named \"XXX\" already exists at \"XXX\".
+FileAlreadyExists.olderMessage=An older file named \"XXX\" already exists at \"XXX\".
+
+# ....................... =Do you want to overwrite the existing file?
+FileAlreadyExists.question=Do you want to overwrite the existing file?
+
+
+
+
+# FINDFILEORFOLDER (DONE)
+# ----------------
+
+# ....................... =Please Choose a File/Folder:
+FindFileOrFolder.askPrompt=Please Choose a &File/Folder:
+
+
+# FINDFILEORFOLDERPANEL (DONE)
+# ---------------------
+
+# .............................. =Choose
+FindFileOrFolderPanel.chooseTitle=Choose
+
+# .................................. =Files are Being Added to the List Below.
+FindFileOrFolderPanel.filesBeingAdded=Files are Being Added to the List Below.
+
+# ................................... =The Files Found are Listed Below.
+FindFileOrFolderPanel.filesFoundListed=The Files Found are Listed Below.
+
+# .................................... =Folders are Being Added to The List Below.
+FindFileOrFolderPanel.foldersBeingAdded=Folders are Being Added to The List Below.
+
+# ..................................... =The Folders Found are Listed Below.
+FindFileOrFolderPanel.foldersFoundListed=The Folders Found are Listed Below.
+
+# ............................. =Found Files Matching:
+FindFileOrFolderPanel.foundFiles=Found Files Matching:
+
+# ............................... =Found Folders Matching:
+FindFileOrFolderPanel.foundFolders=Found Folders Matching:
+
+# .......................... =Found In:
+FindFileOrFolderPanel.foundIn=Found In:
+
+# ............................ =Choose Other...
+FindFileOrFolderPanel.illChoose=Ch&oose Other...
+
+# ............................ =Looking In:
+FindFileOrFolderPanel.lookingIn=Looking In:
+
+# ................................ =Please make your own selection.
+FindFileOrFolderPanel.makeSelection=Please make your own selection.
+
+# .................................... =Searching for Files Matching:
+FindFileOrFolderPanel.searchingForFiles=Searching for Files Matching:
+
+# ...................................... =Searching for Folders Matching:
+FindFileOrFolderPanel.searchingForFolders=Searching for Folders Matching:
+
+# .............................. =Searching
+FindFileOrFolderPanel.searchTitle=Searching
+
+# .............................. =Select
+FindFileOrFolderPanel.selectTitle=Select
+
+# ................................ =The Installer Was Unable to Find a Match for:
+FindFileOrFolderPanel.unableToMatch=The Installer Was Unable to Find a Match for:
+
+
+# FOLDERDIALOGLAYER
+# -----------------
+
+# .......................... =Selected:
+FolderDialogLayer.selectedStr=Selected:
+
+# .............................. =Select a Folder
+FolderDialogLayer.selectFolderStr=Select a Folder
+
+
+# FOLDERSELECTDIALOG
+# ------------------
+
+# ......................... =Cancel
+FolderSelectDialog.cancelStr=Cancel
+
+# ......................... =Create a New Folder
+FolderSelectDialog.createStr=Create a New Folder
+
+# ......................... =Folder:
+FolderSelectDialog.folderStr=Folder:
+
+# ....................... =Name:
+FolderSelectDialog.nameStr=Name:
+
+# ..................... =OK
+FolderSelectDialog.okStr=OK
+
+
+# GENERICCONSOLESTRINGS
+# ---------------------
+
+# ................................ =IS THIS CORRECT?
+GenericConsoleStrings.isThisCorrect=IS THIS CORRECT?
+
+# .................................. =PRESS <ENTER> TO CONTINUE
+GenericConsoleStrings.enterToContinue=PRESS <ENTER> TO CONTINUE
+
+# ............................ =Error:
+GenericConsoleStrings.exception=Error:
+
+
+# GENERICINSTALLPANEL (DONE)
+# -------------------
+
+# ........................ =Please wait, $PRODUCT_NAME$ is being configured for your system.  This may take a moment...
+GenericInstallPanel.message=Please wait, $PRODUCT_NAME$ is being configured for your system.  This may take a moment...
+
+# ...................... =Please Wait
+GenericInstallPanel.title=Please Wait
+
+
+# GETI5OSLIBRARYOVERRIDEPANEL (DONE)
+# -----------------------
+
+# ..................................... =Error!
+i5OSLibraryOverridePanel.errDialog.label=Error!
+
+
+# ........................... =OK
+i5OSLibraryOverridePanel.okStr=OK
+
+# .............................. =Enter the name of the librar(y)ies to override.
+i5OSLibraryOverridePanel.libs2ovr=Enter the name of the librar(y)ies to override.
+
+
+# GETI5OSLOGINCREDINSTALLPANEL (DONE)
+# -----------------------
+
+# .................................... =Error!
+i5OSLoginCredentialInstallPanel.errDialog.label=Error!
+
+# ................................................ =The login or password you entered is incorrect.  Please try again.
+i5OSLoginCredentialInstallPanel.errDialog.narrative=The login or password you entered is incorrect.  Please try again.
+
+# ...................................................... =An error occurred while trying to establish a connection to System i (i5/OS) machine.
+i5OSLoginCredentialInstallPanel.errDialog.connectionError=An error occurred while trying to establish a connection to System i (i5/OS) machine.
+
+# ............................................ =Login Error
+i5OSLoginCredentialInstallPanel.errDialog.title=Login Error
+
+# .................................. =OK
+i5OSLoginCredentialInstallPanel.okStr=OK
+
+# ............................................. =Password is required to continue.
+i5OSLoginCredentialInstallPanel.pwdToContinueStr=Password is required to continue.
+
+# GETPASSWORD (DONE)
+# -----------
+
+# ....................... =This installation requires a password to continue.
+GetPassword.additionalText=This installation requires a password to continue.
+
+# ............... =Please Enter the Password:
+GetPassword.prompt=Please Enter the Pass&word:
+
+# .................. =Enter Password
+GetPassword.stepTitle=Enter Password
+
+
+# GETPASSWORDINSTALLPANEL (DONE)
+# -----------------------
+
+# .................................... =Error!
+GetPasswordInstallPanel.errDialog.label=Error!
+
+# ........................................ =The password you entered is incorrect.  Please try again.
+GetPasswordInstallPanel.errDialog.narrative=The password you entered is incorrect.  Please try again.
+
+# .................................... =Enter Password
+GetPasswordInstallPanel.errDialog.title=Enter Password
+
+# .......................... =OK
+GetPasswordInstallPanel.okStr=OK
+
+# ..................................... =Password is required to continue.
+GetPasswordInstallPanel.pwdToContinueStr=Password is required to continue.
+
+
+# GETPASSWORDCONSOLE
+# -----------
+
+# .............................. =This installation requires a password to continue.
+GetPasswordConsole.additionalText=This installation requires a password to continue.
+
+# ................................... =The password you entered is incorrect.  Please try again.
+GetPasswordConsole.errDialog.narrative=The password you entered is incorrect.  Please try again.
+
+# ...................... =Please Enter the Password
+GetPasswordConsole.prompt=Please Enter the Password
+
+# ................................ =Password is required to continue.
+GetPasswordConsole.pwdToContinueStr=Password is required to continue.
+
+# ......................... =Enter Password
+GetPasswordConsole.stepTitle=Enter Password
+
+# GETI5OSLOGINCREDENTIAL (DONE)
+# -----------
+
+# ............................... =This installation requires an iSeries system name, user name, and password to continue.
+i5OSLoginCredential.additionalText=This installation requires an iSeries system name, user name, and password to continue.
+
+# ....................... =Please Enter the Password:
+i5OSLoginCredential.prompt=Please Enter the Pass&word:
+
+# ....................... =Please Enter the System Name:
+i5OSLoginCredential.system=Please Enter the S&ystem Name:
+
+# ....................... =Please Enter the User Name:
+i5OSLoginCredential.user=Please Enter the &User Name:
+
+# .......................... =Enter Sign on Credentials (i5/OS System, User and Password)
+i5OSLoginCredential.stepTitle=Enter Sign on Credentials (i5/OS System, User and Password)
+# ........................... =10
+i5OSLoginCredential.numConnect=10
+# ............................ =2
+i5OSLoginCredential.initConnect=2
+
+# I5OSLIBRARYOVERRIDECONSOLE
+# -----------
+
+# ...................................... =In the 'Prompt:' field enter the destination library you are using for the System i (i5/OS).  If there is more than one name entered you will be prompted for each one separately.  
+i5OSLibraryOverrideConsole.additionalText=In the 'Prompt:' field enter the destination library you are using for the System i (i5/OS).  If there is more than one name entered you will be prompted for each one separately.  
+
+# ................................. =Override Library Console
+i5OSLibraryOverrideConsole.stepTitle=Override Library Console
+
+# .............................. =Please Enter the library to override:
+i5OSLibraryOverrideConsole.prompt=Please Enter the library to override:
+
+# I5OSLIBRARYOVERRIDEPANEL
+# -----------
+
+# ............................... =Override Library Panel
+i5OSLibraryOverridePanel.stepTitle=Override Library Panel
+
+# .................................... =Objects will be restored into the following i5/OS libraries. For each library name presented, either leave the name unchanged to accept it, or specify the name of a library to be used instead.
+i5OSLibraryOverridePanel.additionalText=Objects will be restored into the following i5/OS libraries. For each library name presented, either leave the name unchanged to accept it, or specify the name of a library to be used instead.
+
+# ............................ =Please Enter the library or libraries:
+i5OSLibraryOverridePanel.prompt=Please Enter the library &or libraries:
+
+
+# GETUSERINPUTCONSOLE 
+# -------------------
+
+# ............................ =ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE DESIRED CHOICES
+GetUserInputConsole.multiPrompt=ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE DESIRED WANTED
+
+# ........................................ =ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE DESIRED CHOICES, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+GetUserInputConsole.multiPromptWithDefaults=ENTER A COMMA-SEPARATED LIST OF NUMBERS REPRESENTING THE DESIRED CHOICES, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+
+# ............................. =ENTER THE NUMBER OF THE DESIRED CHOICE
+GetUserInputConsole.singlePrompt=ENTER THE NUMBER OF THE DESIRED CHOICE
+
+# ......................................... =ENTER THE NUMBER FOR YOUR CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT:
+GetUserInputConsole.singlePromptWithDefaults=ENTER THE NUMBER FOR YOUR CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT:
+
+
+# GETUSERINPUTPANEL
+# -----------------
+
+# ............................. =&Restore Default
+GetUserInputPanel.restoreDefault=&Restore Default
+
+# ..................... =Ch&oose...
+GetUserInputPanel.choose=Ch&oose...
+
+
+# HTMLPANELACTION
+# ---------------
+
+#....................=HTML Panel
+HTMLPanelAction.title=HTML Panel
+
+# IASYSREADLINE
+# -------------
+
+# ................. =This step does not allow quitting the installer at this moment.
+IASysReadLine.noQuit=This step does not allow quitting the installer at this moment.
+
+# ................. =This step does not allow returning to a previous step at the moment.
+IASysReadLine.noBack=This step does not allow returning to a previous step at the moment.
+
+
+# IMPORTANTNOTEACTION (DONE)
+# -------------------
+
+# ...................... =Important Information
+ImportantNoteAction.title=Important Information
+
+# ........................... =Please Read Before Continuing:
+ImportantNoteAction.stepPrompt=Please Read Before Continuing:
+
+
+# IMPORTANTNOTEACTIONCONSOLE
+# --------------------------
+
+# .............................. =IMPORTANT INFORMATION COMPLETE. PRESS <ENTER> TO CONTINUE
+ImportantNoteActionConsole.prompt=IMPORTANT INFORMATION COMPLETE. PRESS <ENTER> TO CONTINUE
+
+# ............................. =Important Information
+ImportantNoteActionConsole.title=Important Information
+
+# .................................. =Please read before continuing:
+ImportantNoteActionConsole.stepPrompt=Please read before continuing:
+
+
+# INSTALLBUNDLE
+# -------------
+
+# ................................. =Application
+InstallBundle.application.bundleName=Application
+
+# .................................. =This installs the application feature.
+InstallBundle.application.description=This installs the application feature.
+
+# .......................... =Help
+InstallBundle.help.bundleName=Help
+
+# ........................... =This installs the help feature.
+InstallBundle.help.description=This installs the help feature.
+
+
+# INSTALLCOMPLETEACTION (DONE)
+# ---------------------
+
+# .......................... =Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n     $USER_INSTALL_DIR$\n\nPress "Done" to quit the installer.
+InstallCompleteAction.message=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\u000A\u000A     $USER_INSTALL_DIR$\u000A\u000APress "Done" to quit the installer.
+
+# ............................ =Install Complete
+InstallFinishAction.windowTitle=Install Complete
+InstallCompleteAction.stepTitle=Install Complete
+
+
+# INSTALLFAILEDACTION (DONE)
+# ---------------------
+
+# ........................ =The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install.\n\nPlease see the installation log for details.  Press "Done" to quit the installer.
+InstallFailedAction.message=The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install.\u000A\u000APlease see the installation log for details.  Press "Done" to quit the installer.
+
+# .......................... =Install Complete
+InstallFailedAction.stepTitle=Install Complete
+
+
+# INSTALLCOMPLETEACTIONCONSOLE
+# ----------------------------
+
+# ............................... =Installation Complete
+InstallCompleteActionConsole.title=Installation Complete
+
+# ................................. =Congratulations. $PRODUCT_NAME$ has been successfully installed to:\n\n   $USER_INSTALL_DIR$
+InstallCompleteActionConsole.message=Congratulations. $PRODUCT_NAME$ has been successfully installed to:\u000A\u000A   $USER_INSTALL_DIR$
+
+# ................................. =The installation of $PRODUCT_NAME$ has been rolled back.\u000A\u000A Please see the installation log for details.
+InstallCompleteActionConsole.rollbackMessage=The installation of $PRODUCT_NAME$ has been rolled back.\u000A\u000A Please see the installation log for details.
+
+# ................................ =PRESS <ENTER> TO EXIT THE INSTALLER
+InstallCompleteActionConsole.prompt=PRESS <ENTER> TO EXIT THE INSTALLER
+
+# .................................. =The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install. Please see the installation log for details.
+InstallCompleteActionConsole.errorStr=The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install.\u000A   Please see the installation log for details.
+
+
+# INSTALLFAILEDACTIONCONSOLE
+# ---------------------
+
+# ............................... =The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install. Please see the installation log for details. Press "ENTER" to quit the installer.
+InstallFailedActionConsole.message=The installation of $PRODUCT_NAME$ is complete, but some errors occurred during the install.\u000A   Please see the installation log for details.  Press "ENTER" to quit the installer.
+
+# .............................. =PRESS <ENTER> TO EXIT THE INSTALLER
+InstallFailedActionConsole.prompt=PRESS <ENTER> TO EXIT THE INSTALLER
+
+# ............................. =Install Complete
+InstallFailedActionConsole.title=Install Complete
+
+
+# INSTALLDIRACTION (DONE)
+# ----------------
+
+# ............................ =Please choose a destination folder for this installation.
+InstallDirAction.additionalText=Please choose a destination folder for this installation.
+
+# ....................... =Choose Install Folder
+InstallDirAction.stepTitle=Choose Install Folder
+
+# .................... =Where Would You Like to Install?
+InstallDirAction.prompt=&Where Would You Like to Install?
+
+# INSTALLIFSACTION (DONE)
+# ----------------
+
+# ............................ =Please choose a destination IFS folder for this installation on the remote System i (i5/OS).
+InstallIFSAction.additionalText=Please choose a destination IFS folder for this installation on the remote System i (i5/OS).
+
+# ....................... =Choose a Remote IFS Folder
+InstallIFSAction.stepTitle=Choose a Remote IFS Folder
+
+# .................... =To which IFS directory would you like to install?
+InstallIFSAction.prompt=To &which IFS directory would you like to install?
+
+
+# INSTALLDIRACTIONCONSOLE
+# -----------------------
+
+# .............................. =Choose Install Folder
+InstallDirActionConsole.stepTitle=Choose Install Folder
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ............................... =ENTER AN ABSOLUTE PATH, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\n   
+InstallDirActionConsole.promptMain=ENTER AN ABSOLUTE PATH, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\u000A   
+
+# ...................................... =ENTER AN ABSOLUTE PATH, TYPE 'default' TO RESTORE THE DEFAULT FOLDER,\n   OR PRESS <ENTER> TO ACCEPT THE CHOSEN FOLDER
+InstallDirActionConsole.promptWithDefault=ENTER AN ABSOLUTE PATH, TYPE 'default' TO RESTORE THE DEFAULT FOLDER,\u000A   OR PRESS <ENTER> TO ACCEPT THE CHOSEN FOLDER
+
+# .................................. =Default Install Folder: 
+InstallDirActionConsole.defaultDirStr=Default Install Folder: 
+
+# ................................. =Chosen Install Folder: 
+InstallDirActionConsole.chosenDirStr=Chosen Install Folder: 
+
+# .................................... =INSTALL FOLDER IS: 
+InstallDirActionConsole.installDirIsStr=INSTALL FOLDER IS: 
+
+# .................................... =The supplied path: 
+InstallDirActionConsole.suppliedPathStr=The supplied path: 
+
+# ....................................... =points to a file that already exists on the target system.\nThis installer cannot over write an existing file with a new folder.\nPlease choose another install location.
+InstallDirActionConsole.cannotOverwriteStr=points to a file that already exists on the target system.\u000AThis installer cannot over write an existing file with a new folder.\u000APlease choose another install location.
+
+# ..................................... =You do not have write permissions to the chosen installation destination. Please choose a different location for installation.
+InstallDirActionConsole.alertDialog.text=You do not have write permissions to the chosen installation destination. \u000APlease choose a different location for installation
+
+# ........................... =Where would you like to install?
+InstallDirActionConsole.prompt=Where would you like to install?
+
+
+# INSTALLDIRACTIONPANEL (DONE)
+# ---------------------
+
+# .................................... =Error! 
+InstallDirActionPanel.alertDialog.label=Error!
+
+# ........................................ =You do not have write permissions to the chosen installation destination. Please choose a different location for installation.
+InstallDirActionPanel.alertDialog.narrative=You do not have write permissions to the chosen installation destination. \u000APlease choose a different location for installation
+
+# .................................... =Choose Install Folder 
+InstallDirActionPanel.alertDialog.title=Choose Install Folder
+
+# .......................................... =The path specified as the installation destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for installation.
+InstallDirActionPanel.alertDialog.invalidPath=The path specified as the installation destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for installation.
+
+# ........................................... =The path specified as the installation destination is relative. \u000APlease specify an absolute path.
+InstallDirActionPanel.alertDialog.relativePath=The path specified as the installation destination is relative. \u000APlease specify an absolute path.
+
+# ................................ =Choose...
+InstallDirActionPanel.chooseDirBttn=Ch&oose...
+
+# .............................. =Restore Default Folder
+InstallDirActionPanel.defaultBttn=&Restore Default Folder
+
+# ............................... =inside
+InstallDirActionPanel.macInsideStr=inside
+
+# ............................. =in the folder
+InstallDirActionPanel.macIntoLbl=in the folder
+
+# ........................... =on the disk
+InstallDirActionPanel.macOnStr=on the disk
+# INSTALLIFSACTIONPANEL (DONE)
+# ---------------------
+
+# .................................... =Error! 
+InstallIFSActionPanel.alertDialog.label=Error!
+
+# ........................................ =You do not have write permissions to the chosen installation destination. Please choose a different location for installation.
+InstallIFSActionPanel.alertDialog.narrative=You do not have write permissions to the chosen installation destination. \u000APlease choose a different location for installation
+
+# .................................... =Choose Install Folder 
+InstallIFSActionPanel.alertDialog.title=Choose Install Folder
+
+# .......................................... =The path specified as the installation destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for installation.
+InstallIFSActionPanel.alertDialog.invalidPath=The path specified as the installation destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for installation.
+
+# ................................ =Choose...
+InstallIFSActionPanel.chooseIFSBttn=Ch&oose...
+
+# .............................. =Restore Default Folder
+InstallIFSActionPanel.defaultBttn=&Restore Default Folder
+
+
+
+# INSTALLER
+# ---------
+
+# .................... =install
+Installer.installerName=install
+
+# ....................... =Introduction
+Installer.installLabels.00=Introduction
+
+# ....................... =Choose Install Folder
+Installer.installLabels.01=Choose Install Folder
+
+# ....................... =Choose $SHORTCUT_NAME$ Folder
+Installer.installLabels.02=Choose $SHORTCUT_NAME$ Folder
+
+# ....................... =Pre-Installation Summary
+Installer.installLabels.03=Pre-Installation Summary
+
+# ....................... =Installing...
+Installer.installLabels.04=Installing...
+
+# ....................... =Install Complete
+Installer.installLabels.05=Install Complete
+
+# ....................... =The Installer Cannot Be Run On this System.
+Installer.rulesFailedLabel=The Installer Cannot Be Run On this System.
+
+# ......................... =The installer cannot run on your configuration. It will now quit.
+Installer.rulesFailedMessage=The installer cannot run on your configuration. It will now quit.
+
+# ................................... =Installer User Interface Mode Not Supported
+Installer.uiSupportError.message.label=Installer User Interface Mode Not Supported
+
+# ....................................... =The installer cannot run in this UI mode. To specify the interface mode, use the -i command-line option, followed by the UI mode identifier. The valid UI modes identifiers are GUI, Console, and Silent.
+Installer.uiSupportError.message.narrative=The installer cannot run in this UI mode. To specify the interface mode, use the -i command-line option, followed by the UI mode identifier. The valid UI modes identifiers are GUI, Console, and Silent.
+
+
+# ................................... =Installer UI Mode Error
+Installer.uiSupportError.message.title=Installer UI Mode Error
+
+# ..................... =Splash.png
+Installer.userSplashName=
+
+# ..................... =com/zerog/ia/installer/images/
+Installer.userSplashPath=
+# ................................... =Uninstall $PRODUCT_NAME$
+InstallFrameConfigurator.uninstallerTitle=Uninstall $PRODUCT_NAME$
+
+InstallFrameConfigurator.maintModeTitle=Configure $PRODUCT_NAME$
+
+# ....................... =The Installer cannot be run.
+Installer.multipleLaunchNotAllowedLabel=The Installer cannot be run.
+
+# ......................... =Multiple launches of this installer is not allowed. It will now quit.
+Installer.multipleLaunchNotAllowedMessage=Multiple launches of this installer is not allowed. It will now quit.
+
+
+# INSTALLFINISHPANEL
+# -----------------
+
+# ............................ =Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n    $USER_INSTALL_DIR$\n\nPress "Done" to quit the installer.
+InstallFinishAction.installSuccessMessage=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\u000A\u000A     $USER_INSTALL_DIR$\u000A\u000APress "Done" to quit the installer.
+
+# ............................ =The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log for details.
+InstallFinishAction.installWarningMessage=The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log for details.
+
+# ............................ =The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.  Please see the installation log for details.
+InstallFinishAction.installErrorMessage=The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.  Please see the installation log for details.
+
+# ............................ =The installation of $PRODUCT_NAME$ has been rolled back.\u000A\u000A Please see the installation log for details.
+InstallFinishAction.installFatalMessage=The installation of $PRODUCT_NAME$ has been rolled back.\u000A\u000A Please see the installation log for details.
+
+# ............................ =The upgrade of $PRODUCT_NAME$ was not successful.\u000A\u000A Please see the installation log for details.
+InstallFinishAction.installFatalUpgradeMessage=The upgrade of $PRODUCT_NAME$ was not successful.\u000A\u000AFor details, see the installation log.
+
+# ............................ =(no message)
+InstallFinishAction.rebootNotNeededMessage=
+
+# ............................ =You should restart the system to complete the installation
+InstallFinishAction.rebootRecommendedMessage=You should restart the system to complete the installation.
+
+# ............................ =You need to restart the system to complete the installation
+InstallFinishAction.rebootRequiredMessage=You need to restart the system to complete the installation.
+
+
+# ............................ =Install Complete
+InstallFinishAction.defaultWindowTitle=Install Complete
+
+# .................. =Yes, restart my system
+InstallFinishAction.restartYesMessage=Yes, restart my system
+
+# .................. =No, I will restart my system myself
+InstallFinishAction.restartNoMessage=No, I will restart my system myself
+
+
+
+# INSTALLPROGRESSUI
+# -----------------
+
+# ............................ =Installing...
+InstallProgressUI.installingStr=Installing...
+
+# ............................ =Adding...
+InstallProgressUI.addingStr=Adding...
+
+# ............................ =Repairing...
+InstallProgressUI.repairingStr=Repairing...
+
+# ................................... =Installing $PRODUCT_NAME$
+InstallProgressUI.installingProductStr=Installing $PRODUCT_NAME$
+
+# ................................... =Add $PRODUCT_NAME$
+InstallProgressUI.addingProductStr=Add $PRODUCT_NAME$
+
+# ................................... =Repair $PRODUCT_NAME$
+InstallProgressUI.repairingProductStr=Repair $PRODUCT_NAME$
+
+# ............................ =Extracting duplicates...
+InstallProgressUI.extractingDuplicatesStr=Extracting duplicates...
+
+# ............................... =Cancelling Installation...
+InstallProgressUI.cancellingString=Cancelling Installation...
+
+# ............................... =Rolling Back Installation...
+InstallProgressUI.rollingBackString=Rolling back installation ...
+
+# ............................... =Progress Percentage Symbol...
+InstallProgressUI.ProgressPercentageSymbolString=%
+
+
+# INSTALLPROGRESSCONSOLE
+# ----------------------
+
+# ................................. =Installing...
+InstallProgressConsole.installingStr=Installing...
+
+# ................................. =Adding...
+InstallProgressConsole.addingStr=Adding...
+
+# ................................. =Repairing...
+InstallProgressConsole.repairingingStr=Repairing...
+
+
+# INSTALLSUMMARY (DONE)
+# --------------
+
+# ................. =Pre-Installation Summary
+InstallSummary.title=Pre-Installation Summary
+
+# ...................... =Please Review the Following Before Continuing:
+InstallSummary.stepPrompt=Please Review the Following Before Continuing:
+
+
+# INSTALLSUMMARYCONSOLE 
+# ---------------------
+
+# ........................ =Pre-Installation Summary
+InstallSummaryConsole.title=Pre-Installation Summary
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ............................. =PRESS <ENTER> TO CONTINUE.  IF THE INFORMATION IS INCORRECT, TYPE "BACK" TO MAKE CHANGES\n   
+InstallSummaryConsole.stepPrompt=PRESS <ENTER> TO CONTINUE.  IF THE INFORMATION IS INCORRECT, TYPE "BACK" TO MAKE CHANGES\u000A   
+
+
+# INSTALLSUMMARYUI (DONE)
+# ----------------
+
+# ......................... =Product Name:
+InstallSummaryUI.productName=Product Name:
+
+# .............................. =Install Folder:
+InstallSummaryUI.installDirectory=Install Folder:
+
+# ..................................... =Shortcut Folder:
+InstallSummaryUI.Win32.shortcutDirectory=Shortcut Folder:
+
+# .................................... =Link Folder:
+InstallSummaryUI.Unix.shortcutDirectory=Link Folder:
+
+# ..................................... =Alias Folder:
+InstallSummaryUI.MacOS.shortcutDirectory=Alias Folder:
+
+# ......................................... =User defined Custom Install Set
+InstallSummaryUI.userDefinedCustomInstallSet=User defined Custom install Set
+
+# ....................................... =Install Set:
+InstallSummaryUI.chosenInstallationFeature=Install Set:
+
+# .......................................... =Product Features:
+InstallSummaryUI.chosenInstallationComponents=Product Features:
+
+# ................................. =Java VM Installation Folder:
+InstallSummaryUI.javaVMInstallation1=Java VM Installation Folder:
+
+# ................................. =Java VM to be Used by Installed Product:
+InstallSummaryUI.javaVMInstallation2=Java VM to be Used by Installed Product:
+
+# ........................=Disk Space Information (for Installation Target): 
+InstallSummaryUI.diskspace=Disk Space Information (for Installation Target): 
+
+# ...................... =Required:
+InstallSummaryUI.required=Required:
+
+# .................. =Bytes
+InstallSummaryUI.byte=Bytes
+
+# .................. =KiloBytes
+InstallSummaryUI.kilobyte=KiloBytes
+
+# .................. =MegaBytes
+InstallSummaryUI.megabyte=MegaBytes
+
+# .................. =GigaBytes
+InstallSummaryUI.gigabyte=GigaBytes
+
+# ....................... =Available:
+InstallSummaryUI.available=Available:
+
+
+# INSTALLSET
+# ----------
+
+# .......................... =Choose this option to customize the features to be installed.
+InstallSet.custom.description=Choose this option to customize the features to be installed.
+
+# ............................. =Custom
+InstallSet.custom.installSetName=Custom
+
+# ........................ =com/zerog/ia/installer/images/
+InstallSet.custom.imagePath=
+
+# ........................ =customIcon.png
+InstallSet.custom.imageName=
+
+# ........................... =Only required application features will be installed.  This option is recommended only for users with limited disk space.
+InstallSet.minimal.description=Only required application features will be installed.  This option is recommended only for users with limited disk space.
+
+# .............................. =Minimal
+InstallSet.minimal.installSetName=Minimal
+
+# ........................... =The most common application features will be installed.  This option is recommended for most users.
+InstallSet.typical.description=The most common application features will be installed.  This option is recommended for most users.
+
+# .............................. =Typical
+InstallSet.typical.installSetName=Typical
+
+
+# INTROACTION
+# -----------
+
+# ................ =InstallAnywhere will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\n\nYou may cancel this installation at any time by clicking the 'Cancel' button.
+IntroAction.message=InstallAnywhere will guide you through the installation of $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing with this installation.\u000A\u000AClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\u000A\u000AYou may cancel this installation at any time by clicking the 'Cancel' button.
+
+# .................. =Introduction
+IntroAction.stepTitle=Introduction
+
+
+# INTROACTIONCONSOLE
+# ------------------
+
+# ........................... =InstallAnywhere will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nRespond to each prompt to proceed to the next step in the installation.  If you want to change something on a previous step, type 'back'.\n\nYou may cancel this installation at any time by typing 'quit'.
+IntroActionConsole.message=InstallAnywhere will guide you through the installation of $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing with this installation.\u000A\u000ARespond to each prompt to proceed to the next step in the installation.  If you want to change something on a previous step, type 'back'.\u000A\u000AYou may cancel this installation at any time by typing 'quit'.
+
+# ..................... =Introduction
+IntroActionConsole.title=Introduction
+
+# LAUNCHDEFAULTBROWSER
+# --------------------
+
+# ............................. =Unable to open URL in Web Browser
+LaunchDefaultBrowser.error.title=Unable to open URL in Web Browser
+
+# ............................... =InstallAnywhere was unable to open the requested URL ($ACTION_URL$) in your system's default web browser.  To view this URL, please type the address shown above in the web browser of your choice.
+LaunchDefaultBrowser.error.message=InstallAnywhere was unable to open the requested URL ($ACTION_URL$) in your system's default web browser.  To view this URL, please type the address shown above in the web browser of your choice.
+
+
+# LICENSEAGRACTION
+# ----------------
+
+# ................... =License Agreement
+LicenseAgrAction.title=License Agreement
+
+# ........................ =Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+LicenseAgrAction.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+
+
+# LICENSEAGRACTIONCONSOLE
+# -----------------------
+
+# .......................... =License Agreement
+LicenseAgrActionConsole.title=License Agreement
+
+# ............................... =Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+LicenseAgrActionConsole.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+
+# ................................. =DO YOU ACCEPT THE TERMS OF THIS LICENSE AGREEMENT?
+LicenseAgrActionConsole.choicePrompt=DO YOU ACCEPT THE TERMS OF THIS LICENSE AGREEMENT?
+
+
+# LICENSEAGRUI (DONE)
+# ------------
+
+# ............................. =Quit
+LicenseAgrUI.dialog.cancelButton=Quit
+
+# ......................... =Resume
+LicenseAgrUI.dialog.okButton=Resume
+
+# ...................... =License Agreement Warning
+LicenseAgrUI.dialog.title=License Agreement Warning
+
+# ........................ =Warning!
+LicenseAgrUI.dialog.warnLbl=Warning!
+
+# ........................ =If you do not accept the terms of the License Agreement you will not be allowed to continue with this installation.
+LicenseAgrUI.dialog.warnStr=If you do not accept the terms of the License Agreement you will not be allowed to continue with this installation.
+
+# .............. =I do NOT accept the terms of the License Agreement
+LicenseAgrUI.noCb=I do NO&T accept the terms of the License Agreement
+
+# .................... =No file found to preview
+LicenseAgrUI.noFileText=No file found to preview
+
+# ............... =I accept the terms of the License Agreement
+LicenseAgrUI.yesCb=I &accept the terms of the License Agreement
+
+# ........................ =No File Selected
+LicenseAgrUI.noFileSelected=No File Selected
+
+
+# PROMPTUSERCONSOLE
+# ---------------------
+
+# ................................. =PRESS <ENTER> TO ACCEPT THE FOLLOWING
+PromptUserConsole.singleChoicePrompt=PRESS <ENTER> TO ACCEPT THE FOLLOWING
+
+# ................................... =ENTER THE NUMBER OF THE DESIRED CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+PromptUserConsole.multipleChoicePrompt=ENTER THE NUMBER OF THE DESIRED CHOICE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+
+# ........................... =OK
+PromptUserConsole.option0Label=OK
+
+# ........................... =Cancel
+PromptUserConsole.option1Label=Cancel
+
+# ........................... =Details...
+PromptUserConsole.option2Label=Details...
+
+
+# READYTOINSTALLACTIONCONSOLE
+# ---------------------------
+
+# .................................=InstallAnywhere is now ready to install $PRODUCT_NAME$ onto your system at the following location:\n\n   $USER_INSTALL_DIR$
+ReadyToInstallActionConsole.message=InstallAnywhere is now ready to install $PRODUCT_NAME$ onto your system at the following location:\u000A\u000A   $USER_INSTALL_DIR$
+
+# ............................... =PRESS <ENTER> TO INSTALL
+ReadyToInstallActionConsole.prompt=PRESS <ENTER> TO INSTALL
+
+# .............................. =Ready To Install
+ReadyToInstallActionConsole.title=Ready To Install
+
+
+# REMOVEDIALOG
+# ------------
+
+# ..................... =InstallAnywhere is finishing up.  Please wait...
+RemoveDialog.description=InstallAnywhere is finishing up.  Please wait...
+
+# ............... =Cleaning up...
+RemoveDialog.title=Cleaning up...
+
+
+# SETSERIALNUMBER (DONE)
+# ---------------
+
+# ........................... =This installation requires a serial number to continue.
+SetSerialNumber.additionalText=This installation requires a serial number to continue.
+
+# ................... =Please Enter the Serial Number:
+SetSerialNumber.prompt=Please Enter the Serial Num&ber:
+
+# ...................... =Enter Serial Number
+SetSerialNumber.stepTitle=Enter Serial Number
+
+
+# SERIALNUMBERINSTALLPANEL (DONE)
+# ------------------------
+
+# ..................................... =Error!
+SerialNumberInstallPanel.errDialog.label=Error!
+
+# ......................................... =The serial number you entered is incorrect.  Please try again.
+SerialNumberInstallPanel.errDialog.narrative=The serial number you entered is incorrect.  Please try again.
+
+# ..................................... =Enter Serial Number
+SerialNumberInstallPanel.errDialog.title=Enter Serial Number
+
+# ........................... =OK
+SerialNumberInstallPanel.okStr=OK
+
+# ...................................... =Serial Number is required to continue.
+SerialNumberInstallPanel.sNoToContinueStr=Serial Number is required to continue.
+
+
+# SETSERIALNUMBERCONSOLE
+# ---------------
+
+# .................................. =This installation requires a serial number to continue.
+SetSerialNumberConsole.additionalText=This installation requires a serial number to continue.
+
+# .......................................... =The serial number you entered is incorrect.  Please try again.
+SetSerialNumberConsole.errMessage.narrative=The serial number you entered is incorrect.  Please try again.
+
+# .......................... =Please Enter the Serial Number:
+SetSerialNumberConsole.prompt=Please Enter the Serial Number
+
+# ...................................... =Serial Number is required to continue.
+SetSerialNumberConsole.sNoToContinueStr=Serial Number is required to continue.
+
+# ............................. =Enter Serial Number
+SetSerialNumberConsole.stepTitle=Enter Serial Number
+
+
+# SHORTCUTNAME
+# ------------
+
+# ............... =Alias
+ShortcutName.alias=Alias
+
+#............... =Link
+ShortcutName.link=Link
+
+#................... =Shortcut
+ShortcutName.shortcut=Shortcut
+
+
+# SHORTCUTLOCACTION (DONE)
+# -----------------
+
+# ........................ =Where would you like to create aliases?
+ShortcutLocAction.macPrompt=Where would you like to create aliases?
+
+# ....................... =Choose Alias Folder
+ShortcutLocAction.macTitle=Choose Alias Folder
+
+# ......................... =Choose Link Folder
+ShortcutLocAction.unixTitle=Choose Link Folder
+
+# ......................... =Where would you like to create links?
+ShortcutLocAction.unixPrompt=Where would you like to create links?
+
+# ........................ =Where would you like to create product icons?
+ShortcutLocAction.winPrompt=Where would you like to create product icons?
+
+# ....................... =Choose Shortcut Folder
+ShortcutLocAction.winTitle=Choose Shortcut Folder
+
+# ............................. =Common Groups
+ShortcutLocAction.allUsersGroups=Common Groups
+
+# ................................ =Current User's Groups
+ShortcutLocAction.currentUserGroups=Current User's Groups
+
+# ........................... =in the folder
+ShortcutLocAction.macInsideStr=in the folder
+
+# ....................... =on the disk
+ShortcutLocAction.macOnStr=on the disk
+
+# ......................... =Choose $SHORTCUT_NAME$ Folder
+ShortcutLocAction.labelTitle=Choose $SHORTCUT_NAME$ Folder
+
+# ......................... =Normal window
+ShortcutLocAction.runNormal=Normal window
+
+# ......................... =Minimized
+ShortcutLocAction.runMinimized=Minimized
+
+# ......................... =Maximized
+ShortcutLocAction.runMaximized=Maximized
+
+# ......................... =Comment
+ShortcutLocAction.comment=
+
+# SHORTCUTLOCACTIONCONSOLE
+# ------------------------
+
+# ................................ =Default: 
+ShortcutLocActionConsole.defaultLoc=Default: 
+
+# ................................ =Current: 
+ShortcutLocActionConsole.currentLoc=Current: 
+
+# ......................................... =Choose another location...
+ShortcutLocActionConsole.specifyAlternateLoc=Choose another location...
+
+# note to localizer: there should be three blank spaces at end of this string.
+# .................................. =ENTER THE NUMBER OF AN OPTION ABOVE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\n   
+ShortcutLocActionConsole.choicePrompt=ENTER THE NUMBER OF AN OPTION ABOVE, OR PRESS <ENTER> TO ACCEPT THE DEFAULT\u000A   
+
+# ............................................. =ENTER THE NUMBER OF AN OPTION ABOVE, OR PRESS <ENTER> TO ACCEPT THE\n   CURRENT SELECTION
+ShortcutLocActionConsole.choicePromptWithCurrent=ENTER THE NUMBER OF AN OPTION ABOVE, OR PRESS <ENTER> TO ACCEPT THE\u000A   CURRENT SELECTION
+
+# note to localizer: there should be three blank spaces at end of this string.
+# ................................ =ENTER THE ABSOLUTE PATH TO THE SHORTCUT DIRECTORY\n   
+ShortcutLocActionConsole.pathPrompt=ENTER THE ABSOLUTE PATH TO THE SHORTCUT DIRECTORY\u000A   
+
+# ...................................... =SHORTCUT DIRECTORY IS: 
+ShortcutLocActionConsole.shortcutDirIsStr=SHORTCUT DIRECTORY IS: 
+
+# ............................... =Choose Link Location
+ShortcutLocActionConsole.unixTitle=Choose Link Location
+
+# ................................ =Where would you like to create links?
+ShortcutLocActionConsole.unixPrompt=Where would you like to create links?
+
+# .............................. =Choose Shortcut Location
+ShortcutLocActionConsole.winTitle=Choose Shortcut Location
+
+# ................................ Where would you like to create product icons?: 
+ShortcutLocActionConsole.winPrompt=Where would you like to create product icons?: 
+
+# .............................. =Choose Alias Location
+ShortcutLocActionConsole.macTitle=Choose Alias Location
+
+# ................................ Where would you like to create aliases?
+ShortcutLocActionConsole.macPrompt=Where would you like to create aliases?
+
+# ..................................... =In the Apple Menu
+ShortcutLocActionConsole.MacUI.appleMenu=In the Apple Menu
+
+# ..................................... =In the Dock
+ShortcutLocActionConsole.MacXUI.theDock=In the Dock
+
+# ................................... =On the Desktop
+ShortcutLocActionConsole.MacUI.desktop=On the Desktop
+
+# ........................................... =Don't create aliases
+ShortcutLocActionConsole.PlatformUI.MACOS.none=Don't create aliases
+
+# ...................................... =Other:
+ShortcutLocActionConsole.PlatformUI.other=Other:
+
+# .......................................... =Don't create links
+ShortcutLocActionConsole.PlatformUI.UNIX.none=Don't create links
+
+# ........................................... =Don't create icons
+ShortcutLocActionConsole.PlatformUI.WIN32.none=Don't create icons
+
+# ................................. =In your home folder
+ShortcutLocActionConsole.UnixUI.home=In your home folder
+
+# ................................... =On the Desktop
+ShortcutLocActionConsole.WinUI.desktop=On the Desktop
+
+# .................................... =In a new Program Group:
+ShortcutLocActionConsole.WinUI.newGroup=In a new Program Group:
+
+# ..................................... =In an existing Program Group:
+ShortcutLocActionConsole.WinUI.progGroup=In an existing Program Group:
+
+# .......................................... =In the Quick Launch Bar:
+ShortcutLocActionPanel.WinUI.quickLaunchBarCb=In the &Quick Launch Bar
+
+# ..................................... =In the Start Menu
+ShortcutLocActionConsole.WinUI.startMenu=In the Start Menu
+
+# .................................... =Create Icons for All Users
+ShortcutLocActionConsole.WinUI.allUsers=Create icons for all users
+
+# ......................... =Normal window
+ShortcutLocActionConsole.runNormal=Normal window
+
+# ......................... =Minimized
+ShortcutLocActionConsole.runMinimized=Minimized
+
+# ......................... =Maximized
+ShortcutLocActionConsole.runMaximized=Maximized
+
+# ......................... =Comment
+ShortcutLocActionConsole.comment=
+
+
+# SHORTCUTLOCACTIONPANEL (DONE)
+# ----------------------
+
+# .................................... =Error! 
+ShortcutLocActionPanel.alertDialog.label=Error!
+
+# ........................................ =You do not have write permissions to the chosen destination. Please choose a different location for installation.
+ShortcutLocActionPanel.alertDialog.narrative=You do not have write permissions to the chosen destination. Please choose a different location for installation.
+
+# ..................................... =In the Apple Menu
+ShortcutLocActionPanel.MacUI.appleMenuCb=In the &Apple Menu
+
+# ..................................... =In the Dock
+ShortcutLocActionPanel.MacXUI.theDockCb=In the Doc&k
+
+# ................................... =On the Desktop
+ShortcutLocActionPanel.MacUI.desktopCb=On the &Desktop
+
+# ................................... =On the Desktop
+ShortcutLocActionPanel.OS2UI.desktopCb=On the &Desktop
+
+# ............................................ =Choose...
+ShortcutLocActionPanel.PlatformUI.chooseDirBttn=Ch&oose...
+
+# ........................................... =Don't create aliases
+ShortcutLocActionPanel.PlatformUI.MACOS.noneCb=Don't create aliases
+
+# ...................................... =Other:
+ShortcutLocActionPanel.PlatformUI.otherCb=Othe&r:
+
+# .......................................... =Don't create links
+ShortcutLocActionPanel.PlatformUI.UNIX.noneCb=Don'&t create links
+
+# ........................................... =Don't create icons
+ShortcutLocActionPanel.PlatformUI.WIN32.noneCb=Don'&t create icons
+
+# ................................. =In your home folder
+ShortcutLocActionPanel.UnixUI.homeCb=In your ho&me folder
+
+# ................................... =On the Desktop
+ShortcutLocActionPanel.WinUI.desktopCb=On the &Desktop
+
+# .................................... =In a new Program Group:
+ShortcutLocActionPanel.WinUI.newGroupCb=In a new Program &Group:
+
+# ..................................... =In an existing Program Group:
+ShortcutLocActionPanel.WinUI.progGroupCb=In an &existing Program Group:
+
+# ..................................... =In the Start Menu
+ShortcutLocActionPanel.WinUI.startMenuCb=In the &Start Menu
+
+# .................................... =Create Icons for All Users
+ShortcutLocActionPanel.WinUI.allUsersCb=Cre&ate Icons for All Users 
+
+
+# SHOWDIALOGACTION
+# ----------------
+
+# .......................... =OK
+ShowDialogAction.button0Label=OK
+
+# .......................... =Cancel
+ShowDialogAction.button1Label=Cancel
+
+# .......................... =Details...
+ShowDialogAction.button2Label=Details...
+
+
+# STEPMASTER
+# ----------
+
+# ...................... =Date:
+StepMaster.dialog.dateLbl=Date:
+
+# ......................... =License ID:
+StepMaster.dialog.licenseLbl=License ID:
+
+# ............................... =Script Version:
+StepMaster.dialog.scriptVersionLbl=Script Version:
+
+# ......................... =Version:
+StepMaster.dialog.versionLbl=Version:
+
+# ............... =Done
+StepMaster.doneStr=&Done
+
+# ............... =Cancel
+StepMaster.exitStr=Cancel
+
+# ............... =Help
+StepMaster.helpStr=&Help
+
+# .................. =Install
+StepMaster.installStr=&Install
+
+# .................. =Upgrade
+StepMaster.upgradeStr=&Upgrade
+
+# ............... =Next
+StepMaster.nextStr=&Next
+
+# ............... =Previous
+StepMaster.prevStr=&Previous
+
+# ............... =Close
+StepMaster.closeStr=Close
+
+# SYSTEMIPROGRESSBARDIALOG
+
+# .............................. =Pause Installer...
+SystemiProgressBarDialog.pauseStr=Pause Installer...
+
+# ............................... =Resume Installer...
+SystemiProgressBarDialog.resumeStr=Resume Installer...
+
+# ............................... =Cancel Installer...
+SystemiProgressBarDialog.cancelStr=Cancel Installer...
+
+# ................................................... =System i (i5/OS) subinstaller was cancelled by user during installation.
+Installer.installLog.SystemiProcessSubinstaller.cancel=System i (i5/OS) subinstaller was cancelled by user during installation.
+
+# UFINAL
+# ------
+
+# ............... =All items were successfully uninstalled.
+UFinal.allFilesStr=All items were successfully uninstalled.
+
+# ............... =Uninstall Complete
+UFinal.completeLbl=Uninstall Complete
+
+# ................ =The following items could not be removed:
+UFinal.someFilesStr=The following items could not be removed:
+
+# .................. =Unable to remove
+UFinal.unableToRemove=Unable to remove
+
+# .................. =You need to restart the system to complete the uninstallation.
+UFinal.rebootRequired=You need to restart the system to complete the uninstallation.
+
+# .................. =You should restart the system to complete the uninstallation.
+UFinal.rebootRecommended=You should restart the system to complete the uninstallation.
+
+# .................. =You also need to restart the system to complete the uninstallation.
+UFinal.rebootRequiredWhenSomeUnableToRemove=You also need to restart the system to complete the uninstallation.
+
+# .................. =You also should restart the system to complete the uninstallation.
+UFinal.rebootRecommendedWhenSomeUnableToRemove=You also should restart the system to complete the uninstallation.
+
+# .................. =Yes, restart my system
+UFinal.restartYesMessage=Yes, restart my system
+
+# .................. =No, I will restart my system myself
+UFinal.restartNoMessage=No, I will restart my system myself
+
+
+# UninstallCompleteAction
+# ------
+
+# ............... =All items were successfully uninstalled.
+UninstallCompleteAction.uninstallSuccessMessage=All items were successfully uninstalled.
+
+# ............... =Uninstall Skipped.
+UninstallCompleteAction.uninstallSkippedMessage=Unable to uninstall $PRODUCT_NAME$.
+
+# ............... =Uninstall Complete
+UninstallCompleteAction.stepTitle=Uninstall Complete
+
+# ................ =The following items could not be removed:
+UninstallCompleteAction.uninstallIncompleteMessage=The following items could not be removed:
+
+# .................. =
+UninstallCompleteAction.rebootNotNeededMessage=
+
+# .................. =You need to restart the system to complete the uninstallation.
+UninstallCompleteAction.rebootRequiredMessage=You need to restart the system to complete the uninstallation.
+
+# .................. =You also should restart the system to complete the uninstallation.
+UninstallCompleteAction.rebootRecommendedMessage=You should restart the system to complete the uninstallation.
+
+
+
+
+# UninstallCompleteActionConsole
+# -----------------------------
+
+# ............... =Uninstall Complete
+UninstallCompleteActionConsole.title=Uninstall Complete
+
+
+# ............... =All items were successfully uninstalled.
+UninstallCompleteActionConsole.message=All items were successfully uninstalled.
+
+
+# ............... =Some items could not be removed.
+UninstallCompleteActionConsole.incompleteMessage=Some items could not be removed.
+
+# ............... =Some items could not be removed.
+UninstallCompleteActionConsole.skippedMessage=Unable to uninstall $PRODUCT_NAME$.
+
+
+# UNINSTALLER
+# -----------
+
+# ..................... =The uninstallation could not complete due to an error.
+UnInstaller.exceptionStr=The uninstallation could not complete due to an error.
+
+# .................. =Uninstall $PRODUCT_NAME$
+UnInstaller.stepTitle=Uninstall $PRODUCT_NAME$
+
+# .................. =Remove $PRODUCT_NAME$
+UnInstaller.removeStepTitle=Remove $PRODUCT_NAME$
+
+
+# UNINSTALLERFRAME
+# ----------------
+
+# ...................... =InstallAnywhere Uninstaller
+UnInstallerFrame.titleStr=InstallAnywhere Uninstaller
+
+# ....................... =Introduction
+UnInstallerFrame.labelStr0=Introduction
+
+# ....................... =Uninstalling...
+UnInstallerFrame.labelStr1=Uninstalling...
+
+# ....................... =Removing...
+UnInstallerFrame.removingLabelStr1=Removing...
+
+# ....................... =Uninstall Complete
+UnInstallerFrame.labelStr2=Uninstall Complete
+
+
+
+# UninstallIntroAction
+# ------
+
+
+# ........... =About to uninstall...\n\n$PRODUCT_NAME$\n\nInstallAnywhere will remove the features that were installed during product installation.  Files and folders created after installation will not be removed.
+UninstallIntroAction.message=About to uninstall...\u000A\u000A$PRODUCT_NAME$\u000A\u000AInstallAnywhere will remove the features that were installed during product installation.  Files and folders created after installation will not be removed.
+
+# ........... ==Uninstall $PRODUCT_NAME$
+UninstallIntroAction.stepTitle=Uninstall $PRODUCT_NAME$
+
+
+# UninstallIntroActionConsole
+# ------
+
+
+# ........... =About to uninstall...\n\n$PRODUCT_NAME$\n\nThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+UninstallIntroActionConsole.message=About to uninstall...\u000A\u000A$PRODUCT_NAME$\u000A\u000AThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+
+# ........... ==Uninstall $PRODUCT_NAME$
+UninstallIntroActionConsole.stepTitle=Uninstall $PRODUCT_NAME$
+
+
+
+
+# UNINSTALLERNAVIGATOR
+# --------------------
+
+# ........................... =Cancel
+UnInstallerNavigator.cancelStr=Cancel
+
+# ......................... =Quit
+UnInstallerNavigator.exitStr=Quit
+
+# ......................... =Help
+UnInstallerNavigator.helpStr=Help
+
+# .............................. =Uninstall
+UnInstallerNavigator.uninstallStr=&Uninstall
+
+
+# UNINSTALLMGR
+# ------------
+
+# .................................. =An action could not be undone because it wasn't supported.
+UninstallMgr.ActUnableToUninstMessage=An action could not be undone because it wasn't supported.
+
+# .................... =Cleaning up...
+UninstallMgr.CleaningUp=Cleaning up...
+
+# .................... =Cleaning up...
+UninstallMgr.NativePackages=Native Packages...
+
+# ............... =Files...
+UninstallMgr.Files=Files...
+
+# ................. =Folders...
+UninstallMgr.Folders=Folders...
+
+# ................ =Java VM...
+UninstallMgr.JavaVM=Java VM...
+
+# ............. =LaunchAnywhere
+UninstallMgr.LAX=LaunchAnywhere
+
+# ............... =Links...
+UninstallMgr.Links=Links...
+
+# ............... =Custom Action Post Uninstall...
+UninstallMgr.CustomActionPost=Custom Action Post Uninstall...
+
+# ................... =Aliases...
+UninstallMgr.Links.mac=Aliases...
+
+# ................... =Shortcuts...
+UninstallMgr.Links.win=Shortcuts...
+
+# ..................... =The product could not be uninstalled because there is no longer a suitable Java virtual machine on this system. Please install a Java virtual machine and try again.
+UninstallMgr.NoVmMessage=The product could not be uninstalled because there is no longer a suitable Java virtual machine on this system. Please install a Java virtual machine and try again.
+
+# ................... =1 folder
+UninstallMgr.OneFolder=1 folder
+
+# ................... =Preparing...
+UninstallMgr.Preparing=Preparing...
+
+# .............. =Software Database...
+UninstallMgr.SwDb=Software Database...
+
+# .................. =Registry...
+UninstallMgr.SwDb.win=Registry...
+
+# .................... =2 folders
+UninstallMgr.TwoFolders=2 folders
+
+# ....................... =Unable to clean up
+UninstallMgr.UnableCleanUp=Unable to clean up
+
+# ....................... =Unable to remove custom action post uninstall
+UninstallMgr.UnableCustomActionPost=Unable to remove custom action post uninstall
+
+# ....................... =Unable to clean up
+UninstallMgr.UnableNativePackages=Unable to remove native packages
+
+# .................... =Unable to remove file
+UninstallMgr.UnableFile=Unable to remove file
+
+# ...................... =Unable to remove directory
+UninstallMgr.UnableFolder=Unable to remove directory
+
+# ...................... =Unable to remove Java VM feature
+UninstallMgr.UnableJavaVM=Unable to remove Java VM feature
+
+# .................... =Unable to remove link
+UninstallMgr.UnableLink=Unable to remove link
+
+# ........................ =Unable to remove alias
+UninstallMgr.UnableLink.mac=Unable to remove alias
+
+# ........................ =Unable to remove shortcut
+UninstallMgr.UnableLink.win=Unable to remove shortcut
+
+# ....................... =Unable to
+UninstallMgr.UnablePrepare=Unable to
+
+# .......................... =Unable to remove 1 file
+UninstallMgr.UnableRemOneFile=Unable to remove 1 file
+
+# ........................... =Unable to remove 2 files
+UninstallMgr.UnableRemTwoFiles=Unable to remove 2 files
+
+# .................... =Unable to remove software database
+UninstallMgr.UnableSwDb=Unable to remove software database
+
+# ........................ =Unable to remove registry key
+UninstallMgr.UnableSwDb.win=Unable to remove registry key
+
+
+# UNINSTALLRESTART
+# ---------
+
+# ................ =System Restart Required
+UninstallRestart.title=System Restart Required
+
+# ................ =It is not recommended that you run the uninstaller until the system is restarted.  Select \"Cancel\" to quit the uninstaller, or \"Continue\" to uninstall anyway.
+UninstallRestart.message=It is not recommended that you run the uninstaller until the system is restarted.  Click \"Cancel\" to quit the uninstaller, or \"Continue\" to uninstall anyway.
+
+# ................ =Continue
+UninstallRestart.continue=Continue
+
+# ................ =Cancel
+UninstallRestart.exit=Cancel
+
+
+# UPROGRESS
+# ---------
+
+# ............=Please wait while InstallAnywhere's uninstaller removes the following features...
+UProgress.wait=Please wait while InstallAnywhere's uninstaller removes the following features...
+
+# VISUAL NAMES
+# ------------
+
+# ...........=Executing Custom Code...
+Indeterminate.custom.code=Executing Custom Code...
+
+# Indeterminate.executing=Executing...
+Indeterminate.executing=Executing...
+
+# Indeterminate.script=Executing Installation Script...
+Indeterminate.script=Executing Installation Script...
+
+# InstallMergeModule.visualname.self=Install Merge Module
+InstallMergeModule.visualname.self=Install Merge Module
+
+# Indeterminate.mergemodule=Installing Merge Module
+Indeterminate.mergemodule=Installing Merge Module
+
+# Indeterminate.iSeriesMM=Installing Remote System i (i5/OS) Merge Modules
+Indeterminate.iSeriesMM=Installing Remote System i (i5/OS) Merge Modules
+# Indeterminate.nativePackage=Installing Native Package
+Indeterminate.nativePackage=Installing Native Package
+# Indeterminate.PoolLoginError=Error when trying to create the connection pool. Make sure you have set the login credentials through a Get System i (i5/OS) Login Credential panel.
+Indeterminate.PoolLoginError=Error when trying to create the connection pool. Make sure you have set the login credentials through a Get System i (i5/OS) Login Credential panel.
+
+# Uninstaller.command.quit=quit
+Uninstaller.command.quit=quit
+
+# Uninstaller.console.begin.text=PRESS <ENTER> TO BEGIN THE UNINSTALL, OR 'QUIT' TO EXIT THE UNINSTALLER:
+Uninstaller.console.begin.text=PRESS <ENTER> TO BEGIN THE UNINSTALL, OR 'QUIT' TO EXIT THE UNINSTALLER:
+
+# Uninstaller.console.exit.text=PRESS <ENTER> TO EXIT THE UNINSTALLER:
+Uninstaller.console.exit.text=PRESS <ENTER> TO EXIT THE UNINSTALLER:
+
+# CopyFileAction.visualname.self=Copy file
+CopyFileAction.visualname.self=Copy file
+
+# CopyFolderAction.visualname.self=Copy folder
+CopyFolderAction.visualname.self=Copy folder
+
+# CreateShortcut.visualname.self.link=Create link
+CreateShortcut.visualname.self.link=Create link
+
+# CreateShortcut.visualname.self.shortcut=Create shortcut
+CreateShortcut.visualname.self.shortcut=Create shortcut
+
+# CreateShortcut.visualname.self.alias=Create alias
+CreateShortcut.visualname.self.alias=Create alias
+
+# CreateFolder.visualname.self=Create folder
+CreateFolder.visualname.self=Create folder
+
+# CreateLaunchAnywhere.visualname.self=Create LaunchAnywhere
+CreateLaunchAnywhere.visualname.self=Create LaunchAnywhere
+
+# DeleteFileAction.visualname.self=Delete file
+DeleteFileAction.visualname.self=Delete file
+
+# DeleteFolderAction.visualname.self=Delete folder
+DeleteFolderAction.visualname.self=Delete folder
+
+# ExpandArchive.visualname.self=Expand archive
+ExpandArchive.visualname.self=Expand archive
+
+# InstallSpeedFolder.visualname.self=Install SpeedFolder
+InstallSpeedFolder.visualname.self=Install SpeedFolder
+
+InstallRPMPackage.visualname.self=Install Linux RPM
+InstallSolarisPackage.visualname.self=Install Solaris Package
+InstallHPUXPackage.visualname.self=Install HP-UX Depot
+
+# MoveFileAction.visualname.self=Move file
+MoveFileAction.visualname.self=Move file
+
+# MoveFolderAction.visualname.self=Move folder
+MoveFolderAction.visualname.self=Move folder
+
+# RegisterWindowsService.visualname.self=Register Windows Service
+RegisterWindowsService.visualname.self=Register Windows Service
+
+# SetSysEnvVar.visualname.self=Set System Environment Variable
+SetSysEnvVar.visualname.self=Set System Environment Variable
+
+# SetWindowsRegistry.visualname.self=Set Windows Registry
+SetWindowsRegistry.visualname.self=Set Windows Registry
+
+# ExecuteAnt.visualname.self=Execute ANT Script
+ExecuteAnt.visualname.self=Execute ANT Script
+
+# ExecuteCommand.visualname.self=Execute Command
+ExecuteCommand.visualname.self=Execute Command
+
+# ExecuteCustomCode.visualname.self=Execute Custom Code
+ExecuteCustomCode.visualname.self=Execute Custom Code
+
+# ExecuteScript.visualname.self=Execute Script
+ExecuteScript.visualname.self=Execute Script
+
+# ExecuteTargetFile.visualname.self=Execute Target File
+ExecuteTargetFile.visualname.self=Execute Target File
+
+# FindComponent.visualname.self=Find Component in InstallAnywhere Registry
+FindComponent.visualname.self=Find Component in InstallAnywhere Registry
+
+# GetWindowsRegistry.visualname.self=Get Windows Registry Entry
+GetWindowsRegistry.visualname.self=Get Windows Registry Entry
+
+# ModifyTextFile.visualname.self=Modify Text File
+ModifyTextFile.visualname.self=Modify Text File
+
+# PerformXSLT.visualname.self=Perform XSL Transform
+PerformXSLT.visualname.self=Perform XSL Transform
+
+# OutputDebug.visualname.self=Output Debug Information
+OutputDebug.visualname.self=Output Debug Information
+
+# ShowDialog.visualname.self=Show Message Dialog
+ShowDialog.visualname.self=Show Message Dialog
+
+# StartWindowsService.visualname.self=Start Windows Service
+StartWindowsService.visualname.self=Start Windows Service
+
+# StopWindowsService.visualname.self=Stop Windows Service
+StopWindowsService.visualname.self=Stop Windows Service
+
+# PauseWindowsService.visualname.self=Pause Windows Service
+PauseWindowsService.visualname.self=Pause Windows Service
+
+
+# WIN32FOLDERDIALOG
+# -----------------
+
+# ....................... =Browse for Folder
+Win32FolderDialog.titleBar=Browse for Folder
+
+Installer.Action.DumpDebugInfo.Modules.installAnywhereVariables=InstallAnywhere Variables
+Installer.Action.DumpDebugInfo.Modules.magicFolders=Magic Folders
+Installer.Action.DumpDebugInfo.Modules.javaProperties=Java Properties
+Installer.Action.DumpDebugInfo.Modules.visualTree=Visual Tree
+Installer.Action.DumpDebugInfo.Modules.componentTree=Component Tree
+Installer.Action.DumpDebugInfo.Modules.preInstallActions=Pre-install Actions
+Installer.Action.DumpDebugInfo.Modules.postInstallActions=Post-install Actions
+Installer.Action.DumpDebugInfo.Modules.postUninstallActions=Post-uninstall Actions
+Installer.Action.DumpDebugInfo.Modules.preUninstallActions=Pre-uninstall Actions
+Installer.Action.DumpDebugInfo.Modules.uninstallVisualTree=Uninstall Visual Tree
+
+#These strings can be found in the different actions when they are first initialized
+Designer.Customizer.executingInstScript=Executing Installation Script...
+Designer.Customizer.executingCustomCode=Executing Custom Code...
+Designer.Customizer.restoreDefault=&Restore Default
+Designer.Customizer.noFileSpecified=<No file specified>
+Designer.Customizer.noFolderSpecified=<No folder specified>
+Designer.Customizer.noNameSpecified=<No name specified>
+Designer.Customizer.noScriptSpecified=<No script specified>
+Designer.Customizer.noTargetSelected=<No target selected>
+Designer.Customizer.noTitleSpecified=<No title specified>
+Designer.Customizer.noVariableSpecified=<No variable specified>
+Designer.Customizer.property=Property
+Designer.Customizer.value=Value
+Designer.Customizer.bidiReadingOrder=Text Reading Order
+Designer.Customizer.variableName=Variable Name
+Designer.Customizer.comment=Comment:
+Designer.Customizer.commentBracket=<Comment>
+Designer.Customizer.defaultValue=Default Value
+Designer.Customizer.environmentVariable=Environment Variable:
+Designer.Customizer.label=Label
+Designer.Customizer.modifying=Modifying:
+Designer.Customizer.vmComponent.name=InstallAnywhere VM Component
+
+#These strings can be found by adding  a Panel: Get User Input - Advanced
+Designer.Installer.GUIGroupData.textFieldNormal=Textfield (Normal)
+Designer.Installer.GUIGroupData.label=Label
+Designer.Installer.GUIGroupData.wrappingLabel=Wrapping Label
+Designer.Installer.GUIGroupData.checkbox=Checkbox
+Designer.Installer.GUIGroupData.radioButton=Radio button
+Designer.Installer.GUIGroupData.popupMenu=Popup Menu
+Designer.Installer.GUIGroupData.list=List
+Designer.Installer.GUIGroupData.directoryChooser=Directory Chooser
+Designer.Installer.GUIGroupData.fileChooser=File Chooser
+Designer.Installer.GUIGroupData.textfieldShadowed=Textfield (Shadowed)
+Designer.Installer.GUIGroupData.textField=Textfield
+Designer.Installer.GUIGroupData.choice=Choice
+Designer.Installer.GUIGroupData.defaultValue=Default Value
+Designer.Installer.GUIGroupData.defaultSelectionValue=Default Selection Value
+Designer.Installer.GUIGroupData.resultsVariable=Results Variable
+Designer.Installer.GUIGroupData.selected=Selected
+Designer.Installer.GUIGroupData.notSelected=Not Selected
+Designer.Installer.GUIGroupData.variableBased=Variable Based
+Designer.Installer.GUIGroupData.bidiColumn=Text Reading Order
+Designer.Installer.GUIGroupData.subComponentsColumn=Subcomponents
+Designer.Installer.GUIGroupData.configureSubComponents=Configure Subcomponents
+
+Designer.Installer.GUIComponentData.enterIAVariable=Enter an InstallAnywhere Variable Name (e.g., $COMPONENT_SELECTION_VAR$). If the variable evaluates to \"true\" at install-time the component will be selected.
+
+#These represent the names of the different actions and appear in the add action dialog, the title of the customizer and in the tree.
+Designer.Action.UpdateServiceClient.visualName=Enable Update Notifications
+Designer.Action.UninstallAllOrFeaturesAction.visualName=Panel: Choose Uninstall Type
+Designer.Action.AllOrFeaturesActionConsole.visualName=Console: Choose Uninstall Type
+Designer.Action.MaintModeAction.visualName=Panel: Maintenance Mode
+Designer.Action.CustomizeBundles.visualName=Panel: Choose Features to Uninstall
+Designer.Action.CustomizeBundlesConsole.visualName=Console: Choose Features to Uninstall
+Designer.Action.EvaluateDependenciesAction.visualName=Evaluate Dependencies
+Designer.Action.StubInstallerAction.visualName=Dynamic Web Installation
+Designer.Action.UninstallFromRegistry.visualName=Uninstall
+Designer.Action.UninstallIsmpSoftware.visualName=Uninstall InstallShield Universal Software
+Designer.Action.UninstallIntroAction.visualName=Panel: Uninstaller Introduction
+Designer.Action.UninstallIntroActionConsole.visualName=Console: Uninstaller Introduction
+Designer.Action.UninstallCompleteAction.visualName=Panel: Uninstall Complete
+Designer.Action.UninstallCompleteActionConsole.visualName=Console: Uninstall Complete
+Designer.Action.UCustomAction.visualName=Execute Custom Code: Uninstall
+Designer.Action.Subinstaller.visualName=Install Merge Module
+Designer.Action.Subinstaller.installTime=(Install Time):
+Designer.Action.Subinstaller.buildTime=(Build Time):
+Designer.Action.Subinstaller.noMergeModuleSpecified=<No merge module specified>
+Designer.Action.SpeedRegistryEntry.visualName=Set Windows Registry - Multiple Entries
+Designer.Action.SpeedRegistryEntry.registryEntries=Registry Entries
+Designer.Action.ShortcutLocAction.visualNameMacOSX=Panel: Choose Alias Folder
+Designer.Action.ShortcutLocAction.visualName=Panel: Choose Alias, Link, Shortcut Folder
+Designer.Action.ShortcutLocActionConsole.visualName=Console: Choose Link Folder
+Designer.Action.SetSerialNumber.visualName=Panel: Get Serial Number
+Designer.Action.SetSerialNumberConsole.visualName=Console: Get Serial Number
+Designer.Action.RefreshEnvironment.visualName=Refresh Windows Environment
+Designer.Action.RebootAction.visualName=Restart Windows
+Designer.Action.ReadyToInstallActionConsole.visualName=Console: Ready To Install
+Designer.Action.RegistryFindAction.visualName=Find Component in InstallAnywhere Registry
+Designer.Action.PowerUpdateClient.visualName=Install PowerUpdate Client
+Designer.Action.PowerUpdateClient.powerUpdateClient=PowerUpdate Client
+Designer.Action.PrintToConsole.visualName=Output Text to Console
+Designer.Action.PrintToConsole.noTextSpecified=<No text specified>
+Designer.Action.SystemiSubinstaller.visualName=Process System i (i5/OS) Install Merge Module
+Designer.Action.PromptUserConsole.visualName=Console: Show Message Console 'Dialog'
+Designer.Action.PromptUserConsole.enterTitleHere=<Enter the title here>
+Designer.Action.PromptUserConsole.enterMessageHere=<Enter the message here>
+Designer.Action.PromptUserConsole.optionLabel=<Option label>
+Designer.Action.PerformXSLTZip.visualName=Perform XSL Transform - In Archive
+Designer.Action.PerformXSLT.visualName=Perform XSL Transform
+Designer.Action.PerformXSLT.performingXSLtransform=Performing XSL Transform:
+Designer.Action.NTServiceController.visualName=Start, Stop, Pause Windows Service
+Designer.Action.NTServiceController.noServiceSpecified=<No service specified>
+Designer.Action.NTServiceController.start=Starting Windows Service:
+Designer.Action.NTServiceController.stop=Stopping Windows Service:
+Designer.Action.NTServiceController.pause=Pausing Windows Service:
+Designer.Action.MoveFileAction.moveFile=Move File:
+Designer.Action.MoveFileAction.movingFile=Moving File:
+Designer.Action.MoveFileAction.visualName=Move File Action
+Designer.Action.MoveFolderAction.visualName=Move Folder Action
+Designer.Action.MoveFolderAction.moveFolder=Move Folder:
+Designer.Action.MoveFolderAction.movingFolder=Moving Folder:
+Designer.Action.MakeRegEntry.setWindowsRegistry=Set Windows Registry - Single Entry: 
+Designer.Action.MakeRegEntry.registryEntry=Registry Entry:
+Designer.Action.MakeRegEntry.visualName=Set Windows Registry - Single Entry
+Designer.Action.MakeExecutable.visualName=Create LaunchAnywhere for Java Application
+Designer.Action.MakeExecutable.visualNameNotNamed=Create LaunchAnywhere: <No name specified>
+Designer.Action.LaunchDefaultBrowser.opeinInBrowser=Open in Browser
+Designer.Action.LaunchDefaultBrowser.visualName=Launch Default Browser
+Designer.Action.LaunchDefaultBrowser.noURLspecified=<No URL specified>
+Designer.Action.JumpLabel.visualName=Add Jump Label
+Designer.Action.JumpLabel.emptyComment=<Empty comment>
+Designer.Action.JumpLabel.emptyLabel=<Empty label>
+Designer.Action.JumpLabel.jumpLabel=Jump Label:
+Designer.Action.JumpAction.visualName=Jump To Target
+Designer.Action.JumpAction.visualNameStatement=Jump To: #TARGET_STATEMENTS#
+Designer.Action.JumpAction.targetsStatement=Next #NEXT# -- Prev: #PREV#
+Designer.Action.JumpAction.noJumpTargetsSelected=<No jump targets selected>
+Designer.Action.JumpAction.noJump=NO JUMP
+Designer.Action.IntroAction.visualName=Panel: Introduction
+Designer.Action.Tomcat.Deployment.Action=Panel: Tomcat Runtime Deployment
+Designer.Action.Websphere.Deployment.Action=Panel: WebSphere Runtime Deployment
+Designer.Action.IntroAction.noMessageIndicated=<No Message Indicated>
+Designer.Action.IntroActionConsole.visualName=Console: Introduction
+Designer.Action.InstallZipfile.visualName=Install Archive
+Designer.Action.CreateUninstaller.visualName=Create Uninstaller
+Designer.Action.InstallSummary.visualName=Panel: Pre-Install Summary
+Designer.Action.InstallSummaryConsole.visualName=Console: Pre-Install Summary
+Designer.Action.InstallPanelAction.visualName=Panel: Custom Code
+Designer.Action.InstallNTService.registerWindowsService=Register Windows Service:
+Designer.Action.InstallNTService.windowsService=Windows Service: 
+Designer.Action.InstallNTService.visualName=Register Windows Service
+Designer.Action.InstallNTService.noServiceNameSpecified=<No service name specified>
+Designer.Action.InstallFailed.visualName=Panel: Install Failed
+Designer.Action.InstallFailedConsole.visualName=Console: Install Failed
+Designer.Action.InstallDirectory.visualName_1=Install Folder
+Designer.Action.InstallDirectory.visualName_2=Create Folder
+Designer.Action.InstallDirAction.visualName=Panel: Choose Install Folder
+Designer.Action.InstallDirActionConsole.visualName=Console: Choose Install Folder
+Designer.Action.InstallConsoleAction.visualName=Console: Custom Code
+Designer.Action.InstallCompleteAction.visualName=Panel: Install Complete
+Designer.Action.InstallCompleteActionConsole.visualName=Console: Install Complete
+Designer.Action.InstallCompleteActionConsole.noTitleIndicated=<No Title Indicated>
+Designer.Action.InstallIFSAction.visualName=Panel: Choose Remote System i (i5/OS) Install Folder
+Designer.Action.LicenseAgrAction.visualName=Panel: License Agreement
+Designer.Action.LicenseAgrActionConsole.visualName=Console: License Agreement
+Designer.Action.ImportantNoteAction.visualName=Panel: Important Note
+Designer.Action.ImportantNoteActionConsole.visualName=Console: Important Note
+Designer.Action.HTMLPanelAction.visualName=Panel: Display HTML
+Designer.Action.GetUserInput.visualName=Panel: Get User Input - Advanced
+GetUserInput.title=Get User Input
+GetUserInput.prompt=Enter requested information
+Designer.Action.GetUserInputConsole.visualName=Console: Get User Input
+Designer.Action.GetRegEntry.visualName=Get Windows Registry Entry
+Designer.Action.GetRegEntry.gettingRegistryEntry=Getting Registry Entry:
+Designer.Action.GetPassword.visualName=Panel: Get Password
+Designer.Action.GetPasswordConsole.visualName=Console: Get Password
+Designer.Action.BOMAction.visualName=Install from Manifest
+Designer.Action.InstallFinishAction.vsiualName=Panel: Install Complete
+Designer.Action.FindFileOrFolder.visualName=Panel: Find File/Folder
+Designer.Action.FindFileOrFolder.noCriteriaSpecified=<No criteria specified>
+Designer.Action.ExpandArchive.visualName=Expand Archive
+Designer.Action.ExpandArchive.archive=Archive:
+Designer.Action.ExpandArchive.noArchiveSpecified=<No archive specified>
+Designer.Action.ExecuteScript.visualName=Execute Script/Batch file
+Designer.Action.Exec.visualName=Execute Command
+Designer.Action.Exec.noCommandSpecified=<No command specified>
+Designer.Action.visualName=Execute Target File
+Designer.Action.EditVariableTable.setIAVariableSingle=Set InstallAnywhere Variable - Single Variable:
+Designer.Action.EditVariableTable.iaVariable=InstallAnywhere Variable
+Designer.Action.EditVariableTable.visualName=Set InstallAnywhere Variable - Single Variable
+Designer.Action.EditMultipleVariables.setIAVariablesMultiple=Set InstallAnywhere Variable - Multiple Variables: 
+Designer.Action.EditMultipleVariables.iaVariables=InstallAnywhere Variables
+Designer.Action.EditMultipleVariables.visualName=Set InstallAnywhere Variable - Multiple Variables
+Designer.Action.EditEnvironment.visualName=Set System Environment Variable
+Designer.Action.EditEnvironment.setSystemEnvVariable=Set System Environment Variable: 
+Designer.Action.DumpDebugInfo.visualName=Output Debug Information
+Designer.Action.DisplayScrollingMessage.visualName=Panel: Scrolling Message
+Designer.Action.DisplayMessage.visualName=Panel: Display Message
+Designer.Action.DisplayMessageConsole.visualName=Console: Display Message
+Designer.Action.DeleteFileAction.visualName=Delete File Action
+Designer.Action.DeleteFileAction.deletingFile=Deleting File:
+Designer.Action.DeleteFileAction.deleteFile=Delete File:
+Designer.Action.DeleteFolderAction.visualName=Delete Folder Action
+Designer.Action.DeleteFolderAction.deletingFolder=Deleting Folder:
+Designer.Action.DeleteFolderAction.deleteFolder=Delete Folder:
+Designer.Action.CustomCode.visualName=Execute Custom Code
+Designer.Action.CustomCode.noCustomCodeClassSpecified=<No custom code class specified>
+Designer.Action.CreateShortcut.visualNameMacOSX=Create Alias, Link, Shortcut
+Designer.Action.CreateShortcut.visualNameOther=Create Alias
+Designer.Action.CreateDialog.visualName=Panel: Get User Input - Simple
+CreateDialog.title=Get User Input
+CreateDialog.prompt=Enter requested information
+GetUserInputConsole.title=Get User Input
+GetUserInputConsole.prompt=Enter requested information
+Designer.Action.AbstractFileOperations.visualName=Abstract File Operation
+Designer.Action.AbstractFileOperations.abstractFileOperation=Abstract File Operation
+Designer.Action.AbstractFileOperations.fileOp=File Op:
+Designer.Action.CopyFileAction.copyFile=Copy File:
+Designer.Action.CopyFileAction.copyingFile=Copying File:
+Designer.Action.CopyFileAction.visualName=Copy File Action
+Designer.Action.CopyFolderAction.copyFolder=Copy Folder:
+Designer.Action.CopyFolderAction.copyingFolder=Copying Folder:
+Designer.Action.CopyFolderAction.visualName=Copy Folder Action
+Designer.Action.Comment.visualName=Comment
+Designer.Action.Comment.emptyComment=<Empty comment>
+Designer.Action.ChooseJavaVMAction.visualName=Panel: Choose Java VM
+Designer.Action.ChooseJavaVMActionConsole.visualName=Console: Choose Java VM
+Designer.Action.ChooseInstallSetActionConsole.visualName=Console: Choose Install Sets
+Designer.Action.ChooseInstallSetAction.visualName=Panel: Choose Install Sets
+Designer.Action.ChooseFile.visualName=Panel: Choose File
+Designer.Action.ChooseFolder.visualName=Panel: Choose Folder
+Designer.Action.ChooseIFSFolder.visualName=Panel: Choose Remote IFS Folder
+Designer.Action.ASCIIFileManipulatorZip.visualName=Modify Text File - In Archive
+Designer.Action.ASCIIFileManipulator.visualName=Modify Text File - Single File
+Designer.Action.AntRunner.executingANTscript=Executing ANT Script...
+Designer.Action.AntRunner.noBuildScript=<No Build Script>
+Designer.Action.AntRunner.noBuildProperties=<No Build Properties>
+Designer.Action.AntRunner.visualName=Execute ANT Script
+Designer.Actions.ShowDialogAction.visualName=Show Message Dialog
+Designer.Actions.ShowDialogAction.messageDialog=Message Dialog:
+Designer.Actions.ShowDialogAction.enterDialogTitleHere=<Enter the dialog title here>
+Designer.Actions.ShowDialogAction.enterDialogLabelHere=<Enter the dialog label here>
+Designer.Actions.ShowDialogAction.enterDialogMessageHere=<Enter the dialog message here>
+Designer.Actions.ShowDialogAction.enterButtonLabel=<Button label>
+Designer.Actions.SpeedASCIIFileManipulator.visualName=Modify Text File - Multiple Files
+Designer.Actions.InstallDirCont.visualName=Install SpeedFolder
+Designer.Action.TriggerRollbackAction.visualName=Trigger Rollback Action
+Designer.Action.AbortInstallationAction.visualName=Abort Installation Action
+Designer.Action.TomcatDeploymentOptionsActionConsole.visualName=Console: Tomcat Runtime Deployment
+Designer.Action.WebsphereDeploymentOptionsActionConsole.visualName=Console: WebSphere Runtime Deployment
+Designer.FolderConstants.installDirName=User Install Folder
+Designer.FolderConstants.programsDirName=Programs Folder
+Designer.FolderConstants.programsDir64Name=Programs Folder (64-bit)
+Designer.FolderConstants.programsDir32Name=Programs Folder (32-bit)
+Designer.FolderConstants.userShortcutsName.win32=Shortcuts' Destination Folder
+Designer.FolderConstants.userShortcutsName.mac=Alias' Destination Folder
+Designer.FolderConstants.userShortcutsName.unix=Links' Destination Folder
+Designer.FolderConstants.systemName=System Folder
+Designer.FolderConstants.system64Name=System Folder (64-bit)
+Designer.FolderConstants.system32Name=System Folder (32-bit)
+Designer.FolderConstants.systemi=System i (i5/OS)
+Designer.FolderConstants.desktopName=Desktop Folder
+Designer.FolderConstants.startupName=Startup Folder
+Designer.FolderConstants.installDriveRootName=Installation Drive Root
+Designer.FolderConstants.systemDriveRootName=System Drive Root
+Designer.FolderConstants.javaHomeName=Java Home
+Designer.FolderConstants.fontsName=Fonts Directory
+Designer.FolderConstants.tempDirName=Temp Directory
+Designer.FolderConstants.iaTempDirName=Installer Temp Directory
+Designer.FolderConstants.win32WindowsName=Windows Directory
+Designer.FolderConstants.win32StartMenuName=Start Menu
+Designer.FolderConstants.win32ProgramsMenuName=Programs Menu
+Designer.FolderConstants.win32FavoritesName=Favorites
+Designer.FolderConstants.win32RecentName=Recent Items
+Designer.FolderConstants.win32SendToName=Send To
+Designer.FolderConstants.win32MethodName=Nethood
+Designer.FolderConstants.win32QuickLaunchName=Quick Launch Bar
+Designer.FolderConstants.win32ShellNewName=ShellNew
+Designer.FolderConstants.win32CommonStartMenuName=All Users Start Menu
+Designer.FolderConstants.win32CommonProgramsMenuName=All Users Programs Menu
+Designer.FolderConstants.win32CommonStartupName=All Users Startup
+Designer.FolderConstants.win32CommonDesktopName=All Users Desktop
+Designer.FolderConstants.appleMenuItems=Apple Menu Items
+Designer.FolderConstants.controlPanelsFolder=Control Panels Folder
+Designer.FolderConstants.extensionsFolder=Extensions Folder
+Designer.FolderConstants.preferencesFolder=Preferences Folder
+Designer.FolderConstants.cleanUpStartupFolder=Clean-Up at Startup Folder
+Designer.FolderConstants.dock=The Dock
+Designer.FolderConstants.userApplicationsFolder=User Applications Folder
+Designer.FolderConstants.homeDirectory=Home Directory
+Designer.FolderConstants.doNotInstall=DO NOT INSTALL
+Designer.FolderConstants.variableMagicFolder=Variable Magic Folder
+Installer.StandardDialog.cancel=Cancel
+Installer.StandardDialog.ok=OK
+Installer.StandardDialog.details=Details
+Installer.ZGStandardDialog.alert=Alert
+Installer.iGetUserInput.question=Question
+Installer.iGetUserInput.textFields=Text fields
+Installer.GetUserInputConsole.singleChoice=Single Choice
+Installer.GetUserInputConsole.multipleChoice=Multiple Choice
+Installer.EntryAtom.setVariable=Set Variable
+
+Installer.JZGTextComponentUtil.undo=Undo
+Installer.JZGTextComponentUtil.copy=Copy
+Installer.JZGTextComponentUtil.cut=Cut
+Installer.JZGTextComponentUtil.paste=Paste
+Installer.JZGTextComponentUtil.clear=Clear
+Installer.JZGTextComponentUtil.selectAll=Select All
+Installer.JZGTextComponentUtil.secureText=Edit Text Securely
+Installer.JZGTextComponentUtil.secureText.title=Edit Text Securely
+Installer.JZGTextComponentUtil.secureText.messagePrompt=Enter the appropriate value
+
+Installer.EntryAtom.enterVariableName=Enter an InstallAnywhere Variable Name (e.g., $COMPONENT_SELECTION_VAR$). If the variable evaluates to \"true\" at install-time the component will be selected.
+Installer.variableNameForComponent=Variable Name for Component Selection
+Installer.InstallSet.untitled=<Untitled>
+Installer.InstallSet.untitledComment=<Enter Install Set description here>
+Installer.InstallBundle.untitled=<Untitled>
+Installer.InstallBundle.untitledComment=<Enter Product Feature description here -- do not forget to assign this Feature to desired Install Sets>
+Installer.InstallComponent.untitled=<Untitled>
+Installer.InstallComponent.untitledComment=<Enter Install Component comment here -- do not forget to assign this Component to desired Product Features>
+Installer.FileModicationCheck.compareFileModification=Compare File Modification Timestamp
+Installer.rule.visualName=Check if File/Folder Exists
+Installer.Customizer.ok=OK
+Installer.Customizer.cancel=Cancel
+FileChooser.saveButtonText=Save
+FileChooser.openButtonText=Open
+FileChooser.cancelButtonText=Cancel
+FileChooser.updateButtonText=Update
+FileChooser.helpButtonText=Help
+FileChooser.saveButtonToolTipText=Save
+FileChooser.openButtonToolTipText=Open
+FileChooser.cancelButtonToolTipText=Cancel
+FileChooser.updateButtonToolTipText=Update
+FileChooser.helpButtonToolTipText=Help
+FileChooser.fileNameLabelText=File name
+FileChooser.filesOfTypeLabelText=Files of type
+FileChooser.lookInLabelText=Look in
+FileChooser.upFolderToolTipText=Up One Level
+FileChooser.homeFolderToolTipText=Home
+FileChooser.newFolderToolTipText=Create New Folder
+FileChooser.listViewButtonToolTipText=List
+FileChooser.detailsViewButtonToolTipText=Details
+FileChooser.directoryOpenButtonText=Open
+FileChooser.directoryOpenButtonToolTipText=Open
+FileChooser.newFolderButtonText=New Folder
+FileChooser.byDateText=Date Modified
+FileChooser.byNameText=Name
+FileChooser.newFolderTitleText=New Folder
+FileChooser.newFolderPromptText=Name of new folder:
+FileChooser.createButtonText=Create
+FileChooser.untitledFolderName=Untitled Folder
+FileChooser.acceptAllFileFilterText=All Files
+ActionGroup.visualName.self=Action Group
+
+#Hosts
+OSHost.visualName.self=Operating System
+JEEHost.visualName.self=Application Server
+DBHost.visualName.self=Database Server
+
+Installer.Actions.UpdateServiceClient.badClasspath=#UPDATE_SERVICE# URL for loading us.jar is incorrect.
+Installer.Actions.UpdateServiceClient.badUsJar=The #UPDATE_SERVICE# library does not contain the necessary class for registration.  The provided jar might be incorrect.
+Installer.Actions.UpdateServiceClient.noRegisterOrSethostMethodFound=The #UPDATE_SERVICE# class does not contain the necessary method for registration.
+
+#Strings for the plain text version of the install log
+Installer.installLog.actionNotes=Action Notes:
+Installer.installLog.installLogDetail=Install Log Detail:
+Installer.installLog.installation=Installation: 
+Installer.installLog.unsuccessful=Unsuccessful.
+Installer.installLog.successful=Successful
+Installer.installLog.withErrors= with errors.
+Installer.installLog.withwarnings= with warnings.
+Installer.installLog.cancelled=Cancelled
+Installer.installLog.duringPostInstall= during post-install
+Installer.installLog.duringInstall= during install
+Installer.installLog.duringPreInstall= during pre-install
+Installer.installLog.cancelledBeforePreInstallation=INSTALLATION WAS CANCELLED BY USER BEFORE PRE-INSTALLATION
+Installer.installLog.cancelledDuringPreInstallation=INSTALLATION WAS CANCELLED BY USER DURING PRE-INSTALLATION
+Installer.installLog.cancelledDuringInstallation=INSTALLATION WAS CANCELLED BY USER DURING INSTALLATION
+Installer.InstallLog.cancelledDuringPostInstallation=INSTALLATION WAS CANCELLED BY USER AFTER INSTALLATION OR DURING POST-INSTALLATION
+Installer.installLog.duringPostUninstall= during post-uninstall
+Installer.installLog.duringPreUninstall= during pre-uninstall
+Installer.installLog.duringUninstall= during uninstall
+Installer.installLog.cancelledBeforeOrDuringPreUninstallation=UNINSTALLATION WAS CANCELLED BY USER BEFORE/DURING PRE-UNINSTALLATION
+Installer.installLog.cancelledDuringOrAfterUninstallation=UNINSTALLATION WAS CANCELLED BY USER DURING/AFTER UNINSTALLATION
+
+Installer.installLog.successes=Successes
+Installer.installLog.warnings=Warnings
+Installer.installLog.nonFatalErrors=NonFatalErrors
+Installer.installLog.fatalErrors=FatalErrors
+Installer.installLog.details=Details
+Installer.installLog.nothingWasInstalled=Nothing was installed.
+Installer.installLog.none=None
+Installer.installLog.summary=Summary
+Installer.installLog.installedBy=Installed by InstallAnywhere #BUILD_INFO#
+Installer.installLog.status=Status: 
+Installer.installLog.additionalNotes=Additional Notes: 
+Installer.installLog.exceptionClass=Exception Class: 
+Installer.installLog.exceptionMessage=Exception Message: 
+Installer.installLog.exceptionStackTrace=Exception Stack Trace:
+Installer.installLog.successLevel.successful=SUCCESSFUL
+Installer.installLog.successLevel.warning=WARNING
+Installer.installLog.successLevel.error=ERROR
+Installer.installLog.successLevel.fatalError=FATAL ERROR
+Installer.installLog.successLevel.unsupported=UNSUPPORTED ERROR LEVEL
+Installer.installLog.successLevel.notice=NOTE
+Installer.installLog.action.description=Install Action:
+Installer.installLog.antRunner.description=Execute ANT Script:
+Installer.installLog.antRunner.script=Script: 
+Installer.installLog.asciiFileManipulator.noTargetChosen=No Target Chosen
+Installer.installLog.asciiFileManipulator.newFile=New File 
+Installer.installLog.copyDirectory.description=Copy Directory:
+Installer.installLog.copyFile.description=Copy File:
+Installer.installLog.copyFileAction.destination=Destination: 
+Installer.installLog.createShortcut.createShortcut=Create Shortcut:
+Installer.installLog.createShortcut.createAlias=Create Alias:
+Installer.installLog.createShortcut.createLink=Create Link:
+Installer.installLog.deleteFileAction.source=Source:
+Installer.installLog.editEnvironment.description=Set Environment Variable:
+Installer.installLog.removeEnvironment.description=Remove Environment Variable:
+Installer.installLog.expandFile.description=Expand Archive:
+Installer.installLog.getRegEntry.description=Get Registry Entry:
+Installer.installLog.getRegEntry.key=Key: 
+Installer.installLog.getRegEntry.value=Value Name: 
+Installer.installLog.installJRE.description=Install JRE:
+Installer.installLog.installDirCont.description=Install Speedfolder:
+Installer.installLog.installDirectory.description=Install Directory:
+Installer.installLog.installFile.description=Install File:
+Installer.installLog.installNTService.description=Register NT Service:
+Installer.installLog.installUninstaller.description=Install Uninstaller:
+Installer.installLog.installUninstaller.note=(Install All Uninstaller Components)
+Installer.installLog.makeExecutable.description=Create LaunchAnywhere:
+Installer.installLog.makeExecutable.note=(Install All LaunchAnywhere Java Executable Components)
+Installer.installLog.makeExecutable.launcherCannotPointedToBundledVM=Launcher cannot be configured to the bundled VM as the bundled VM was not installed.
+Installer.installLog.makeExecutable.vmNotFound=Valid VM not found, launcher cannot be configured to a specific launcher.
+Installer.installLog.makeRegEntry.description=Make Registry Entry:
+Installer.installLog.removeRegEntry.description=Remove Registry Entry:
+Installer.installLog.makeRegEntry.key=Key:
+Installer.installLog.makeRegEntry.name=Value Name:
+Installer.installLog.makeRegEntry.data=Value Data:
+Installer.installLog.checkDiskSpace.description=Check Disk Space:
+Installer.installLog.speedRegistry.description=Registry Entries:
+Installer.installLog.subinstaller.description=Install Merge Module:
+Installer.installLog.subuninstaller.description=Execute Uninstaller:
+Installer.installLog.subuninstaller.descriptionForUpgrades=Remove earlier version:
+Installer.installLog.subuninstaller.descriptionForUpgradesFailed=Removing earlier version while upgrading failed.
+Installer.installLog.upgrade.prevUninstall.exitCode=Uninstaller exit code for earlier version:
+Installer.installLog.upgrade.prevUninstall.failed=Removal of one or more instances of an earlier version of the product failed. Skipping removal of instance. 
+Installer.installLog.customAction.description=Custom Action:
+Installer.installLog.userInteractions=User Interactions
+Installer.installLog.installBegin=Install Begin:
+Installer.installLog.installEnd=Install End:
+Installer.installLog.freeMemory=Free Memory:
+Installer.installLog.totalMemory=Total Memory:
+Installer.installLog.commandLineArgs=Command Line Args:
+Installer.installLog.noArguments=No Arguments
+Installer.installLog.deployJEEArchiveAction.description=Deploy WAR/EAR Archive:
+Installer.installLog.undeployJEEArchiveAction.description=Undeploy WAR/EAR Archive:
+Installer.installLog.deployJEEArchiveAction.archiveNotSpecified=The WAR/EAR archive must be defined prior to executing this action.
+Installer.installLog.deployJEEArchiveAction.serverNotFound=Could not find server at the specified path.
+Installer.installLog.deployJEEArchiveAction.invalidExtension=Bad archive extension, must be a WAR or an EAR.
+Installer.installLog.deployJEEArchiveAction.driverNotFound=Could not find driver at the specified path.  Check that server path is accurate.
+Installer.installLog.deployJEEArchiveAction.archiveAlreadyDeployed=There was an application with the same archive name already deployed to this server.
+Installer.installLog.deployJEEArchiveAction.remoteDeploymentFailure=Failed to deploy WAR to Apache Tomcat running on
+Installer.installLog.deployJEEArchiveAction.doNotDeployFailure=Failed to copy WAR to the local machine
+Installer.installLog.deployJEEArchiveAction.wasDeploymentFailure=Failed to deploy archive onto the WebSphere application server at
+Installer.installLog.deployJEEArchiveAction.wasDoNotDeployFailure=Failed to copy WAR/EAR to the local machine
+Installer.installLog.runSQLScriptAction.description=Run SQL Script:
+Installer.installLog.runSQLScriptAction.archiveNotSpecified=The SQL script must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.serverTypeNotSpecified=The server type must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.serverPathNotSpecified=The server path must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.serverPortNotSpecified=The server port must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.usernameNotSpecified=The username must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.passwordNotSpecified=The password must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.databaseNameNotSpecified=The database name must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.delimiterNotSpecified=The delimiter must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.jdbcDriverClassNotSpecified=The JDBC driver class must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.connectionStringNotSpecified=The connection string must be defined prior to executing this action.
+Installer.installLog.runSQLScriptAction.authenticationNotSet=This action can only be used if authentication is set for it.
+Installer.installLog.runSQLScriptAction.affectedRows=Affected Rows
+Installer.installLog.runSQLScriptAction.sqlErrorMessage=SQL Error Message
+Installer.installLog.runSQLScriptAction.scriptNotFound=Script file not found.
+Installer.installLog.runSQLScriptAction.connectionError=An error occurred while trying to establish a connection with the database server: 
+Installer.installLog.runSQLScriptAction.errorMessage=Error Message
+Installer.installLog.runSQLScriptAction.scriptError=An error occurred while running the script:
+Installer.installLog.runSQLScriptAction.invalidNumberArgsUninstall=Unable to run uninstall SQL script because there are missing arguments in the product registry.
+Installer.installLog.runSQLScriptAction.invalidPortNumber=The specified number is not a valid server port number.
+Installer.installLog.runSQLScriptAction.dbcreationerror=The specified database could not be created
+Installer.installLog.triggerRollbackAction.description=This action rolls back the Installation.
+Installer.installLog.logs.install=Install
+Installer.installLog.logs.add=Add
+Installer.installLog.logs.repair=Repair
+Installer.installLog.logs.remove=Remove
+Installer.installLog.logs.uninstall=Uninstall
+Installer.installLog.add=Add Feature(s): 
+Installer.installLog.repair=Repair Installation: 
+Installer.installLog.Remove=Remove Feature(s): 
+Installer.installLog.uninstall=Uninstallation: 
+Installer.installLog.addLogDetail=Add Feature(s) Log Detail:
+Installer.installLog.removeLogDetail=Remove Feature(s) Log Detail:
+Installer.installLog.repairLogDetail=Repair Installation Log Detail:
+Installer.installLog.uninstallLogDetail=Uninstall Log Detail:
+Installer.installLog.addBegin=Add Begin:
+Installer.installLog.removeBegin=Remove Begin:
+Installer.installLog.repairBegin=Repair Begin:
+Installer.installLog.uninstallBegin=Uninstall Begin:
+Installer.installLog.addEnd=Add End:
+Installer.installLog.removeEnd=Remove End:
+Installer.installLog.repairEnd=Repair End:
+Installer.installLog.uninstallEnd=Uninstall End:
+Installer.installLog.addHeader=Added Feature(s) #FEATURES#
+Installer.installLog.removeHeader=Removed Feature(s) #FEATURES#
+Installer.installLog.installHeader=Installed Feature(s) #FEATURES# of $PRODUCT_NAME$
+Installer.installLog.repairHeader=Repaired $PRODUCT_NAME$
+Installer.installLog.uninstallHeader=Uninstalled $PRODUCT_NAME$
+Installer.installLog.uninstallFile.description=Uninstall File:
+Installer.installLog.uninstallMergemodule.description=Uninstall Merge Module:
+Installer.installLog.uninstallFolder.description=Uninstall Folder:
+Installer.installLog.shortcut.uninstallShortcut=Uninstall Shortcut:
+Installer.installLog.alias.uninstallAlias=Uninstall Alias:
+Installer.installLog.link.uninstallLink=Uninstall Link:
+InstallRPMPackage.visualname.self.uninstall=Uninstall Linux RPM:
+InstallSolarisPackage.visualname.self.uninstall=Uninstall Solaris Package:
+InstallHPUXPackage.visualname.self.uninstall=Uninstall HP-UX Depot:
+Installer.installLog.makeExecutable.description.remove=Remove LaunchAnywhere:
+Installer.installLog.nothingWasUninstalled=Nothing was uninstalled.
+Installer.installLog.containsDeleteProtectedFiles=Directory contains delete protected files
+
+DeployJEEArchiveAction.visualName=Deploy WAR/EAR Archive
+DeployJEEArchiveAction.archiveNotSpecified=<No archive specified>
+DeployJEEArchiveAction.unableToUninstallPrefix=Unable to undeploy
+DeployJEEArchiveAction.unableToUninstallMessage=#ARCHIVE_NAME# from server at #SERVER_PATH#
+
+RunSQLScriptAction.visualName=Run SQL Script
+RunSQLScriptAction.noScriptSpecified=<No script specified>
+
+Designer.Action.I5OSFiles.addFile=Install i5/OS File:
+Designer.Action.I5OSFiles.addingFile=Installing File:
+Designer.Action.I5OSFiles.visualName=System i (i5/OS) Install File
+Designer.Action.i5OSLoginCredential.visualName=Panel: Get System i (i5/OS) Login Credential
+Installer.unexpectedChanges.title=Error
+Installer.unexpectedChanges.label=Unable to launch installer.
+Installer.unexpectedChanges.message=The installer found unexpected changes to the install script.
+Installer.iseries.I5OSFiles.wrongCCSIDCode=Incorrect CCSIDs:
+
+Installer.iseries.i5OSLibrary.visualName=System i (i5/OS) Library
+Installer.iseries.i5OSObject.visualName=System i (i5/OS) Object
+Installer.iseries.i5OSPTF.visualName=System i (i5/OS) Program Temporary Fix (PTF)
+Installer.iseries.i5OSIFS.visualName=System i (i5/OS) Integrated File System (IFS)
+Installer.iseries.i5OSLicensedPgm.visualName=System i (i5/OS) Licensed Program
+Installer.iseries.i5OSQueryRAIR.visualName=System i (i5/OS) Find Component in RAIR
+Designer.iseries.I5OSLibraryOverrideConsole.visualName=Console: System i (i5/OS) Override Library Console
+Designer.iseries.I5OSLibraryOverridePanel.visualName=Panel: System i (i5/OS) Override Library Panel
+Designer.iseries.I5OSCommand.visualName=System i (i5/OS) Command
+Installer.iseries.i5OSCrtJvaPgm.visualName=System i (i5/OS) Create Java Program
+Installer.iseries.i5OSProgram.visualName=System i (i5/OS) Program
+Installer.iseries.SystemiRemoteDeployment.visualName=System i (i5/OS) Remote Install 
+Installer.iseries.SystemiRemoteHandler.visualName=System i (i5/OS) Remote Handler 
+Installer.iseries.SystemiRunRemotePackage.visualName=System i (i5/OS) Remote Package 
+Installer.iseries.I5RAIR.visualName=System i (i5/OS) Registration Application Installation Repository (i5/OS RAIR)
+Installer.rule.I5OSLicensedPgmInstalledCondition.visualName=System i (i5/OS) Licensed Program Exists Condition
+Installer.rule.I5OSPrerequisitePTFAppliedCondition.visualName=System i (i5/OS) Program Temporary Fix (PTF) Condition
+Installer.rule.I5OSCheckRemoteInstallCondition.visualName=System i (i5/OS) Check If Remote Install Condition
+Installer.rule.I5OSCheckRAIRRegisteredCondition.visualName=System i (i5/OS) Check RAIR Registered Condition
+
+Installer.iseries.i5OSQueryRAIR.notProperlyConfigured=Action not properly configured.
+
+Installer.encryption.encryptProblem=A problem has occurred during encryption:
+Installer.encryption.decryptProblem=A problem has occurred during decryption:
+Installer.encryption.keyRetrievalProblem=A problem has occurred while retrieving encryption key:
+Installer.encryption.jceNotAvailable=JCE Encryption is not available.
+
+Installer.native.registry.aix.visualName=Registering $PRODUCT_NAME$ into SWVPD
+Installer.native.registry.aix.superUserWarning=You do not have sufficient permissions to register with the SWVPD.  Please try running again as super-user.
+Installer.native.registry.aix.vpdaddNotFound=Unable to find vpdadd command in the path.
+Installer.native.registry.aix.vpddelNotFound=Unable to find vpddel command in the path.
+Installer.native.registry.aix.unableToRemove=Unable to clean SWVPD
+
+Designer.Action.UninstallCategory.emptyCategory=<Untitled category>
+
+Installer.instanceSupportError.message.title=Instance Management Error
+Installer.instanceSupportError.message.label=Error while checking for instances
+Installer.instanceSupportError.message.message=Aborting installation as the user has either cancelled the installation or exceeded the maximum number of instances allowed.
+Installer.instanceManagement.customizer.okButton=&OK
+Installer.instanceManagement.customizer.cancelButton=&Cancel
+Installer.instanceManagement.customizer.description=Manage instances by selecting one of the following options:
+Installer.instanceManagement.customizer.installNewInstance=&Install a New Instance
+Installer.instanceManagement.customizer.modifyExistingInstance=&Modify an Existing Instance
+Installer.instanceManagement.customizer.title=Manage Instances
+Installer.instanceSupportError.message.instanceerror=An error occurred while trying to manage the selected instance
+
+Installer.instanceManagement.console.chooseInstanceToModify=Choose the instance to modify
+Installer.instanceManagement.console.choose.option=Choose Instance Management Option
+Installer.instanceManagement.console.install.newInstance=Install a new instance
+Installer.instanceManagement.console.install.modifyExistingInstance=Modify an existing instance
+Installer.instanceManagement.console.install.followingInstancesPresent=The following instances are already present on this machine
+Installer.instanceManagement.console.customizer.title=Manage Instances
+
+Installer.rollback.rollbackLog.errorLogInfo=Error occurred while installing the following Action, hence rolling back the installation....!
+Installer.rollback.rollbackLog.actionName=Action Name:
+Installer.rollback.rollbackLog.actionDescription=Action Description:
+Installer.rollback.rollbackLog.errorDetails=Error Details as below:
+Installer.rollback.console.rollbackInfo=Fatal error occured during installation, Rolling back the installation.....
+Installer.rollback.rollbackLog.triggerRollbackAction=Install Rollback is not enabled for installer. Skipping the Trigger Rollback action.
+
+Installer.maintMode.Console.SupportError.message.title=Maintenance option error.
+Installer.maintMode.Console.SupportError.message.label=Error occurred while processing maintenance option.
+Installer.maintMode.Console.add.notenabled=Adding features not supported for this installation.
+Installer.maintMode.Console.repair.notenabled=Repairing not supported for this installation.
+Installer.maintMode.Console.remove.notenabled=Removing features not supported for this installation.
+Installer.maintMode.Console.uninstall.notenabled=Uninstallation not enabled for this installation.
+Installer.maintMode.console.duplicate.maint.mode.options.present=Duplicate maintenance options passed as arguements. All maintenance options will be ignored.
+Installer.uninstaller.not.enabled=Unable to launch uninstaller since uninstallation is not enabled for this product.
+Installer.maintMode.Console.add.nothingToAdd=All product features have already been installed. Cancelling this operation.
+
+IntroActionAddFeature.message=InstallAnywhere will guide you through adding features to $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.\u000A\u000AClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\u000A\u000AYou may cancel this installation at any time by clicking the 'Cancel' button
+IntroActionRemoveFeature.message=InstallAnywhere will guide you through removing features from $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.\u000A\u000AClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\u000A\u000AYou may cancel this installation at any time by clicking the 'Cancel' button.
+IntroActionRepairFeature.message=InstallAnywhere will guide you through repairing the $PRODUCT_NAME$ installation.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.\u000A\u000AClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\u000A\u000AYou may cancel this installation at any time by clicking the 'Cancel' button
+
+IntroActionAddFeatureConsole.message=InstallAnywhere will guide you through adding features to $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.
+IntroActionRemoveFeatureConsole.message=InstallAnywhere will guide you through removing features from $PRODUCT_NAME$.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.
+IntroActionRepairFeatureConsole.message=InstallAnywhere will guide you through repairing the $PRODUCT_NAME$ installation.\u000A\u000AIt is strongly recommended that you quit all programs before continuing.
+
+IntroActionAddFeature.stepTitle=Add Features
+IntroActionRemoveFeature.stepTitle=Remove Features
+IntroActionRepairFeature.stepTitle=Repair Installation
+
+IntroActionAddFeatureConsole.title=Add Features
+IntroActionRemoveFeatureConsole.title=Remove Features
+IntroActionRepairFeatureConsole.title=Repair Installation
+Message.dir.already.existed=Directory already existed
+
+InstallFile.visualname.self=Install File
+InstallDirActionPanel.alertDialog.instanceOvertopInstallation=An instance of this product already exists in the selected location. This instance will be overwritten.
+InstallDirActionPanel.alertDialog.instanceOvertopInstallationStay=An instance of this product already exists in the selected location. Please change the path and continue installation
+InstallDirActionPanel.alertDialog.warning.label=Warning!
+
+Designer.Customizer.AUninstallCategory.categoryName=Category Name
+UninstallPhase.category.name=Uninstall  Category
+UninstallPhase.category.default.name.file=Files
+UninstallPhase.category.default.name.lax=LaunchAnywheres
+UninstallPhase.category.default.name.link=Shortcuts/Links/Aliases
+UninstallPhase.category.default.name.reg=Registry Entries
+UninstallPhase.category.default.name.swdb=Software Databases
+UninstallPhase.category.default.name.native=Native Packages
+UninstallPhase.category.default.name.folder=Folders
+UninstallPhase.category.default.name.aix=AIX Entries
+UninstallPhase.category.default.name.rair=RAIR Entries
+UninstallPhase.category.default.name.jeearchives=JEE Archives
+UninstallPhase.category.default.name.dbScripts=DB Scripts
+UninstallPhase.category.default.name.others=Others Category
+
+UninstallPhase.execute.category.name.files=Uninstall Files
+UninstallPhase.execute.category.name.folders=Uninstall Folders
+UninstallPhase.execute.category.name.lax=Uninstall LaunchAnywheres
+UninstallPhase.execute.category.name.links=Uninstall Shortcuts/Links/Aliases
+UninstallPhase.execute.category.name.rpm=Uninstall RPM Packages
+UninstallPhase.execute.category.name.registries=Uninstall Registry Entries
+UninstallPhase.execute.category.name.swdb=Uninstall Software Databases
+UninstallPhase.execute.category.name.custom=Custom Uninstall
+UninstallPhase.execute.category.name.aix=Uninstall AIX Entries
+UninstallPhase.execute.category.name.rair=Uninstall RAIR Entries
+UninstallPhase.execute.category.name.jeearchive=Uninstall JEE Archives
+UninstallPhase.execute.category.name.dbScript=Uninstall DB Scripts
+UninstallPhase.execute.category.name.envVariables=Uninstall Environment Variables
+UninstallPhase.execute.category.name.rpmEntries=Uninstall RPM Entries
+UninstallPhase.execute.category.name.mergemodules=Uninstall Merge Modules
+
+Designer.Customizer.AExecuteUninstallCategoryFiles.info=This action takes care to uninstall all the Files installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryFolders.info=This action takes care to uninstall all the Folders installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryLAX.info=This action takes care to uninstall all the LaunchAnywheres installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryLinks.info=This action takes care to uninstall all the Links/Shortcuts/Aliases installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryRPMPackages.info=This action takes care to uninstall all rpm Packages installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryRegistries.info=This action takes care to remove all the Registry Entries installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategorySwDB.info=This action takes care to uninstall all the Software Databases installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryAIX.info=This action takes care to uninstall all the aix entries installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryRAIR.info=This action takes care to uninstall all the rair entries installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryJEEArchive.info=This action takes care to uninstall all the jee archives installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryDBScript.info=This action takes care to uninstall all the db scripts installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryEnvVariables.info=This action takes care to uninstall all the environmental variables installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryRPMEntries.info=This action takes care to uninstall all the rpm entries installed/created by the installer during install time
+Designer.Customizer.AExecuteUninstallCategoryMergeModules.info=This action takes care to uninstall all associated merge modules installed by parent installer during install time
+
+CustomizeBundlesConsole.add.instructions=All the above features are selected.Please choose the features you want to deselect (or) press <ENTER> to continue.
+Designer.Rule.CompareVariableNumerically.visualName=Compare InstallAnywhere Variables Numerically
+Installer.addFeat.Console.error.message.title=Add Features Error
+Installer.addFeat.Console.error.message.message=No Features were selected for adding
+Installer.Console.pressEnterToExit=PRESS <ENTER> TO EXIT
+
+Installer.instance.installed.in.other.mode=This instance you are trying to modify seems to be installed in console mode. It can not be modified using GUI mode. Please relaunch using console mode. 
+
+Designer.Action.Expand7zipArchive.couldNotExtractArchieve=Could not Expand the 7-zip Archive
+Designer.Action.Expand7zipArchive.unsupportedMethod=The Method/Encoding of the 7zip Archive is unsupported.
+Designer.Action.Expand7zipArchive.crcError=CRC Error
+Designer.Action.Expand7zipArchive.dataError=Data Error / Could not open file.
+Designer.Action.Expand7zipArchive.otherError=Other Error
+Designer.rules.new.container.validation.illegalOperatorStartEnd=The rule expression starts or ends with operators or invalid characters
+Designer.rules.new.container.validation.illegalUsageOfNot=Illegal usage. ! (NOT) to be followed by an operand expression
+Designer.rules.new.container.validation.illegalANDfollowedOR=Illegal usage. && (AND) cannot be followed by || (OR)
+Designer.rules.new.container.validation.illegalORfollowedAND=Illegal usage. || (OR) cannot be followed by && (AND)
+Designer.rules.new.container.validation.ParenthesisFollowedByANDOR=Illegal usage. ( cannot be followed by && (AND) or || (OR)
+Designer.rules.new.container.validation.missingMatchingParenthesis=Missing Matching Parenthesis. ) is used without a corresponding (
+Designer.rules.new.container.validation.unknownErrorInParsing=Unknown Error in parsing rule expression
+Designer.rules.new.container.validation.missingParenthesis=Missing Matching Parenthesis
+Designer.rules.new.container.validation.invalid.ruleid=Invalid rule ID
+Designer.rules.new.container.validation.valid=The Rule Expression Is Valid
+
+Designer.Action.ExpandArchive.couldNotFindFile = Could not find file to extract:
+Designer.Action.ExpandArchive.expanding=Expanding Archive
+
+Designer.Action.ReadOrModifyXML.visualName=Read/Modify XML File
+Designer.Action.ReadOrModifyXML.couldNotFindXMLFile=Could not find XML file
+Designer.Action.ReadOrModifyXML.missingTag=Could not find the tag specified
+Designer.Action.ReadOrModifyXML.missingAttribute=Could not find the attribute specified
+Designer.Action.ReadOrModifyXML.invalidOccurenceNumber=Could not find the tag/attribute at the specified occurence.
+Designer.Action.ReadOrModifyXML.couldNotEdit=Could not modify XML file
+
+LogSettingsEntry.pathExists=The path does not exist
+LogSettingsEntry.fileExists=The file does not exist 
+CreateShortcut.file.name.exists=Unable to Create Shortcut; file with same name exists.
+Installer.iseries.error=A problem has occurred during execution of this action.  
+
+Designer.Action.customizer.DownloadFile.visualName=Download File Action
+DownloadFile.action.log.protocolException=Specified protocol not supported.
+DownloadFile.action.protocol.url.mismatch=The protocol selected for the action does not match the protocol specified in the URL
+DownloadFile.action.log.NumberFormatException=Specified port is not valid. Default port is used.
+DownloadFile.action.log.PermissionDenied=Specified destination does not have write permission.
+DownloadFile.action.log.NotEnoughSpaceOnDEstination=Destination does not have enough space for downloaded files. Please choose another location for Download.
+DownloadFile.action.log.FileNotFoundException=Download file action could not find the specified file on server: The file may not exist/File may not have the permission for downloading.
+
+Designer.Action.customizer.DownloadFile.logName=Download File :
+Designer.Action.customizer.DownloadFile.logNameFailed=Failed by this specified file - 
+DownloadFile.action.log.ConnectionException=Connection with the specified server could not be established. Please check specified URL/port number/your system's firewall setting.
+DownloadFile.action.log.ConnectionExceptionForFatal=Connection with the specified server could not be established during Download File Action. Please check your firewall settings or URL and/or port number specified.
+DownloadFile.action.log.socketException=There is an error in the underlying protocol, such as a TCP error.
+DownloadFile.action.log.jSchException=Error occurred while executing download file action.
+DownloadFile.action.log.nullPointerException=Specified URL for download file action is invalid.
+DownloadFile.action.log.malformedException=Specified URL for download file action was not supported.
+DownloadFile.action.log.ioException=Error occurred while executing the download file action.
+DownloadFile.action.log.DownloadFail=File download failed. Hence failing installation.
+DownloadFile.action.log.ftpLoginException=Entered user name and password does not match.Please enter correct user name and password.
+DownloadFile.action.log.unknownHostException=Hostname specified in the URL is incorrect. 
+
+# .......................................... =The path specified as the Alias/Link/Shortcut destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for Alias/Link/Shortcut.
+ShortcutLocActionPanel.alertDialog.invalidPath=The path specified as the Alias/Link/Shortcut destination has one or more characters that are invalid in this platform.  \u000APlease choose a different location for Alias/Link/Shortcut.
+
+# ..................................... =You do not have write permissions to the chosen Alias/Link/Shortcut destination. Please choose a different location for Alias/Link/Shortcut.
+ShortcutLocActionPanel.alertDialog.text=You do not have write permissions to the chosen Alias/Link/Shortcut destination. \u000APlease choose a different location for Alias/Link/Shortcut
+
+# ........................................... =The path specified as the Alias/Link/Shortcut destination is relative. \u000APlease specify an absolute path.
+ShortcutLocActionPanel.alertDialog.relativePath=The path specified as the Alias/Link/Shortcut destination is relative. \u000APlease specify an absolute path.
+
+Designer.Action.customizer.DownloadFile.displayName=Download File via FTP/HTTP
+
+GetInputConsolePanel.defaulttString=Default:
+
+
+
+#Apache Tomcat Deployment Action panel
+#Resource.Apache.Tomcat.Runtime.Deployment=Apache Tomcat Runtime Deployment
+#Resource.Apache.Tomcat.Runtime.Deployment.Panel=Apache Tomcat Runtime Deployment Panel
+TomcatDeploymentAction.stepTitle=Choose Tomcat Deployment Option
+TomcatDeploymentAction.panel.question=Where would you like to deploy the WAR?
+TomcatDeploymentOptionsAction.prompt=Where would you like to deploy the WAR?
+TomcatDeploymentAction.panel.instruction=Choose a deployment option for
+TomcatDeploymentAction.panel.localTomcatDeployOption=&Local Tomcat server
+TomcatDeploymentAction.panel.remoteTomcatDeployOption=Remote &Tomcat server
+TomcatDeploymentAction.panel.amazonEC2TomcatDeployOption=Tomcat Server on an Am&azon EC2 Instance
+TomcatDeploymentAction.panel.tomcatDontDeployOption=Save the &WAR locally on the target system for later deployment
+TomcatDeploymentOptionsAction.title=Choose Tomcat Deployment Option
+TomcatDeploymentOptionsActionConsole.title=Choose Tomcat Deployment Option
+TomcatDeploymentOptionsAction.instructions=Choose Tomcat Deployment Option
+TomcatDeploymentOptionsAction.Runtime.Deployment=Apache Tomcat Runtime Deployment
+TomcatDeploymentAction.panel.remote.sslEnabled=SS&L Enabled
+
+#Local Tomcat Deployment Panel
+TomcatDeploymentOptionsPanel.local.serverPath=Local To&mcat server path:
+TomcatDeploymentOptionsPanel.local.choose=Choose...
+TomcatDeploymentOptionsPanel.local.chooseFileDialog.title=Choose Tomcat installation location
+TomcatDeploymentOptionsPanel.alertDialog.relativePath=The path specified as the Tomcat server path is relative. \u000APlease specify an absolute path.
+TomcatDeploymentOptionsPanel.alertDialog.text=You do not have write permissions to the chosen folder. Please choose a different folder.
+TomcatDeploymentOptionsPanel.alertDialog.invalidPath=The path specified as the Tomcat server path has one or more characters that are invalid in this platform.  \u000APlease choose a different location.
+TomcatDeploymentOptionsPanel.alertDialog.label.error=Error!
+TomcatDeploymentOptionsPanel.alertDialog.label.success=Success!
+TomcatDeploymentOptionsPanel.alertDialog.label.connection.error=Error in establishing connection with the remote machine.
+TomcatDeploymentOptionsPanel.alertDialog.label.connection.success=Successfully established connection with the remote machine.
+
+#Remote Tomcat Deployment Panel
+TomcatDeploymentOptionsPanel.remote.hostname=&Host Name:
+TomcatDeploymentOptionsPanel.remote.port=Po&rt:
+TomcatDeploymentOptionsPanel.remote.username=&User Name:
+TomcatDeploymentOptionsPanel.remote.password=Pa&ssword:
+TomcatDeploymentOptionsPanel.remote.authenticate=Test Conn&ection
+
+#Tomcat Deployment Console Panel
+TomcatDeploymentOptionsConsoleUI.prompt=ENTER THE NUMBER FOR THE DEPLOYMENT OPTION, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+TomcatDeploymentOptionsConsoleUI.Continue.prompt=Press <ENTER> to continue
+TomcatDeploymentOptionsConsoleUI.local.serverPath=Enter local Tomcat server path
+TomcatDeploymentOptionsConsoleUI.remote.hostname=Enter remote Tomcat hostname
+TomcatDeploymentOptionsConsoleUI.remote.port=Enter remote Tomcat port number
+TomcatDeploymentOptionsConsoleUI.remote.username=Enter remote Tomcat username
+TomcatDeploymentOptionsConsoleUI.remote.password=Enter remote Tomcat password
+TomcatDeploymentOptionsConsoleUI.panel.localTomcatDeployOption=Local Tomcat server
+TomcatDeploymentOptionsConsoleUI.panel.remoteTomcatDeployOption=Remote Tomcat server
+TomcatDeploymentOptionsConsoleUI.panel.tomcatDontDeployOption=Save the WAR locally on the target system for later deployment
+TomcatDeploymentOptionsConsoleUI.panel.OnlyLocalDeployment=Going to deploy WAR file locally.
+TomcatDeploymentOptionsConsoleUI.panel.OnlyRemoteDeployment=Going to deploy WAR file on a remote Tomcat server.
+TomcatDeploymentOptionsConsoleUI.panel.OnlySaveLocally=Going to save WAR file on the target system for later deployment
+
+#Remote Tomcat deployment exit dialog
+RemoteTomcatExitDialog.install.narrative=A problem occurred while connecting to the remote Tomcat server.
+RemoteTomcatExitDialog.install.console.narrative=There was a problem in establishing connection with the remote Tomcat server. Press <ENTER> to continue or type <QUIT> to quit the installation
+
+#Upgrade Runtime Panel
+Installer.instanceManagement.customizer.upgrade.title=Upgrade Confirmation
+Installer.instanceManagement.customizer.upgrade.description.multipleInstance1=Specify the instance that you want to upgrade.
+Installer.instanceManagement.customizer.upgrade.description.multipleInstance=Select the instance that you want to upgrade.
+Installer.instanceManagement.customizer.upgrade.Upgrade=Upgrade
+Installer.instanceManagement.customizer.upgrade.dontUpgrade=Cancel Upgrade
+Installer.instanceManagement.customizer.manageAndUpgrade.abort=Abort
+Installer.upgradeManagement.customizer.AbortCustomizer.HigherVersion=One or more newer versions of the product are already installed. An upgrade is not applicable.
+Installer.upgradeManagement.customizer.AbortCustomizer.HigherVersion1=One or more newer versions of the product are already installed.
+Installer.upgradeManagement.customizer.AbortCustomizer.HigherVersion2=An upgrade is not applicable in this case.
+Installer.instanceManagement.customizer.upgrade.AbortUpgradeConsole.Exit=Press ENTER to exit
+Installer.instanceManagement.customizer.upgrade.AbortUpgradeConsole.Cosole.Reading.Error=An error occurred while reading value from console terminal during upgrade.
+Installer.instanceManagement.customizer.upgrade.UpgradeCustomizerConsole.Get.Value=Enter 1 for first instance, 2 for second instance, and so on
+Installer.instanceManagement.customizer.upgrade.UpgradeCustomizerConsole.EnterProperValue=Enter the appropriate value
+
+# Database connection panel/console
+ChooseDBConnectionAction.steptitle=Choose Database Connection 
+ChooseDBConnectionAction.connectionMessage=Database server to which you would like to connect
+ChooseDBConnectionAction.datebaseName=&Database Name:
+ChooseDBConnectionAction.serverHost=Server &Host:
+ChooseDBConnectionAction.serverPort=&Server Port:
+ChooseDBConnectionAction.serverAuthentication=Connect using server authentication
+ChooseDBConnectionAction.username=Use&rname:
+ChooseDBConnectionAction.password=Pass&word:
+Designer.Action.ChooseDBConnectionActionConsole.visualName=Console: Choose Database Connection
+Designer.Action.ChooseDBConnectionAction.visualName=Panel: Choose Database Connection
+ChooseDBConnectionActionConsole.datebaseName=Database Name
+ChooseDBConnectionActionConsole.serverHost=Server Host
+ChooseDBConnectionActionConsole.serverPort=Server Port
+ChooseDBConnectionActionConsole.username=User Name
+ChooseDBConnectionActionConsole.password=Password
+ChooseDBConnectionActionConsole.testConnection=Test Connection (Yes/No)
+ChooseDBConnectionAction.statusDialog.status=Connection Status
+ChooseDBConnectionAction.connectionSuccess.status=The connection to the specified server was successful.
+ChooseDBConnectionAction.connectionFailure.status=The connection to the specified server failed.
+Designer.Customizer.AChooseDBConnectionActionConsole.connectionFailed=Failed to establish the database connection
+Designer.Customizer.AChooseDBConnectionActionConsole.connectionCloseFailure=Failed to close the database connection
+Designer.Customizer.AChooseDBConnectionActionConsole.loadDriverFailure=Unable to load the database driver
+
+#WebSphere
+WebsphereDeploymentAction.stepTitle=Choose WebSphere Deployment Option
+WebsphereDeploymentAction.panel.question=Where would you like to deploy the archive?
+WebsphereDeploymentOptionsAction.prompt=Where would you like to deploy the archive?
+WebsphereDeploymentAction.panel.instruction=Choose a deployment option for
+WebsphereDeploymentAction.panel.websphereDeployOption=&Local/remote WebSphere server 
+WebsphereDeploymentAction.panel.websphereDontDeployOption=Save the ar&chive locally for later deployment
+WebsphereDeploymentOptionsAction.title=Choose WebSphere Deployment Option
+WebsphereDeploymentOptionsActionConsole.title=Choose WebSphere Deployment Option
+WebsphereDeploymentOptionsAction.instructions=Choose WebSphere Deployment Option
+WebsphereDeploymentOptionsAction.Runtime.Deployment=IBM WebSphere Runtime Deployment
+WebsphereDeploymentAction.panel.remote.sslEnabled=&Admin Security Enabled
+ChooseFile.chooseStr.websphere = ...
+
+#Local WebSphere Deployment Panel
+WebsphereDeploymentOptionsPanel.local.serverPath=Local &WebSphere server path:
+WebsphereDeploymentOptionsPanel.local.choose=Choose...
+WebsphereDeploymentOptionsPanel.local.chooseFileDialog.title=Choose WebSphere installation location
+WebsphereDeploymentOptionsPanel.alertDialog.relativePath=The specified WebSphere server path is relative. \u000ASpecify an absolute path.
+WebsphereDeploymentOptionsPanel.alertDialog.text=You do not have write permissions to the chosen folder. Choose a different folder.
+WebsphereDeploymentOptionsPanel.alertDialog.invalidPath=One or more characters in the specified WebSphere server path are invalid for a path on this platform. \u000AChoose a different location.
+WebsphereDeploymentOptionsPanel.alertDialog.label.error=Error!
+WebsphereDeploymentOptionsPanel.alertDialog.label.success=Success!
+WebsphereDeploymentOptionsPanel.alertDialog.label.connection.error=Error in establishing connection with the remote machine.
+WebsphereDeploymentOptionsPanel.alertDialog.label.connection.success=Successfully established connection with the remote machine.
+
+#Remote WebSphere Deployment Panel
+WebsphereDeploymentOptionsPanel.remote.hostname= Server &Host:
+WebsphereDeploymentOptionsPanel.remote.port=SOAP Po&rt:
+WebsphereDeploymentOptionsPanel.remote.username=&User Name:
+WebsphereDeploymentOptionsPanel.remote.password=Pa&ssword:
+WebsphereDeploymentOptionsPanel.remote.sslkey=SSL &TrustStore:
+WebsphereDeploymentOptionsPanel.remote.sslpass=TrustStore Passwor&d:
+WebsphereDeploymentOptionsPanel.remote.testconn=Test Conn&ection
+
+
+#WebSphere Deployment Console Panel
+WebsphereDeploymentOptionsConsoleUI.prompt=ENTER THE NUMBER FOR THE DEPLOYMENT OPTION, OR PRESS <ENTER> TO ACCEPT THE DEFAULT
+WebsphereDeploymentOptionsConsoleUI.Continue.prompt=Press <ENTER> to continue
+WebsphereDeploymentOptionsConsoleUI.remote.hostname=Enter WebSphere host name
+WebsphereDeploymentOptionsConsoleUI.remote.port=Enter WebSphere SOAP port number
+WebsphereDeploymentOptionsConsoleUI.remote.username=Enter user name
+WebsphereDeploymentOptionsConsoleUI.remote.password=Enter password
+WebsphereDeploymentOptionsConsoleUI.remote.trustpath=Enter SSL truststore path
+WebsphereDeploymentOptionsConsoleUI.remote.trustpassword=Enter SSL truststore password
+WebsphereDeploymentOptionsConsoleUI.panel.websphereDeployOption=Local/remote WebSphere server
+WebsphereDeploymentOptionsConsoleUI.panel.websphereDontDeployOption=Save the archive locally for later deployment
+WebsphereDeploymentOptionsConsoleUI.panel.OnlyDeployment=Going to deploy archive file onto a target WebSphere server
+WebsphereDeploymentOptionsConsoleUI.panel.OnlySaveLocally=Going to save archive file on the target system for later deployment
+
+#Remote WebSphere deployment exit dialog
+RemoteWebsphereExitDialog.install.narrative=A problem occurred while connecting to the WebSphere server.
+RemoteWebsphereExitDialog.install.console.narrative=There was a problem connecting to the WebSphere server. Press <ENTER> to continue or type <QUIT> to quit the installation.
+
+#Strings used in log
+Installlog.Magicfolder.donotinstall=Do Not Install
+Installlog.CheckDiskSpace.requireddiskspace=Required Disk Space:
+Installlog.CheckDiskSpace.freediskspace=Free Disk Space:
+Installlog.ASCIIfile.nofiletomanipulate=No ASCII text file was designated to be manipulated
+Installlog.ASCIIfile.parentdirectorymatched=Specified ASCII text file matched the name of its parent directory.
+Installlog.ASCIIfile.unabletolocate=Unable to locate ASCII text file to be manipulated. Deferring...
+Installlog.ASCIIfile.wrongfile=Specified ASCII text file is actually a directory
+Installlog.ASCIIFile.encodingfailedtoapply=Failed to apply
+Installlog.ASCIIFile.encodingapplied=Encoding applied:
+Installlog.ASCIIFile.currentencoding=File encoding:
+Installlog.createshortcut.filenotexist=File did not exist
+Installlog.createshortcut.unabletocreate=Unable to Create Shortcut (Permission Denied)
+Installlog.createshortcut.unabletoreplace=Unable to replace directory with desired shortcut
+Installlog.createshortcut.errorgeneratingwin32shortcut=Error Generating Win32 Shortcut Icon
+Installlog.createshortcut.aliasnamesameasdirectory=Alias had same name as an existing directory. Appending 'Alias' to the alias's name
+Installlog.createshortcut.errorgeneratingmacalias=Error Generating Apple OS Alias
+Installlog.createshortcut.linknamesameasfile=Link had same name as an existing file. Prefixing 'run' to the link's name
+Installlog.createshortcut.aliasnamesameasfile=Alias had same name as an existing file. Appending 'Alias' to the alias's name
+Installlog.editenvironment.filenotfound=The appropriate file was not found.
+Installlog.editenvironment.variablenotspecified=No system environment variable was specified
+Installlog.editenvironment.environmentvariable=System environment variable specified was an InstallAnywhere variable that resolved to an empty string
+Installlog.Exec.executionfailed=Execution was not successful
+Installlog.Executescript.executionerror=Error while attempting to execute the installation script
+Installlog.ExpandArchive.archivenotsupported=Archive Type (Stuffit File) Not Supported for this Platform. Writing original archive to disk untouched
+Installlog.registryentry.failedtoclosekey=Failed to close key
+Installlog.installdirectory.actionsnotinstalled=All Install actions under this directory have not been installed.
+Installlog.installfile.nulldestinationpath=Destination path was null
+Installlog.installfile.fontnotinstalled=Could not install font.
+Installlog.installfile.inadequatepermissions=Inadequate Permissions to Create Directory
+Installlog.installfile.failedtocreatedirectory=Failure to create directory:
+Installlog.InstallNTServices.noexecutabledesignated=No executable was designated to register as an NT Service
+Installlog.InstallNTServices.unabletolocate=Unable to locate executable to register as NT service. Deferring...
+Installlog.InstallNTServices.noexecutable=Specified executable file was actually a directory
+Installlog.InstallNTServices.failureregistering=Failure registering the NT Service
+Installlog.InstallRPM.filenotfound=RPM file not found
+Installlog.InstallRPM.packagenotrelocated=The specified package is not relocatable.
+Installlog.InstallRPM.directorynotexist=The relocation directory does not exist.
+Installlog.InstallRPM.invalidplatform=RPM installation on invalid platform
+Installlog.InstallRPM.commandnotfound=The rpm command was not found on the PATH
+Installlog.InstallRPM.rpmdoesnotrun=RPM does not run on this platform
+Installlog.InstallUninstaller.errorcopyingresources=Error copying native uninstaller resources. Some native/feature actions may fail to uninstall/install.
+Installlog.InstallUninstaller.unableretrieveclasses=Unable to retrieve uninstaller classes from Installer ZIP
+Installlog.InstallUninstaller.errorinstallinguninstaller=Error installing uninstaller:
+Installlog.InstallUninstaller.erroraddingregistry=Error adding Windows registry entries (Uninstaller may not show up in Add/Remove Programs):
+Installlog.InstallUninstaller.errorcreatingdirectory=Error creating InstData directory:
+Installlog.InstallUninstaller.unabletoschedule=Unable to schedule Uninstaller components for installation
+Installlog.InstallUninstaller.failuretoinstallexecutable=Failure to install Uninstaller executable:
+Installlog.MakeExecutable.failuretowriteproperties=Failure to write Properties file for LaunchAnywhere:
+Installlog.MakeExecutable.failuretogenerateproperties=Failure to properly generate Properties file for LaunchAnywhere:
+Installlog.MakeExecutable.operateincorrectly=Launcher will likely operate incorrectly
+Installlog.MakeExecutable.failuretoinstallproperties=Failure to install Properties file for LaunchAnywhere:
+Installlog.MakeExecutable.platformnotsupported=Platform not supported for pure Java installer. LaunchAnywhere executables not installed
+Installlog.MakeExecutable.couldnotchangeicon=Could not change the icon for the executable:
+Installlog.MakeExecutable.unrecognizedplatform=Unrecognized platform. LaunchAnywhere executables not installed
+Installlog.MakeExecutable.errorwritingcomponents=Error writing LaunchAnywhere components (Access Denied)
+Installlog.MakeExecutable.errorgeneratingcomponents=Error generating LaunchAnywhere components
+Installlog.MakeExecutable.errorinstallinguninstaller=Error installing uninstaller. The uninstaller may fail to function
+Installlog.MakeExecutable.errorinstallingexecutable=Error installing LaunchAnywhere executable. The launcher for one of the Java applications may fail to function
+Installlog.MakeExecutable.failtoinstalllax=Failure to install Java LAX file for LaunchAnywhere: lax.jar
+Installlog.MakeExecutable.errorgeneratingicon=Error Generating Launcher Icon
+Installlog.MakeExecutable.errorinstallinglauncher=Error installing Windows launcher
+Installlog.MakeExecutable.couldnotfindlauncher=Could not find Windows launcher
+Installlog.ExtractZip.nofilestoinstall=No files to install
+Installlog.ExtractZip.errorinstall=Error Installing Folder Contents:
+Installlog.ExtractZip.sourcefoldernotspecified=A source folder was not specified for installation
+Installlog.PerformXSLT.InvalidArgument=XSL transformation could not be performed because of an invalid argument
+Installlog.PerformXSLT.TransformationFailed=XSL transformation could not be performed because the transformation failed
+Installlog.PerformXSLT.IOerror=XSL transformation could not be performed because of an I/O error
+Installlog.PerformXSLT.Fileerror=XSL transformation could not be performed because of a file operation error
+Installlog.PowerUpdateClint.NoZipSpecified=No PowerUpdate Client Source ZIP Specified
+Installlog.PowerUpdateClint.InvalidZipSpecified=Invalid PowerUpdate Client ZIP Specified
+Installlog.PowerUpdateClint.UnableToInstall=Unable to install PowerUpdate client:
+Installlog.ReadReplaceXML.CouldNotReadFile=Could not read the specified XML file
+Installlog.RegistryFindAction.DefineAllVariables=To execute the Get Windows Registry Entry action, all variables must be defined.
+Installlog.RegistryFindAction.DefineUUID=To execute the Get Windows Registry Entry action, the component UUID must be defined.
+Installlog.RegistryFindAction.InvalidUUID=The component UUID is not valid:
+Installlog.RegistryFindAction.LocationUndefined=Search location only set to true, but search location is undefined.
+Installlog.RegistryFingAction.VersionStringEmpty=Version string is empty.
+Installlog.RegistryFindAction.InvalidVersion=Version is not a valid version number:
+Installlog.SpeedASCIIFileManipulator.NoDirectoryManipulated=No directory was designated to be manipulated
+Installlog.SpeedASCIIFileManipulator.UnableToLocateDirectory=Unable to locate directory to be manipulated. Deferring...
+Installlog.SpeedASCIIFileManipulator.NotADirectory=Specified file was not a directory
+Installlog.SpeedRegistry.NoRegistryEntry=No registry entries were specified
+Installlog.Subinstaller.NoMergeModuleFound=No Merge Modules found at location:
+Installlog.Subinstaller.NoPathSpecified=No path specified for install-time Merge Modules
+Installlog.Subinstaller.NoMergeModuleSpecified=No Merge Modules were specified
+Installlog.Subinstaller.Installing=Installing:
+Installlog.Subinstaller.UnableToInstall=Unable to install
+Installlog.Subinstaller.IAVersionError=Built with another version of InstallAnywhere
+Installlog.InstallProgressAction.UnableToInstallUninstaller=Unable to install uninstaller for files installed prior to cancellation:
+Installlog.Installer.NothingInstalled=Nothing was installed on this system
+Installlog.Installer.FailedToInstallUninstaller=Failed to install uninstaller:
+Installlog.Installer.UnableToCreateDirectory=Unable to create directory hierarchy for Java VM installation
+Installlog.Installer.UnableToCreateJRE=Unable to create the JRE to the destination directory
+Installlog.Installer.ErrorCopyingJRE=Error Copying the JRE to the destination directory
+Installlog.Installer.JRENotExist=JRE source does not exist
+Installlog.LifeCycleManager.UnhandledException=The installer has failed due to an unhandled exception
+Installlog.LifeCycleManager.createdWith=created with InstallAnywhere
+Installlog.LifeCycleManager.console.install=Preparing CONSOLE Mode Installation
+Installlog.LifeCycleManager.console.addFeatures=Preparing CONSOLE Mode Add Features
+Installlog.LifeCycleManager.console.repair=Preparing CONSOLE Mode Repair Installation
+Installlog.LifeCycleManager.console.removeFeatures=Preparing CONSOLE Mode Remove Features
+Installlog.LifeCycleManager.console.uninstall=Preparing CONSOLE Mode Uninstallation
+Installlog.LifeCycleManager.swing.install=Preparing SWING Mode Installation
+Installlog.LifeCycleManager.swing.addFeatures=Preparing SWING Mode Add Features
+Installlog.LifeCycleManager.swing.repair=Preparing SWING Mode Repair Installation
+Installlog.LifeCycleManager.swing.removeFeatures=Preparing SWING Mode Remove Features
+Installlog.LifeCycleManager.swing.uninstall=Preparing SWING Mode Uninstallation
+Installlog.LifeCycleManager.silent.install=Preparing SILENT Mode Installation
+Installlog.LifeCycleManager.silent.addFeatures=Preparing SILENT Mode Add Features
+Installlog.LifeCycleManager.silent.repair=Preparing SILENT Mode Repair Installation
+Installlog.LifeCycleManager.silent.removeFeatures=Preparing SILENT Mode Remove Features
+Installlog.LifeCycleManager.silent.uninstall=Preparing SILENT Mode Uninstallation
+Installlog.RPM.InsufficientPermission=You have insufficient permissions to install this RPM package. Please try running as super-user.
+Installlog.ExpandZip.OverwriteSettings=File not installed due to file overwrite settings
+Installlog.ExpandFile.UnknownArchive=Unknown Archive Type. Writing original archive file to disk untouched
+Installlog.CustomAction.unavailable=Class unavailable:
+Installlog.ExpandArchive.UnknownType=Unknown archive type:
+Installlog.ExpandArchive.UnknownTypeTAR=Unknown archive type. Could not find file to extract TAR:
+Installlog.ExpandArchive.UnknownType7zip=Unknown archive type. Could not find file to extract 7-zip:
+Installlog.ExpandFile.FormatNotSupported=The format is not supported:
+Installlog.ExpandFile.ProblemWithFileType=Problems occurred with the expander of file's type:
+Installlog.InstallHPUXPackage.PackageNotInstalled=Package was not installed:
+Installlog.PowerUpdateClient.SourceNotAvailable=Source of archive not available:
+Installlog.ASCIIFileManipulator.FailedEncoding=Failed to apply encoding:
+Installlog.ASCIIFileManipulator.AppliedEncoding=Applied encoding:
+Installlog.CustomAction.FatalError=Unexpected Fatal Error in Class:
+Installlog.UpdateServiceClient.LibraryNotFound=Could not find update service library at
+Installlog.UpdateServiceClient.NotRegistered=Update service was not registered
+Installlog.ExpandErchive.InvalidSize=Could not find file to extract TAR (Invalid size):
+Installlog.InstallFile.UninstallFont=Could not uninstall font:
+Installlog.InstallFile.CouldNotDelete=Could not delete
+Installlog.InstallFile.MoveFailed=move failed
+Installlog.MakeExecutable.NoEntryFound=No entry found:
+InstallLog.MakeExecutable.EmptyResourceJar=resource jar is empty
+Installlog.InstallablePiece.ActionsNotInstalled=All install actions beneath this action have not been installed.
+Installer.splashScreenConsolePrompt=CHOOSE LOCALE BY NUMBER
+Installer.splashScreenConsoleTitle=Choose Locale...
+
+ConsoleBasedAAMgr.firstStepMessage=This is the first step in the installer.
+ConsoleBasedAAMgr.firstStepMessageAfterFilesInstalled=This is the first step immediately following the installation of files.
+ConsoleBasedAAMgr.exceptionConsoleAction=Exception executing console action:
+
+# Following strings are used by unix INSTALLER launcher script
+# Variables such as $ZIPLOC, $INSTBASE, $HOME and $free_up kilobytes do not need transaltions
+# -------------------------------------------------------------------------------------------
+unix_prepareInstall=Preparing to install
+unix_extractJRE=Extracting the JRE from the installer archive...
+unix_unpackJRE=Unpacking the JRE...
+unix_extractRes=Extracting the installation resources from the installer archive...
+unix_configure=Configuring the installer for this system's environment...
+unix_launch=Launching installer...
+unix_tmpCleanup=WARNING! This installation has been interrupted. The installation process will now terminate and the temporary files it is using will be deleted from $ZIPLOC.
+unix_iatempdirNotPresent=You have used the IATEMPDIR to set the install base and tmp dir for this installation.  However, the directory $INSTBASE does not exist or is not a directory.  Please choose a valid directory.
+unix_noPermission=The temporary install directory: $INSTBASE does not exist or you do not have permission to write to it.
+unix_noEnoughSpace=WARNING: $INSTBASE does not have enough disk space! Attempting to use $HOME for install base and tmp dir.
+unix_needMoreSpace=WARNING! The amount of $INSTBASE disk space required to perform this installation is greater than what is available.  Please free up at least $free_up kilobytes in $INSTBASE and attempt this installation again.
+unix_spaceUndetermined=WARNING! The amount of $INSTBASE disk space required and/or available could not be determined.  The installation will attempted anyway.
+unix_jreExtractFailed=The included VM could not be extracted.
+unix_jreUntarFailed=The included VM could not be unarchived (TAR).
+unix_jreUnzipFailed=The included VM could not be uncompressed (GZIP/UNCOMPRESS).
+unix_corruptedFiles=The size of the extracted files to be installed are corrupted.
+unix_reDownload=Please try to download the installer again and make sure that you download using 'binary' mode.  Please do not attempt to install this currently downloaded copy.
+unix_invalidUnzip=Invalid unzip command found
+unix_vmDownloadError=Error in downloading the VM. Installer exiting...
+unix_downloadedVM1=Downloaded VM Pack using URL=$jvmSpecBuildWithoutVMNotFoundDownloadUrl
+unix_downloadLoc1=Download location=$jreDownloadFileName
+unix_checksumFailed=Error!! MD5 checksum verification for downloaded JVM failed. Installer exiting...
+unix_checksumPassed=MD5 checksum verification for downloaded JVM passed
+unix_downloadedVM2=Downloaded VM Pack using URL=$jvmSpecBuildWithoutVmDirectDownloadUrl
+unix_downloadLoc2=Download location=$jreDownloadFileName_1
+unix_defaultCase=default case
+unix_default=default

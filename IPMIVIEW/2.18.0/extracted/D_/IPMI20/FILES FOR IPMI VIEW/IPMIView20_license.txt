@@ -1,0 +1,25 @@
+The license distributed with IPMIView, includes IPMIView and TrapReceiver, grants you the right to use IPMIView and TrapReceiver software on any system to manage Super Micro products, subject to the restrictions listed below and the disclaimer relating to warranties, support and damages.
+
+1. DISCLAIMER: This software is provided on an "as is" basis, without any other warranties, or conditions, express or implied, including but not limited to warranties of merchantable quality, merchantability or fitness for a particular purpose, or those arising by law, statute, usage of trade or course of dealing. The entire risk as to the results and performance of the Product is assumed by you. Neither we nor our dealers or suppliers shall have any liability to you or any other person or entity for any indirect, incidental, special or consequential damages whatsoever, including but not limited to loss of revenue or profit, lost or damaged data or other commercial or economic loss, even if we have been advised of the possibility of such damages or they are foreseeable; or for claims by a third party. You may have other rights which vary from state to state. 
+
+2. RESTRICTIONS: This license gives you the right to use this software but all rights not specifically mentioned in this agreement, including ownership rights, intellectual property rights, trademarks and copyright, are reserved by Super Micro Computer Inc. You may not decompile, reverse engineer, disassemble or otherwise reduce the software to a human perceivable form. You may not modify, rent, lease, loan or resell for profit the software, or create derivative works based upon the software in whole or in part.  You may not electronically transfer the Software from one computer to another or over a network.
+
+3. TERMINATION. This Licence is effective until terminated. You may terminate this Licence at any time by destroying the compact disc, Software and Materials and all copies thereof. This Licence will terminate immediately without notice from Super Micro Computer Inc. if you fail to comply with any provision of this Licence. Upon termination you must destroy the compact disc, Software and Materials and all copies thereof.
+
+4. DISCLAIMER OF WARRANTY ON SOFTWARE AND MATERIALS. You expressly acknowledge and agree that use of the Software and Materials is at your sole risk. FURTHERMORE, SUPER MICRO COMPUTER INC. DOES NOT WARRANT OR MAKE ANY REPRESENTATIONS REGARDING THE USE OR THE RESULTS OF THE USE OF THE SOFTWARE OR MATERIALS IN TERMS OF THEIR CORRECTNESS, ACCURACY, RELIABILITY, OR OTHERWISE. NO ORAL OR WRITTEN INFORMATION OR ADVICE GIVEN BY SUPER MICRO COMPUTER INC. OR SUPER MICRO COMPUTER INC. AUTHORIZED REPRESENTATIVE SHALL CREATE A WARRANTY OR IN ANY WAY INCREASE THE SCOPE OF THIS WARRANTY. SHOULD THE SOFTWARE AND/OR MATERIALS PROVE DEFECTIVE, YOU (AND NOT SUPER MICRO COMPUTER INC. OR A SUPER MICRO COMPUTER INC. AUTHORIZED REPRESENTATIVE) ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICE, REPAIR, OR CORRECTION. 
+
+5. LIMITATION OF LIABILITY. UNDER NO CIRCUMSTANCES INCLUDING NEGLIGENCE, SHALL SUPER MICRO COMPUTER INC. BE LIABLE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES THAT RESULT FROM THE USE OR INABILITY TO USE THE SOFTWARE OR MATERIALS, EVEN IF SUPER MICRO COMPUTER INC. OR A SUPER MICRO COMPUTER INC. AUTHORIZED REPRESENTATIVE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+6. COMPLETE AGREEMENT. This Licence constitutes the entire agreement between the parties with respect to the use of the Software and Materials, and supersedes all prior or contemporaneous understandings or agreements, written or oral, regarding such subject matter. No amendment to or modification of this Licence will be binding unless in writing and signed by a duly authorized representative of Super Micro Computer Inc.
+
+Super Micro Computer Inc.
+980 Rock Avenue
+San Jose, CA 95131
+USA
+
+(408) 503-8000 Voice
+(408) 503-8008 Fax 
+E-mail: support@supermicro.com
+Internet: http://www.supermicro.com
+
+IPMIView, TrapReceiver Copyright 2018 Super Micro Computer Inc and its licensors. All Rights Reserved.

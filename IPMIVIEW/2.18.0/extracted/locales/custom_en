@@ -1,0 +1,699 @@
+# InstallAnywhere Localization File
+#
+# External strings for locale: English (en)
+# See the 'ProjectLocalizationInfo.txt' file in this same directory for information 
+#     regarding mappings between the properties shown below and your InstallAnywhere
+#     project.
+#
+# External/Locale property names can take one of three forms:
+#     <ActionName>.<ReferenceID>.<ActionProperty>          (e.g., Installer.858175031081.productName)
+#     <ActionName>.<ReferenceID>.<ActionProperty>.<Index>  (e.g., Installer.858175031081.installLabels.01)
+#         - where the <ActionProperty> is a Vector and the <Index> represents the place within the
+#           Vector where the value of the property should be inserted
+#     _ia.<SomeProperty>                                   (e.g., _ia.MyCustomCodePanelProperty)
+#         - where <SomeProperty> is used as an identifier for a localized value by custom code
+#
+# External/Locale property values should be plain text strings.  Special or i18n characters
+#     that cannot be represented by ASCII characters should be written using escaped unicode.
+#     - see the utility 'native2ascii' distributed with your JDK
+#
+# Product Name: IPMIView
+# Project File: D:\InstallAnywhere\IPMIView20\IPMIView20Btmp.iap_xml
+# Generated:    Wed Oct 07 18:09:37 CST 2020
+
+
+# Billboard.160ae8eda573.imageName=billboard_default.png
+Billboard.160ae8eda573.imageName=billboard_default.png
+
+# Billboard.160ae8eda573.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Billboard.160ae8eda573.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Billboard.26fbaa13a8e8.imageName=billboard_default.png
+Billboard.26fbaa13a8e8.imageName=billboard_default.png
+
+# Billboard.26fbaa13a8e8.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Billboard.26fbaa13a8e8.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# ChooseFolder.160ae8cea4f3.additionalText=If this is your first time to install IPMIView or you already uninstalled IPMIView with 32-bit JRE version, you can skip this step by pressing \"Next\" button.\n\nIPMIView_2.16.0_build.191005 and later version will use 64-bit JRE, we strongly recommend you to remove other old IPMIView with 32-bit JRE version.\n\nPlease choose your old IPMIView path if the below path is not your original installing IPMIView path.\n\nWe will help you copy your IPMI Domain setting  from old to new IPMIView folder.\n\nAn x86 IPMIView uninstall wizard will pop-out after you press the \"Next\" button.
+ChooseFolder.160ae8cea4f3.additionalText=If this is your first time to install IPMIView or you already uninstalled IPMIView with 32-bit JRE version, you can skip this step by pressing \"Next\" button.\n\nIPMIView_2.16.0_build.191005 and later version will use 64-bit JRE, we strongly recommend you to remove other old IPMIView with 32-bit JRE version.\n\nPlease choose your old IPMIView path if the below path is not your original installing IPMIView path.\n\nWe will help you copy your IPMI Domain setting  from old to new IPMIView folder.\n\nAn x86 IPMIView uninstall wizard will pop-out after you press the \"Next\" button.
+
+# ChooseFolder.160ae8cea4f3.defaultFile=IPMIView
+ChooseFolder.160ae8cea4f3.defaultFile=IPMIView
+
+# ChooseFolder.160ae8cea4f3.prompt=Please Choose a &Folder:
+ChooseFolder.160ae8cea4f3.prompt=Please Choose a &Folder:
+
+# ChooseFolder.160ae8cea4f3.stepTitle=Uninstall old IPMIView
+ChooseFolder.160ae8cea4f3.stepTitle=Uninstall old IPMIView
+
+# ChooseFolder.9ef813b6a379.additionalText=If this is your first time to install IPMIView or you already uninstalled IPMIView with 32-bit JRE version, you can skip this step by pressing \"Next\" button.\n\nIPMIView_2.16.0_build.191005 and later version will use 64-bit JRE, we strongly recommend you to remove other old IPMIView with 32-bit JRE version.\n\nPlease choose your old IPMIView path if the below path is not your original installing IPMIView path.\n\nWe will help you copy your IPMI Domain setting  from old to new IPMIView folder.\n\nAn x86 IPMIView uninstall wizard will pop-out after you press the \"Next\" button.
+ChooseFolder.9ef813b6a379.additionalText=If this is your first time to install IPMIView or you already uninstalled IPMIView with 32-bit JRE version, you can skip this step by pressing \"Next\" button.\n\nIPMIView_2.16.0_build.191005 and later version will use 64-bit JRE, we strongly recommend you to remove other old IPMIView with 32-bit JRE version.\n\nPlease choose your old IPMIView path if the below path is not your original installing IPMIView path.\n\nWe will help you copy your IPMI Domain setting  from old to new IPMIView folder.\n\nAn x86 IPMIView uninstall wizard will pop-out after you press the \"Next\" button.
+
+# ChooseFolder.9ef813b6a379.defaultFile=IPMIView
+ChooseFolder.9ef813b6a379.defaultFile=IPMIView
+
+# ChooseFolder.9ef813b6a379.prompt=Please Choose a &Folder:
+ChooseFolder.9ef813b6a379.prompt=Please Choose a &Folder:
+
+# ChooseFolder.9ef813b6a379.stepTitle=Uninstall old IPMIView
+ChooseFolder.9ef813b6a379.stepTitle=Uninstall old IPMIView
+
+# CreateShortcut.160ae8f3a5a7.args=
+CreateShortcut.160ae8f3a5a7.args=
+
+# CreateShortcut.160ae8f3a5a7.destinationName=IPMIView20
+CreateShortcut.160ae8f3a5a7.destinationName=IPMIView20
+
+# CreateShortcut.160ae8f3a5a7.workingDir=
+CreateShortcut.160ae8f3a5a7.workingDir=
+
+# CreateShortcut.160ae8f8a5b7.args=
+CreateShortcut.160ae8f8a5b7.args=
+
+# CreateShortcut.160ae8f8a5b7.destinationName=TrapReceiver
+CreateShortcut.160ae8f8a5b7.destinationName=TrapReceiver
+
+# CreateShortcut.160ae8f8a5b7.workingDir=
+CreateShortcut.160ae8f8a5b7.workingDir=
+
+# CreateShortcut.160ae902a5fb.args=
+CreateShortcut.160ae902a5fb.args=
+
+# CreateShortcut.160ae902a5fb.destinationName=Uninstall
+CreateShortcut.160ae902a5fb.destinationName=Uninstall
+
+# CreateShortcut.160ae902a5fb.workingDir=
+CreateShortcut.160ae902a5fb.workingDir=
+
+# CreateShortcut.26fbaa16a907.args=
+CreateShortcut.26fbaa16a907.args=
+
+# CreateShortcut.26fbaa16a907.destinationName=Uninstall
+CreateShortcut.26fbaa16a907.destinationName=Uninstall
+
+# CreateShortcut.26fbaa16a907.workingDir=
+CreateShortcut.26fbaa16a907.workingDir=
+
+# CreateShortcut.9d1c69af9212.args=
+CreateShortcut.9d1c69af9212.args=
+
+# CreateShortcut.9d1c69af9212.destinationName=IPMIView20
+CreateShortcut.9d1c69af9212.destinationName=IPMIView20
+
+# CreateShortcut.9d1c69af9212.workingDir=
+CreateShortcut.9d1c69af9212.workingDir=
+
+# CreateShortcut.9d1f26589239.args=
+CreateShortcut.9d1f26589239.args=
+
+# CreateShortcut.9d1f26589239.destinationName=TrapReceiver
+CreateShortcut.9d1f26589239.destinationName=TrapReceiver
+
+# CreateShortcut.9d1f26589239.workingDir=
+CreateShortcut.9d1f26589239.workingDir=
+
+# CustomizeBundles.160ae8e2a543.checkInstructions=Check features that you want to uninstall. Unchecked features will remain installed.
+CustomizeBundles.160ae8e2a543.checkInstructions=Check features that you want to uninstall. Unchecked features will remain installed.
+
+# CustomizeBundles.160ae8e2a543.title=Choose Product Features
+CustomizeBundles.160ae8e2a543.title=Choose Product Features
+
+# CustomizeBundles.160ae8e2a543.uncheckInstructions=Uncheck features that you want to uninstall. Checked features will remain installed.
+CustomizeBundles.160ae8e2a543.uncheckInstructions=Uncheck features that you want to uninstall. Checked features will remain installed.
+
+# CustomizeBundles.26fbaa0fa8b9.checkInstructions=Check features that you want to uninstall. Unchecked features will remain installed.
+CustomizeBundles.26fbaa0fa8b9.checkInstructions=Check features that you want to uninstall. Unchecked features will remain installed.
+
+# CustomizeBundles.26fbaa0fa8b9.title=Choose Product Features
+CustomizeBundles.26fbaa0fa8b9.title=Choose Product Features
+
+# CustomizeBundles.26fbaa0fa8b9.uncheckInstructions=Uncheck features that you want to uninstall. Checked features will remain installed.
+CustomizeBundles.26fbaa0fa8b9.uncheckInstructions=Uncheck features that you want to uninstall. Checked features will remain installed.
+
+# Exec.160ae8cea4f5.commandLineArgs=$USER_SELECTED_OLD_FOLDER$$/$Uninstall_IPMIView$/$Uninstall IPMIView.exe
+Exec.160ae8cea4f5.commandLineArgs=$USER_SELECTED_OLD_FOLDER$$/$Uninstall_IPMIView$/$Uninstall IPMIView.exe
+
+# Exec.160ae8cea4f5.dialogLabel=Executing...
+Exec.160ae8cea4f5.dialogLabel=Executing...
+
+# Exec.9e001516909f.commandLineArgs=$USER_SELECTED_OLD_FOLDER$$/$Uninstall_IPMIView$/$Uninstall IPMIView.exe
+Exec.9e001516909f.commandLineArgs=$USER_SELECTED_OLD_FOLDER$$/$Uninstall_IPMIView$/$Uninstall IPMIView.exe
+
+# Exec.9e001516909f.dialogLabel=Executing...
+Exec.9e001516909f.dialogLabel=Executing...
+
+# InstallBundle.160ae8eaa573.bundleName=Application
+InstallBundle.160ae8eaa573.bundleName=Application
+
+# InstallBundle.160ae8eaa573.description=This installs the application feature.
+InstallBundle.160ae8eaa573.description=This installs the application feature.
+
+# InstallBundle.160ae904a602.bundleName=Help
+InstallBundle.160ae904a602.bundleName=Help
+
+# InstallBundle.160ae904a602.description=This installs the help feature.
+InstallBundle.160ae904a602.description=This installs the help feature.
+
+# InstallBundle.26fbaa13a8e7.bundleName=Application
+InstallBundle.26fbaa13a8e7.bundleName=Application
+
+# InstallBundle.26fbaa13a8e7.description=This installs the application feature.
+InstallBundle.26fbaa13a8e7.description=This installs the application feature.
+
+# InstallBundle.26fbaa18a90e.bundleName=Help
+InstallBundle.26fbaa18a90e.bundleName=Help
+
+# InstallBundle.26fbaa18a90e.description=This installs the help feature.
+InstallBundle.26fbaa18a90e.description=This installs the help feature.
+
+# InstallDirAction.160ae8cea4f9.additionalText=
+InstallDirAction.160ae8cea4f9.additionalText=
+
+# InstallDirAction.160ae8cea4f9.prompt=Where Would You Like to Install?
+InstallDirAction.160ae8cea4f9.prompt=Where Would You Like to Install?
+
+# InstallDirAction.160ae8cea4f9.stepTitle=Choose Install Folder
+InstallDirAction.160ae8cea4f9.stepTitle=Choose Install Folder
+
+# InstallDirAction.26fba9ffa857.additionalText=
+InstallDirAction.26fba9ffa857.additionalText=
+
+# InstallDirAction.26fba9ffa857.prompt=Where Would You Like to Install?
+InstallDirAction.26fba9ffa857.prompt=Where Would You Like to Install?
+
+# InstallDirAction.26fba9ffa857.stepTitle=Choose Install Folder
+InstallDirAction.26fba9ffa857.stepTitle=Choose Install Folder
+
+# Installer.160ae8caa4ea.installLabels.00=Introduction
+Installer.160ae8caa4ea.installLabels.00=Introduction
+
+# Installer.160ae8caa4ea.installLabels.01=License Agreement
+Installer.160ae8caa4ea.installLabels.01=License Agreement
+
+# Installer.160ae8caa4ea.installLabels.02=Uninstall old IPMIView
+Installer.160ae8caa4ea.installLabels.02=Uninstall old IPMIView
+
+# Installer.160ae8caa4ea.installLabels.03=Choose Install Folder
+Installer.160ae8caa4ea.installLabels.03=Choose Install Folder
+
+# Installer.160ae8caa4ea.installLabels.05=Pre-Installation Summary
+Installer.160ae8caa4ea.installLabels.05=Pre-Installation Summary
+
+# Installer.160ae8caa4ea.installLabels.06=Installing...
+Installer.160ae8caa4ea.installLabels.06=Installing...
+
+# Installer.160ae8caa4ea.installLabels.07=Install Complete
+Installer.160ae8caa4ea.installLabels.07=Install Complete
+
+# Installer.160ae8caa4ea.installProgressImageName=introImage.png
+Installer.160ae8caa4ea.installProgressImageName=introImage.png
+
+# Installer.160ae8caa4ea.installProgressImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.160ae8caa4ea.installProgressImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.160ae8caa4ea.panelImageName=introImage.png
+Installer.160ae8caa4ea.panelImageName=introImage.png
+
+# Installer.160ae8caa4ea.panelImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.160ae8caa4ea.panelImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.160ae8caa4ea.rulesFailedMessage=The installer cannot run on your configuration. It will now quit.
+Installer.160ae8caa4ea.rulesFailedMessage=The installer cannot run on your configuration. It will now quit.
+
+# Installer.160ae8caa4ea.splashScreenConsolePrompt=CHOOSE LOCALE BY NUMBER
+Installer.160ae8caa4ea.splashScreenConsolePrompt=CHOOSE LOCALE BY NUMBER
+
+# Installer.160ae8caa4ea.splashScreenConsoleTitle=Choose Locale...
+Installer.160ae8caa4ea.splashScreenConsoleTitle=Choose Locale...
+
+# Installer.160ae8caa4ea.splashScreenGUIConfirm=OK
+Installer.160ae8caa4ea.splashScreenGUIConfirm=OK
+
+# Installer.160ae8caa4ea.splashScreenGUIImageName=Splash.png
+Installer.160ae8caa4ea.splashScreenGUIImageName=Splash.png
+
+# Installer.160ae8caa4ea.splashScreenGUIImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.160ae8caa4ea.splashScreenGUIImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.160ae8caa4ea.splashScreenGUIInstructions=
+Installer.160ae8caa4ea.splashScreenGUIInstructions=
+
+# Installer.160ae8caa4ea.splashScreenGUITitle=
+Installer.160ae8caa4ea.splashScreenGUITitle=
+
+# Installer.26fba9fda84d.installLabels.00=Introduction
+Installer.26fba9fda84d.installLabels.00=Introduction
+
+# Installer.26fba9fda84d.installLabels.01=License Agreement
+Installer.26fba9fda84d.installLabels.01=License Agreement
+
+# Installer.26fba9fda84d.installLabels.02=Uninstall old IPMIView
+Installer.26fba9fda84d.installLabels.02=Uninstall old IPMIView
+
+# Installer.26fba9fda84d.installLabels.03=Choose Install Folder
+Installer.26fba9fda84d.installLabels.03=Choose Install Folder
+
+# Installer.26fba9fda84d.installLabels.04=Choose Shortcut Folder
+Installer.26fba9fda84d.installLabels.04=Choose Shortcut Folder
+
+# Installer.26fba9fda84d.installLabels.05=Pre-Installation Summary
+Installer.26fba9fda84d.installLabels.05=Pre-Installation Summary
+
+# Installer.26fba9fda84d.installLabels.06=Installing...
+Installer.26fba9fda84d.installLabels.06=Installing...
+
+# Installer.26fba9fda84d.installLabels.07=Install Complete
+Installer.26fba9fda84d.installLabels.07=Install Complete
+
+# Installer.26fba9fda84d.installProgressImageName=introImage.png
+Installer.26fba9fda84d.installProgressImageName=introImage.png
+
+# Installer.26fba9fda84d.installProgressImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.26fba9fda84d.installProgressImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.26fba9fda84d.panelImageName=introImage.png
+Installer.26fba9fda84d.panelImageName=introImage.png
+
+# Installer.26fba9fda84d.panelImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.26fba9fda84d.panelImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.26fba9fda84d.rulesFailedMessage=The installer cannot run on your configuration. It will now quit.
+Installer.26fba9fda84d.rulesFailedMessage=The installer cannot run on your configuration. It will now quit.
+
+# Installer.26fba9fda84d.splashScreenConsolePrompt=CHOOSE LOCALE BY NUMBER
+Installer.26fba9fda84d.splashScreenConsolePrompt=CHOOSE LOCALE BY NUMBER
+
+# Installer.26fba9fda84d.splashScreenConsoleTitle=Choose Locale...
+Installer.26fba9fda84d.splashScreenConsoleTitle=Choose Locale...
+
+# Installer.26fba9fda84d.splashScreenGUIConfirm=OK
+Installer.26fba9fda84d.splashScreenGUIConfirm=OK
+
+# Installer.26fba9fda84d.splashScreenGUIImageName=Splash.png
+Installer.26fba9fda84d.splashScreenGUIImageName=Splash.png
+
+# Installer.26fba9fda84d.splashScreenGUIImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+Installer.26fba9fda84d.splashScreenGUIImagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# Installer.26fba9fda84d.splashScreenGUIInstructions=
+Installer.26fba9fda84d.splashScreenGUIInstructions=
+
+# Installer.26fba9fda84d.splashScreenGUITitle=
+Installer.26fba9fda84d.splashScreenGUITitle=
+
+# InstallerInfoData.160ae8dea53a.email=
+InstallerInfoData.160ae8dea53a.email=
+
+# InstallerInfoData.160ae8dea53a.installerName=IPMIView20
+InstallerInfoData.160ae8dea53a.installerName=IPMIView20
+
+# InstallerInfoData.160ae8dea53a.installerTitle=IPMIView
+InstallerInfoData.160ae8dea53a.installerTitle=IPMIView
+
+# InstallerInfoData.160ae8dea53a.productDescription=
+InstallerInfoData.160ae8dea53a.productDescription=
+
+# InstallerInfoData.160ae8dea53a.productName=IPMIView
+InstallerInfoData.160ae8dea53a.productName=IPMIView
+
+# InstallerInfoData.160ae8dea53a.productURL=
+InstallerInfoData.160ae8dea53a.productURL=
+
+# InstallerInfoData.160ae8dea53a.supportURL=
+InstallerInfoData.160ae8dea53a.supportURL=
+
+# InstallerInfoData.160ae8dea53a.vendorName=Supermicro
+InstallerInfoData.160ae8dea53a.vendorName=Supermicro
+
+# InstallerInfoData.160ae8dea53a.vendorURL=http://www.supermicro.com
+InstallerInfoData.160ae8dea53a.vendorURL=http://www.supermicro.com
+
+# InstallerInfoData.26fbaa0da8ad.email=
+InstallerInfoData.26fbaa0da8ad.email=
+
+# InstallerInfoData.26fbaa0da8ad.installerName=IPMIView20
+InstallerInfoData.26fbaa0da8ad.installerName=IPMIView20
+
+# InstallerInfoData.26fbaa0da8ad.installerTitle=IPMIView
+InstallerInfoData.26fbaa0da8ad.installerTitle=IPMIView
+
+# InstallerInfoData.26fbaa0da8ad.productDescription=
+InstallerInfoData.26fbaa0da8ad.productDescription=
+
+# InstallerInfoData.26fbaa0da8ad.productName=IPMIView
+InstallerInfoData.26fbaa0da8ad.productName=IPMIView
+
+# InstallerInfoData.26fbaa0da8ad.productURL=
+InstallerInfoData.26fbaa0da8ad.productURL=
+
+# InstallerInfoData.26fbaa0da8ad.supportURL=
+InstallerInfoData.26fbaa0da8ad.supportURL=
+
+# InstallerInfoData.26fbaa0da8ad.vendorName=Supermicro
+InstallerInfoData.26fbaa0da8ad.vendorName=Supermicro
+
+# InstallerInfoData.26fbaa0da8ad.vendorURL=http://www.supermicro.com
+InstallerInfoData.26fbaa0da8ad.vendorURL=http://www.supermicro.com
+
+# InstallFinishAction.160ae8d2a503.installErrorMessage=The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.   Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+InstallFinishAction.160ae8d2a503.installErrorMessage=The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.   Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+
+# InstallFinishAction.160ae8d2a503.installFatalMessage=The installation of $PRODUCT_NAME$ has been rolled back.\n\n Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for more details.
+InstallFinishAction.160ae8d2a503.installFatalMessage=The installation of $PRODUCT_NAME$ has been rolled back.\n\n Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for more details.
+
+# InstallFinishAction.160ae8d2a503.installSuccessMessage=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n     $USER_INSTALL_DIR$\n\nPress \"Done\" to quit the installer.
+InstallFinishAction.160ae8d2a503.installSuccessMessage=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n     $USER_INSTALL_DIR$\n\nPress \"Done\" to quit the installer.
+
+# InstallFinishAction.160ae8d2a503.installWarningMessage=The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log  with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+InstallFinishAction.160ae8d2a503.installWarningMessage=The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log  with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+
+# InstallFinishAction.160ae8d2a503.rebootNotNeededMessage=
+InstallFinishAction.160ae8d2a503.rebootNotNeededMessage=
+
+# InstallFinishAction.160ae8d2a503.rebootRecommendedMessage=You should restart the system to complete the installation.
+InstallFinishAction.160ae8d2a503.rebootRecommendedMessage=You should restart the system to complete the installation.
+
+# InstallFinishAction.160ae8d2a503.rebootRequiredMessage=You need to restart the system to complete the installation.
+InstallFinishAction.160ae8d2a503.rebootRequiredMessage=You need to restart the system to complete the installation.
+
+# InstallFinishAction.160ae8d2a503.windowTitle=Install Complete
+InstallFinishAction.160ae8d2a503.windowTitle=Install Complete
+
+# InstallFinishAction.26fbaa00a867.installErrorMessage=The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.   Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+InstallFinishAction.26fbaa00a867.installErrorMessage=The installation of $PRODUCT_NAME$ is finished, but some errors occurred during the install.   Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+
+# InstallFinishAction.26fbaa00a867.installFatalMessage=The installation of $PRODUCT_NAME$ has been rolled back.\n\n Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for more details.
+InstallFinishAction.26fbaa00a867.installFatalMessage=The installation of $PRODUCT_NAME$ has been rolled back.\n\n Please see the installation log with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for more details.
+
+# InstallFinishAction.26fbaa00a867.installSuccessMessage=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n     $USER_INSTALL_DIR$\n\nPress \"Done\" to quit the installer.
+InstallFinishAction.26fbaa00a867.installSuccessMessage=Congratulations! $PRODUCT_NAME$ has been successfully installed to:\n\n     $USER_INSTALL_DIR$\n\nPress \"Done\" to quit the installer.
+
+# InstallFinishAction.26fbaa00a867.installWarningMessage=The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log  with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+InstallFinishAction.26fbaa00a867.installWarningMessage=The installation of $PRODUCT_NAME$ is finished, but some warnings occurred during the install.  Please see the installation log  with path $USER_INSTALL_DIR$$\\$_$PRODUCT_NAME$_installation$\\$Logs$/$ for  details.
+
+# InstallFinishAction.26fbaa00a867.rebootNotNeededMessage=
+InstallFinishAction.26fbaa00a867.rebootNotNeededMessage=
+
+# InstallFinishAction.26fbaa00a867.rebootRecommendedMessage=You should restart the system to complete the installation.
+InstallFinishAction.26fbaa00a867.rebootRecommendedMessage=You should restart the system to complete the installation.
+
+# InstallFinishAction.26fbaa00a867.rebootRequiredMessage=You need to restart the system to complete the installation.
+InstallFinishAction.26fbaa00a867.rebootRequiredMessage=You need to restart the system to complete the installation.
+
+# InstallFinishAction.26fbaa00a867.windowTitle=Install Complete
+InstallFinishAction.26fbaa00a867.windowTitle=Install Complete
+
+# InstallFrameConfigurator.160ae8dca533.maintModeTitle=Configure $PRODUCT_NAME$
+InstallFrameConfigurator.160ae8dca533.maintModeTitle=Configure $PRODUCT_NAME$
+
+# InstallFrameConfigurator.160ae8dca533.uninstallerTitle=Uninstall $PRODUCT_NAME$
+InstallFrameConfigurator.160ae8dca533.uninstallerTitle=Uninstall $PRODUCT_NAME$
+
+# InstallFrameConfigurator.26fbaa0ba8a6.maintModeTitle=Configure $PRODUCT_NAME$
+InstallFrameConfigurator.26fbaa0ba8a6.maintModeTitle=Configure $PRODUCT_NAME$
+
+# InstallFrameConfigurator.26fbaa0ba8a6.uninstallerTitle=Uninstall $PRODUCT_NAME$
+InstallFrameConfigurator.26fbaa0ba8a6.uninstallerTitle=Uninstall $PRODUCT_NAME$
+
+# InstallSet.160ae8dfa535.description=Choose this option to customize the features to be installed.
+InstallSet.160ae8dfa535.description=Choose this option to customize the features to be installed.
+
+# InstallSet.160ae8dfa535.imageName=customIcon.png
+InstallSet.160ae8dfa535.imageName=customIcon.png
+
+# InstallSet.160ae8dfa535.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.160ae8dfa535.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.160ae8dfa535.installSetName=Custom
+InstallSet.160ae8dfa535.installSetName=Custom
+
+# InstallSet.160ae8eaa572.description=The most common application features will be installed.  This option is recommended for most users.
+InstallSet.160ae8eaa572.description=The most common application features will be installed.  This option is recommended for most users.
+
+# InstallSet.160ae8eaa572.imageName=typical.png
+InstallSet.160ae8eaa572.imageName=typical.png
+
+# InstallSet.160ae8eaa572.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.160ae8eaa572.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.160ae8eaa572.installSetName=Typical
+InstallSet.160ae8eaa572.installSetName=Typical
+
+# InstallSet.160ae906a609.description=Only required application features will be installed.  This option is recommended only for users with limited disk space.
+InstallSet.160ae906a609.description=Only required application features will be installed.  This option is recommended only for users with limited disk space.
+
+# InstallSet.160ae906a609.imageName=minimal.png
+InstallSet.160ae906a609.imageName=minimal.png
+
+# InstallSet.160ae906a609.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.160ae906a609.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.160ae906a609.installSetName=Minimal
+InstallSet.160ae906a609.installSetName=Minimal
+
+# InstallSet.26fbaa0ba8a9.description=Choose this option to customize the features to be installed.
+InstallSet.26fbaa0ba8a9.description=Choose this option to customize the features to be installed.
+
+# InstallSet.26fbaa0ba8a9.imageName=customIcon.png
+InstallSet.26fbaa0ba8a9.imageName=customIcon.png
+
+# InstallSet.26fbaa0ba8a9.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.26fbaa0ba8a9.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.26fbaa0ba8a9.installSetName=Custom
+InstallSet.26fbaa0ba8a9.installSetName=Custom
+
+# InstallSet.26fbaa13a8e6.description=The most common application features will be installed.  This option is recommended for most users.
+InstallSet.26fbaa13a8e6.description=The most common application features will be installed.  This option is recommended for most users.
+
+# InstallSet.26fbaa13a8e6.imageName=typical.png
+InstallSet.26fbaa13a8e6.imageName=typical.png
+
+# InstallSet.26fbaa13a8e6.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.26fbaa13a8e6.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.26fbaa13a8e6.installSetName=Typical
+InstallSet.26fbaa13a8e6.installSetName=Typical
+
+# InstallSet.26fbaa18a916.description=Only required application features will be installed.  This option is recommended only for users with limited disk space.
+InstallSet.26fbaa18a916.description=Only required application features will be installed.  This option is recommended only for users with limited disk space.
+
+# InstallSet.26fbaa18a916.imageName=minimal.png
+InstallSet.26fbaa18a916.imageName=minimal.png
+
+# InstallSet.26fbaa18a916.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+InstallSet.26fbaa18a916.imagePath=$IA_PROJECT_DIR$\\resources\\254563a034ed41e4e80b453700885aba
+
+# InstallSet.26fbaa18a916.installSetName=Minimal
+InstallSet.26fbaa18a916.installSetName=Minimal
+
+# InstallSummary.160ae8d1a500.stepPrompt=Please Review the Following Before Continuing:
+InstallSummary.160ae8d1a500.stepPrompt=Please Review the Following Before Continuing:
+
+# InstallSummary.160ae8d1a500.title=Pre-Installation Summary
+InstallSummary.160ae8d1a500.title=Pre-Installation Summary
+
+# InstallSummary.26fba9ffa85c.stepPrompt=Please Review the Following Before Continuing:
+InstallSummary.26fba9ffa85c.stepPrompt=Please Review the Following Before Continuing:
+
+# InstallSummary.26fba9ffa85c.title=Pre-Installation Summary
+InstallSummary.26fba9ffa85c.title=Pre-Installation Summary
+
+# InstallUninstaller.160ae8eca57e.destinationName=Uninstall $PRODUCT_NAME$
+InstallUninstaller.160ae8eca57e.destinationName=Uninstall $PRODUCT_NAME$
+
+# InstallUninstaller.26fbaa15a8f2.destinationName=Uninstall $PRODUCT_NAME$
+InstallUninstaller.26fbaa15a8f2.destinationName=Uninstall $PRODUCT_NAME$
+
+# IntroAction.160ae8cda4f0.message=The install wizard will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\n\nYou may cancel this installation at any time by clicking the 'Cancel' button.
+IntroAction.160ae8cda4f0.message=The install wizard will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\n\nYou may cancel this installation at any time by clicking the 'Cancel' button.
+
+# IntroAction.160ae8cda4f0.stepTitle=Introduction
+IntroAction.160ae8cda4f0.stepTitle=Introduction
+
+# IntroAction.26fba9fea84f.message=The install wizard will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\n\nYou may cancel this installation at any time by clicking the 'Cancel' button.
+IntroAction.26fba9fea84f.message=The install wizard will guide you through the installation of $PRODUCT_NAME$.\n\nIt is strongly recommended that you quit all programs before continuing with this installation.\n\nClick the 'Next' button to proceed to the next screen. If you want to change something on a previous screen, click the 'Previous' button.\n\nYou may cancel this installation at any time by clicking the 'Cancel' button.
+
+# IntroAction.26fba9fea84f.stepTitle=Introduction
+IntroAction.26fba9fea84f.stepTitle=Introduction
+
+# LicenseAgrAction.160ae8cfa4f6.resourceName=IPMIView20_license.txt
+LicenseAgrAction.160ae8cfa4f6.resourceName=IPMIView20_license.txt
+
+# LicenseAgrAction.160ae8cfa4f6.resourcePath=D:\\IPMI20\\FILES FOR IPMI VIEW\\
+LicenseAgrAction.160ae8cfa4f6.resourcePath=D:\\IPMI20\\FILES FOR IPMI VIEW\\
+
+# LicenseAgrAction.160ae8cfa4f6.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+LicenseAgrAction.160ae8cfa4f6.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+
+# LicenseAgrAction.160ae8cfa4f6.title=License Agreement
+LicenseAgrAction.160ae8cfa4f6.title=License Agreement
+
+# LicenseAgrAction.26fba9ffa851.resourceName=IPMIView20_license.txt
+LicenseAgrAction.26fba9ffa851.resourceName=IPMIView20_license.txt
+
+# LicenseAgrAction.26fba9ffa851.resourcePath=D:\\IPMI20\\FILES FOR IPMI VIEW\\
+LicenseAgrAction.26fba9ffa851.resourcePath=D:\\IPMI20\\FILES FOR IPMI VIEW\\
+
+# LicenseAgrAction.26fba9ffa851.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+LicenseAgrAction.26fba9ffa851.stepPrompt=Installation and Use of $PRODUCT_NAME$ Requires Acceptance of the Following License Agreement:
+
+# LicenseAgrAction.26fba9ffa851.title=License Agreement
+LicenseAgrAction.26fba9ffa851.title=License Agreement
+
+# MakeExecutable.160ae8f0a598.destinationName=IPMIView20
+MakeExecutable.160ae8f0a598.destinationName=IPMIView20
+
+# MakeExecutable.160ae8f2a5a9.destinationName=TrapReceiver
+MakeExecutable.160ae8f2a5a9.destinationName=TrapReceiver
+
+# MakeExecutable.160ae8f9a5b8.destinationName=iKVM
+MakeExecutable.160ae8f9a5b8.destinationName=iKVM
+
+# MakeExecutable.160ae8fba5c7.destinationName=JViewerX9
+MakeExecutable.160ae8fba5c7.destinationName=JViewerX9
+
+# MakeExecutable.9d1c69af9211.destinationName=IPMIView20
+MakeExecutable.9d1c69af9211.destinationName=IPMIView20
+
+# MakeExecutable.9d1f26589238.destinationName=TrapReceiver
+MakeExecutable.9d1f26589238.destinationName=TrapReceiver
+
+# MakeExecutable.9d2013369260.destinationName=iKVM
+MakeExecutable.9d2013369260.destinationName=iKVM
+
+# MakeExecutable.9d20b8de9289.destinationName=JViewerX9
+MakeExecutable.9d20b8de9289.destinationName=JViewerX9
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.allDescription=Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+UninstallAllOrFeaturesAction.160ae8e1a542.allDescription=Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.allLabel=Complete Uninstall
+UninstallAllOrFeaturesAction.160ae8e1a542.allLabel=Complete Uninstall
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.instructions=Please select one of the following options:
+UninstallAllOrFeaturesAction.160ae8e1a542.instructions=Please select one of the following options:
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.someDescription=Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+UninstallAllOrFeaturesAction.160ae8e1a542.someDescription=Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.someLabel=Uninstall Specific Features
+UninstallAllOrFeaturesAction.160ae8e1a542.someLabel=Uninstall Specific Features
+
+# UninstallAllOrFeaturesAction.160ae8e1a542.stepTitle=Uninstall Options
+UninstallAllOrFeaturesAction.160ae8e1a542.stepTitle=Uninstall Options
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.allDescription=Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.allDescription=Completely remove all features and components of $PRODUCT_NAME$ that were installed by InstallAnywhere. Files and folders created after the installation will not be affected.
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.allLabel=Complete Uninstall
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.allLabel=Complete Uninstall
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.instructions=Please select one of the following options:
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.instructions=Please select one of the following options:
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.someDescription=Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.someDescription=Choose specific features of $PRODUCT_NAME$ that were installed by InstallAnywhere to be uninstalled.
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.someLabel=Uninstall Specific Features
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.someLabel=Uninstall Specific Features
+
+# UninstallAllOrFeaturesAction.26fbaa0ea8b7.stepTitle=Uninstall Options
+UninstallAllOrFeaturesAction.26fbaa0ea8b7.stepTitle=Uninstall Options
+
+# UninstallCategory.160ae8e1a546.categoryName=Files
+UninstallCategory.160ae8e1a546.categoryName=Files
+
+# UninstallCategory.160ae8e3a547.categoryName=LaunchAnywheres
+UninstallCategory.160ae8e3a547.categoryName=LaunchAnywheres
+
+# UninstallCategory.160ae8e3a549.categoryName=Shortcuts/Links/Aliases
+UninstallCategory.160ae8e3a549.categoryName=Shortcuts/Links/Aliases
+
+# UninstallCategory.160ae8e5a54a.categoryName=Registry Entries
+UninstallCategory.160ae8e5a54a.categoryName=Registry Entries
+
+# UninstallCategory.160ae8e5a54d.categoryName=Native Packages
+UninstallCategory.160ae8e5a54d.categoryName=Native Packages
+
+# UninstallCategory.160ae8e5a552.categoryName=Folders
+UninstallCategory.160ae8e5a552.categoryName=Folders
+
+# UninstallCategory.160ae8e5a554.categoryName=Others Category
+UninstallCategory.160ae8e5a554.categoryName=Others Category
+
+# UninstallCategory.26fbaa10a8c0.categoryName=Files
+UninstallCategory.26fbaa10a8c0.categoryName=Files
+
+# UninstallCategory.26fbaa10a8c2.categoryName=LaunchAnywheres
+UninstallCategory.26fbaa10a8c2.categoryName=LaunchAnywheres
+
+# UninstallCategory.26fbaa10a8c4.categoryName=Shortcuts/Links/Aliases
+UninstallCategory.26fbaa10a8c4.categoryName=Shortcuts/Links/Aliases
+
+# UninstallCategory.26fbaa10a8c6.categoryName=Registry Entries
+UninstallCategory.26fbaa10a8c6.categoryName=Registry Entries
+
+# UninstallCategory.26fbaa10a8c9.categoryName=Native Packages
+UninstallCategory.26fbaa10a8c9.categoryName=Native Packages
+
+# UninstallCategory.26fbaa10a8ce.categoryName=Folders
+UninstallCategory.26fbaa10a8ce.categoryName=Folders
+
+# UninstallCategory.26fbaa10a8d0.categoryName=Others Category
+UninstallCategory.26fbaa10a8d0.categoryName=Others Category
+
+# UninstallCompleteAction.160ae8e1a545.rebootNotNeededMessage=
+UninstallCompleteAction.160ae8e1a545.rebootNotNeededMessage=
+
+# UninstallCompleteAction.160ae8e1a545.rebootRecommendedMessage=You should restart the system to complete the uninstallation.
+UninstallCompleteAction.160ae8e1a545.rebootRecommendedMessage=You should restart the system to complete the uninstallation.
+
+# UninstallCompleteAction.160ae8e1a545.rebootRequiredMessage=You need to restart the system to complete the uninstallation.
+UninstallCompleteAction.160ae8e1a545.rebootRequiredMessage=You need to restart the system to complete the uninstallation.
+
+# UninstallCompleteAction.160ae8e1a545.stepTitle=Uninstall Complete
+UninstallCompleteAction.160ae8e1a545.stepTitle=Uninstall Complete
+
+# UninstallCompleteAction.160ae8e1a545.uninstallIncompleteMessage=The following items could not be removed:
+UninstallCompleteAction.160ae8e1a545.uninstallIncompleteMessage=The following items could not be removed:
+
+# UninstallCompleteAction.160ae8e1a545.uninstallSkippedMessage=Unable to uninstall $PRODUCT_NAME$.
+UninstallCompleteAction.160ae8e1a545.uninstallSkippedMessage=Unable to uninstall $PRODUCT_NAME$.
+
+# UninstallCompleteAction.160ae8e1a545.uninstallSuccessMessage=All items were successfully uninstalled.
+UninstallCompleteAction.160ae8e1a545.uninstallSuccessMessage=All items were successfully uninstalled.
+
+# UninstallCompleteAction.26fbaa0ea8bc.rebootNotNeededMessage=
+UninstallCompleteAction.26fbaa0ea8bc.rebootNotNeededMessage=
+
+# UninstallCompleteAction.26fbaa0ea8bc.rebootRecommendedMessage=You should restart the system to complete the uninstallation.
+UninstallCompleteAction.26fbaa0ea8bc.rebootRecommendedMessage=You should restart the system to complete the uninstallation.
+
+# UninstallCompleteAction.26fbaa0ea8bc.rebootRequiredMessage=You need to restart the system to complete the uninstallation.
+UninstallCompleteAction.26fbaa0ea8bc.rebootRequiredMessage=You need to restart the system to complete the uninstallation.
+
+# UninstallCompleteAction.26fbaa0ea8bc.stepTitle=Uninstall Complete
+UninstallCompleteAction.26fbaa0ea8bc.stepTitle=Uninstall Complete
+
+# UninstallCompleteAction.26fbaa0ea8bc.uninstallIncompleteMessage=The following items could not be removed:
+UninstallCompleteAction.26fbaa0ea8bc.uninstallIncompleteMessage=The following items could not be removed:
+
+# UninstallCompleteAction.26fbaa0ea8bc.uninstallSkippedMessage=Unable to uninstall $PRODUCT_NAME$.
+UninstallCompleteAction.26fbaa0ea8bc.uninstallSkippedMessage=Unable to uninstall $PRODUCT_NAME$.
+
+# UninstallCompleteAction.26fbaa0ea8bc.uninstallSuccessMessage=All items were successfully uninstalled.
+UninstallCompleteAction.26fbaa0ea8bc.uninstallSuccessMessage=All items were successfully uninstalled.
+
+# UninstallIntroAction.160ae8e0a540.message=About to uninstall...\n\n$PRODUCT_NAME$\n\nThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+UninstallIntroAction.160ae8e0a540.message=About to uninstall...\n\n$PRODUCT_NAME$\n\nThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+
+# UninstallIntroAction.160ae8e0a540.stepTitle=Uninstall $PRODUCT_NAME$
+UninstallIntroAction.160ae8e0a540.stepTitle=Uninstall $PRODUCT_NAME$
+
+# UninstallIntroAction.26fbaa0da8b4.message=About to uninstall...\n\n$PRODUCT_NAME$\n\nThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+UninstallIntroAction.26fbaa0da8b4.message=About to uninstall...\n\n$PRODUCT_NAME$\n\nThis will remove features installed by InstallAnywhere.  It will not remove files and folders created after the installation.
+
+# UninstallIntroAction.26fbaa0da8b4.stepTitle=Uninstall $PRODUCT_NAME$
+UninstallIntroAction.26fbaa0da8b4.stepTitle=Uninstall $PRODUCT_NAME$
+

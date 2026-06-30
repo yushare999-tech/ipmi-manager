@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: install
+Created-By: InstallAnywhere 2015 (C) 2015 Flexera Software LLC.
+IA-Digest: 4D142336251698F3E8DB0D73D51D23878F657995

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPMI Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <div class="logo" style="display: flex; align-items: center;">
+      <div class="logo-icon">⚡</div>
+      <span>IPMI Manager</span>
+      <span class="app-version" id="app-version" style="font-size: 10px; margin-left: 8px; color: var(--text-secondary); background: #232734; padding: 2px 6px; border-radius: 4px; font-weight: 600;">v0.0.0</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-tab="devices" id="nav-devices">
+        <span class="nav-icon">🖥️</span> 장비 목록
+      </button>
+      <button class="nav-btn" data-tab="java" id="nav-java">
+        <span class="nav-icon">☕</span> Java 설정
+      </button>
+      <button class="nav-btn" data-tab="api" id="nav-api">
+        <span class="nav-icon">🔌</span> API 연동
+      </button>
+      <button class="nav-btn" data-tab="settings" id="nav-settings">
+        <span class="nav-icon">⚙️</span> 환경설정
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-bar">
+        <span id="java-status-dot" class="status-dot warning"></span>
+        <span id="java-status-text">Java 확인 중...</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="main">
+
+    <!-- ── 탭: 장비 목록 ── -->
+    <section class="tab-content active" id="tab-devices">
+      <div class="page-header">
+        <div>
+          <h1>장비 목록</h1>
+          <p class="subtitle">IPMI/BMC 장비를 관리하고 KVM에 접속합니다</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="btn-refresh-ping">🔄 핑 재체크</button>
+          <button class="btn btn-secondary" id="btn-import-api">🔌 API에서 가져오기</button>
+          <button class="btn btn-primary" id="btn-add-device">+ 장비 추가</button>
+        </div>
+      </div>
+
+      <!-- 검색 및 필터 -->
+      <div class="toolbar">
+        <input type="text" class="search-input" id="device-search" placeholder="🔍 장비명, IP 검색..." />
+        <select class="filter-select" id="vendor-filter">
+          <option value="">모든 벤더</option>
+          <option value="dell">Dell (iDRAC)</option>
+          <option value="hp">HP (iLO)</option>
+          <option value="supermicro">SuperMicro</option>
+          <option value="asus">ASUS</option>
+          <option value="asrock">ASRock</option>
+          <option value="generic">기타</option>
+        </select>
+      </div>
+
+      <!-- 장비 그리드 -->
+      <div class="device-grid" id="device-grid">
+        <!-- JS로 렌더링 -->
+      </div>
+    </section>
+
+    <!-- ── 탭: Java 설정 ── -->
+    <section class="tab-content" id="tab-java">
+      <div class="page-header">
+        <div>
+          <h1>Java 환경 설정</h1>
+          <p class="subtitle">IPMI KVM Java Applet 연동을 위한 Java 버전 관리</p>
+        </div>
+        <button class="btn btn-primary" id="btn-detect-java">🔍 Java 탐지</button>
+      </div>
+
+      <!-- Java 설치 목록 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>설치된 Java 목록</h2>
+        </div>
+        <div id="java-list">
+          <div class="empty-state">Java 탐지 버튼을 눌러주세요</div>
+        </div>
+      </div>
+
+      <!-- 레거시 설정 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>⚠️ IPMI 호환 보안 설정</h2>
+          <span class="badge badge-warning">레거시 모드</span>
+        </div>
+        <p class="card-desc">구형 IPMI 장비의 Java Applet 실행을 위해 TLS 1.0/1.1 허용 및 보안 레벨을 조정합니다.</p>
+        <div class="action-row">
+          <button class="btn btn-warning" id="btn-apply-legacy">🔧 레거시 Java 보안 설정 적용</button>
+          <span class="hint">deployment.properties 수정 · TLS 1.0/1.1 허용</span>
+        </div>
+        <div class="action-row" style="margin-top: 15px; border-top: 1px solid #2e323e; padding-top: 15px;">
+          <button class="btn btn-danger" id="btn-patch-java-security">🛡️ Java 보안 차단 완전 해제 (TLS/암호화 제한 제거)</button>
+          <span class="hint">java.security 수정 (관리자 권한 필요) · TLS 1.0/1.1, MD5 및 SHA1 차단 해제</span>
+        </div>
+        <div id="legacy-result" class="result-box hidden"></div>
+      </div>
+
+      <!-- 예외 사이트 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Java 예외 사이트 등록</h2>
+        </div>
+        <p class="card-desc">특정 IPMI IP/URL을 Java 보안 예외 목록에 추가합니다.</p>
+        <div class="input-row">
+          <input type="text" class="text-input" id="exception-site-input" placeholder="예: 192.168.1.10 또는 https://bmc.server.local" />
+          <button class="btn btn-primary" id="btn-add-exception">추가</button>
+        </div>
+        <div id="exception-result" class="result-box hidden"></div>
+      </div>
+
+      <!-- 구버전 Java 다운로드 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>📥 구버전 Java 다운로드 안내</h2>
+        </div>
+        <p class="card-desc">일부 구형 IPMI는 특정 Java 버전에서만 동작합니다. 아래 링크를 참고하세요.</p>
+        <div id="java-download-links"></div>
+      </div>
+    </section>
+
+    <!-- ── 탭: API 연동 ── -->
+    <section class="tab-content" id="tab-api">
+      <div class="page-header">
+        <div>
+          <h1>API 연동 설정</h1>
+          <p class="subtitle">웹 관리 페이지 API에서 장비 정보를 가져옵니다</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>API 서버 설정</h2></div>
+        <div class="form-group">
+          <label>API Base URL</label>
+          <input type="text" class="text-input" id="api-base-url" placeholder="https://your-site.com/api" />
+        </div>
+        <div class="form-group">
+          <label>인증 토큰 (Bearer)</label>
+          <input type="password" class="text-input" id="api-token" placeholder="Bearer token..." />
+        </div>
+        <div class="form-group">
+          <label>장비 목록 엔드포인트</label>
+          <input type="text" class="text-input" id="api-endpoint" placeholder="/ipmi/devices" value="/ipmi/devices" />
+        </div>
+        <div class="action-row">
+          <button class="btn btn-primary" id="btn-test-api">🔗 연결 테스트</button>
+          <button class="btn btn-secondary" id="btn-save-api">💾 저장</button>
+        </div>
+        <div id="api-test-result" class="result-box hidden"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>📋 예상 API 응답 형식</h2></div>
+        <pre class="code-block">{
+  "devices": [
+    {
+      "id": "server-001",
+      "name": "Web Server 01",
+      "vendor": "dell",
+      "model": "iDRAC9",
+      "ipmi_ip": "192.168.1.10",
+      "https": true,
+      "username": "root",
+      "password": "calvin"
+    }
+  ]
+}</pre>
+      </div>
+    </section>
+
+    <!-- ── 탭: 환경설정 ── -->
+    <section class="tab-content" id="tab-settings">
+      <div class="page-header">
+        <div><h1>환경설정</h1></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>기본 접속 및 자동화 설정</h2></div>
+        <div class="form-group">
+          <label>KVM 기본 접속 방법</label>
+          <select class="filter-select" id="default-kvm-method">
+            <option value="html5">HTML5 (내장 브라우저)</option>
+            <option value="jnlp">Java Web Start (JNLP)</option>
+            <option value="ipmiview">IPMIView (SuperMicro)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>javaws.exe 경로</label>
+          <div class="input-row">
+            <input type="text" class="text-input" id="javaws-path"
+              value="C:\Program Files\Java\jre1.8.0_441\bin\javaws.exe" />
+            <button class="btn btn-secondary" id="btn-browse-javaws">찾기</button>
+          </div>
+        </div>
+        
+        <!-- 자동 로그인 설정 -->
+        <div class="form-group">
+          <label>자동 로그인 동작</label>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+            <label class="radio-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="auto-submit" id="auto-submit-false" value="false" checked />
+              <span>자동완성만 수행 (ID/PW 입력 후 대기 - 권장)</span>
+            </label>
+            <label class="radio-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="auto-submit" id="auto-submit-true" value="true" />
+              <span>자동 로그인 수행 (입력 후 자동 제출)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 디버그 설정 -->
+        <div class="form-group">
+          <label>개발자 설정</label>
+          <div style="margin-top: 6px;">
+            <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="enable-devtools" />
+              <span>개발자 도구(DevTools) 자동 열기</span>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-save-settings">💾 설정 저장</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 장비 추가/수정 모달 -->
+  <div class="modal-overlay hidden" id="device-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">장비 추가</h3>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>장비명 *</label>
+            <input type="text" class="text-input" id="form-name" placeholder="Web Server 01" />
+          </div>
+          <div class="form-group">
+            <label>IPMI IP *</label>
+            <input type="text" class="text-input" id="form-ip" placeholder="192.168.1.10" />
+          </div>
+          <div class="form-group">
+            <label>벤더</label>
+            <select class="filter-select" id="form-vendor">
+              <option value="dell">Dell (iDRAC)</option>
+              <option value="hp">HP (iLO)</option>
+              <option value="supermicro">SuperMicro</option>
+              <option value="asus">ASUS</option>
+              <option value="asrock">ASRock</option>
+              <option value="generic">기타</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>모델</label>
+            <input type="text" class="text-input" id="form-model" placeholder="iDRAC9" />
+          </div>
+          <div class="form-group">
+            <label>사용자명</label>
+            <input type="text" class="text-input" id="form-username" placeholder="root" />
+          </div>
+          <div class="form-group">
+            <label>비밀번호</label>
+            <div class="password-wrapper" style="position: relative; display: flex; align-items: center; width: 100%;">
+              <input type="password" class="text-input" id="form-password" placeholder="••••••••" style="padding-right: 40px;" />
+              <button type="button" id="btn-toggle-password" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; height: 100%; user-select: none;">👁️</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>메모</label>
+          <input type="text" class="text-input" id="form-note" placeholder="선택 사항" />
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox" id="form-https" checked />
+          HTTPS 사용
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-modal-cancel">취소</button>
+        <button class="btn btn-primary" id="btn-modal-save">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "ipmi-manager",
+  "version": "1.5.0",
+  "description": "IPMI KVM 통합 관리 도구 - 벤더별 접속 지원",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --win"
+  },
+  "keywords": [
+    "ipmi",
+    "kvm",
+    "idrac",
+    "ilo",
+    "supermicro",
+    "bmc"
+  ],
+  "author": "IPMI Manager Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "build": {
+    "appId": "com.ipmi.manager",
+    "productName": "IPMI Manager",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "allowScripts": {
+    "electron@32.3.3": true
+  }
+}
