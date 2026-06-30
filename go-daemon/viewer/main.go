@@ -7,12 +7,27 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"syscall"
+	"time"
+	"unsafe"
 
 	"github.com/jchv/go-webview2"
 )
 
+var (
+	modUser32      = syscall.NewLazyDLL("user32.dll")
+	procShowWindow = modUser32.NewProc("ShowWindow")
+	procFindWindowW = modUser32.NewProc("FindWindowW")
+)
+
+const (
+	swHide            = 0
+	swShowMinimized   = 2
+	swShowNormal      = 1
+)
+
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.13"
+const Version = "1.5.14"
 
 func main() {
 	// Bypass SSL/TLS security warnings, self-signed certificate errors and allow legacy TLS 1.0/1.1
@@ -24,6 +39,8 @@ func main() {
 	password := flag.String("pass", "", "IPMI Password")
 	vendor := flag.String("vendor", "", "Hardware Vendor (dell, supermicro, hp, etc.)")
 	debugMode := flag.Bool("debug", false, "Enable Edge DevTools (Inspect Element)")
+	minimized := flag.Bool("minimized", false, "Start window minimized to taskbar")
+	hidden := flag.Bool("hidden", false, "Start window completely hidden (no taskbar icon)")
 	flag.Parse()
 
 	if *targetURL == "" {
@@ -53,6 +70,29 @@ func main() {
 	defer w.Destroy()
 
 	w.SetSize(1280, 800, webview2.HintNone)
+
+	// Apply window visibility state via Windows API
+	// go-webview2 does not expose HWND directly, so we find it by window title
+	if *hidden || *minimized {
+		go func() {
+			// Wait briefly for the window to be created before applying state
+			// Use a short polling approach since we can't hook into window creation
+			titlePtr, _ := syscall.UTF16PtrFromString("IPMI Web Viewer v" + Version)
+			for i := 0; i < 20; i++ {
+				hwnd, _, _ := procFindWindowW.Call(0, uintptr(unsafe.Pointer(titlePtr)))
+				if hwnd != 0 {
+					if *hidden {
+						procShowWindow.Call(hwnd, swHide)
+					} else if *minimized {
+						procShowWindow.Call(hwnd, swShowMinimized)
+					}
+					break
+				}
+				// Sleep 50ms between attempts
+				time.Sleep(50 * time.Millisecond)
+			}
+		}()
+	}
 
 	// Build JavaScript for auto-filling credentials and clicking login with console tracking
 	jsTemplate := `

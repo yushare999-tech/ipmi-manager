@@ -70,7 +70,7 @@ if ($Content -match $Pattern) {
 # 3. Compile ipmi-viewer.exe (Ultra-lightweight Go viewer)
 # ==================================================
 Write-Host "`n[3/5] Compiling ipmi-viewer.exe..." -ForegroundColor Yellow
-go build -o ipmi-viewer.exe ./viewer
+go build -ldflags "-H windowsgui" -o ipmi-viewer.exe ./viewer
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[Error] Failed to build ipmi-viewer.exe. Process aborted." -ForegroundColor Red
     exit 1

@@ -678,6 +678,9 @@ func launchWeb(device Device) (bool, error) {
 		if debugMode {
 			args = append(args, "--debug")
 			logger.Infof("[WEB] [DEBUG] 디버그 옵션을 활성화하여 뷰어를 구동합니다. (인자: %v)", args)
+		} else {
+			// 서비스/백그라운드 모드에서 창이 갑자기 뜨는 대신 최소화 상태로 기동
+			args = append(args, "--minimized")
 		}
 		return true, launchAsUser(viewerPath, args, "")
 	}
