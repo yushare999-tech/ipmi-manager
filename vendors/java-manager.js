@@ -184,7 +184,7 @@ function getCompatLevel(version) {
  * 경로: %APPDATA%\Sun\Java\Deployment\security\exception.sites
  */
 function addJavaExceptionSite(siteUrl) {
-  const exceptionDir = path.join(os.homedir(), 'AppData', 'Roaming', 'Sun', 'Java', 'Deployment', 'security');
+  const exceptionDir = path.join(os.homedir(), 'AppData', 'LocalLow', 'Sun', 'Java', 'Deployment', 'security');
   const exceptionFile = path.join(exceptionDir, 'exception.sites');
 
   if (!fs.existsSync(exceptionDir)) {
