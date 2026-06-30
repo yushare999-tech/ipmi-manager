@@ -238,11 +238,15 @@ async function openIpmiWithAutoLogin(device) {
   kvmWindows[winId] = win;
 
   // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
-  win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    if (validatedURL.startsWith('https://') && (errorCode === -107 || errorCode === -112 || errorCode === -113)) {
-      const httpUrl = validatedURL.replace('https://', 'http://');
-      log(`[SSL 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
-      win.loadURL(httpUrl);
+  win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    // 메인 프레임 로드 실패이고 HTTPS 주소인 경우에만 처리
+    if (isMainFrame !== false) {
+      const targetUrl = validatedURL || win.webContents.getURL();
+      if (targetUrl.startsWith('https://')) {
+        const httpUrl = targetUrl.replace('https://', 'http://');
+        log(`[로딩 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
+        win.loadURL(httpUrl);
+      }
     }
   });
 
@@ -477,11 +481,15 @@ function openKvmWithAutoLogin(device) {
   kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
 
   // SSL 버전/암호화 스위트 불일치로 로딩 실패 시 HTTP로 자동 폴백
-  kvmWin.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    if (validatedURL.startsWith('https://') && (errorCode === -107 || errorCode === -112 || errorCode === -113)) {
-      const httpUrl = validatedURL.replace('https://', 'http://');
-      log(`[SSL 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
-      kvmWin.loadURL(httpUrl);
+  kvmWin.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    // 메인 프레임 로드 실패이고 HTTPS 주소인 경우에만 처리
+    if (isMainFrame !== false) {
+      const targetUrl = validatedURL || kvmWin.webContents.getURL();
+      if (targetUrl.startsWith('https://')) {
+        const httpUrl = targetUrl.replace('https://', 'http://');
+        log(`[로딩 에러 감지] 코드: ${errorCode} (${errorDescription}) → HTTP 폴백 자동 재접속: ${httpUrl}`);
+        kvmWin.loadURL(httpUrl);
+      }
     }
   });
 
