@@ -11,16 +11,16 @@ const SettingsHTML = `<!DOCTYPE html>
     <style>
         :root {
             --bg-color: #08080c;
-            --card-bg: rgba(18, 18, 28, 0.75);
-            --card-border: rgba(255, 255, 255, 0.07);
-            --text-main: #f0f0f5;
-            --text-muted: #8e93ad;
-            --primary: #00f0ff;
-            --primary-glow: rgba(0, 240, 255, 0.25);
-            --secondary: #b500ff;
-            --secondary-glow: rgba(181, 0, 255, 0.25);
-            --success: #00ff87;
-            --danger: #ff0055;
+            --card-bg: #12121c;
+            --card-border: rgba(255, 255, 255, 0.06);
+            --text-main: #e2e2e9;
+            --text-muted: #83889e;
+            --primary: #00e5f2;
+            --primary-glow: rgba(0, 229, 242, 0.15);
+            --secondary: #a300e6;
+            --secondary-glow: rgba(163, 0, 230, 0.15);
+            --success: #00d972;
+            --danger: #e6004c;
             --font-family: 'Outfit', 'Noto Sans KR', sans-serif;
         }
 
@@ -33,8 +33,8 @@ const SettingsHTML = `<!DOCTYPE html>
         body {
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(181, 0, 255, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(0, 240, 255, 0.06) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(163, 0, 230, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 229, 242, 0.04) 0px, transparent 50%);
             color: var(--text-main);
             font-family: var(--font-family);
             min-height: 100vh;
@@ -61,8 +61,7 @@ const SettingsHTML = `<!DOCTYPE html>
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 16px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
         }
 
         .brand {
@@ -89,14 +88,13 @@ const SettingsHTML = `<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(0, 255, 135, 0.1);
-            border: 1px solid rgba(0, 255, 135, 0.3);
+            background: rgba(0, 217, 114, 0.08);
+            border: 1px solid rgba(0, 217, 114, 0.25);
             color: var(--success);
             padding: 0.4rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
-            text-shadow: 0 0 8px rgba(0, 255, 135, 0.4);
         }
 
         /* Config Grid */
@@ -118,8 +116,7 @@ const SettingsHTML = `<!DOCTYPE html>
             border: 1px solid var(--card-border);
             border-radius: 16px;
             padding: 1.8rem;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
@@ -128,7 +125,7 @@ const SettingsHTML = `<!DOCTYPE html>
         .card-title {
             font-size: 1.15rem;
             font-weight: 600;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding-bottom: 0.75rem;
             display: flex;
             justify-content: space-between;
@@ -156,34 +153,41 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         input[type="text"], input[type="password"], input[type="number"], select, textarea {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #191926; /* 명확한 어두운 색상으로 설정하여 흰색 배경 방지 */
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-main);
             padding: 0.75rem 0.9rem;
             border-radius: 8px;
             font-family: var(--font-family);
             font-size: 0.9rem;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 8px var(--primary-glow);
-            background: rgba(255, 255, 255, 0.05);
+            background: #1d1d2e;
+        }
+
+        /* select 내부 option 태그 스타일 강제 지정 (다크테마 텍스트 가시성 해결) */
+        select option {
+            background-color: #191926;
+            color: var(--text-main);
+            padding: 0.5rem;
         }
 
         /* Buttons */
         .btn {
-            background: linear-gradient(135deg, var(--primary), #00b0ff);
-            color: #0b0b0f;
+            background: linear-gradient(135deg, var(--primary), #00c6d1);
+            color: #08080c;
             border: none;
             padding: 0.75rem 1.3rem;
             border-radius: 8px;
             font-family: var(--font-family);
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -194,27 +198,27 @@ const SettingsHTML = `<!DOCTYPE html>
         .btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px var(--primary-glow);
-            filter: brightness(1.1);
+            filter: brightness(1.08);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             box-shadow: none;
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #ff00aa);
+            background: linear-gradient(135deg, var(--danger), #b3003b);
             color: #fff;
         }
 
         .btn-danger:hover {
-            box-shadow: 0 4px 12px rgba(255, 0, 85, 0.35);
+            box-shadow: 0 4px 12px rgba(230, 0, 76, 0.25);
         }
 
         .btn-mini {
@@ -232,8 +236,8 @@ const SettingsHTML = `<!DOCTYPE html>
 
         /* Profile Item Box */
         .profile-item {
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.012);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             border-radius: 10px;
             padding: 1rem;
             display: flex;
@@ -269,7 +273,7 @@ const SettingsHTML = `<!DOCTYPE html>
             font-size: 0.75rem;
             color: var(--text-muted);
             font-family: monospace;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             padding: 0.4rem;
             border-radius: 6px;
             word-break: break-all;
@@ -281,13 +285,13 @@ const SettingsHTML = `<!DOCTYPE html>
             gap: 0.5rem;
             flex-wrap: wrap;
             padding: 0.3rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             padding-bottom: 1rem;
         }
 
         .filter-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text-muted);
             padding: 0.4rem 0.8rem;
             border-radius: 6px;
@@ -298,27 +302,27 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
             color: var(--text-main);
         }
 
         .filter-btn.active {
-            background: rgba(0, 240, 255, 0.12);
+            background: rgba(0, 229, 242, 0.08);
             border-color: var(--primary);
             color: var(--primary);
-            box-shadow: 0 0 8px var(--primary-glow);
+            box-shadow: 0 0 6px var(--primary-glow);
         }
 
         /* Vendor Group Box */
         .vendor-group-card {
-            background: rgba(255, 255, 255, 0.012);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 12px;
             padding: 1.2rem;
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .vendor-group-header {
@@ -355,19 +359,19 @@ const SettingsHTML = `<!DOCTYPE html>
 
         /* Rule Item Box */
         .rule-item {
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.02);
             border-radius: 8px;
             padding: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
         .rule-item:hover {
-            background: rgba(255, 255, 255, 0.025);
-            border-color: rgba(0, 240, 255, 0.15);
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(0, 229, 242, 0.12);
         }
 
         .rule-info {
@@ -392,37 +396,37 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .badge-priority {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
             color: var(--text-main);
         }
 
         .badge-vendor {
-            background: rgba(181, 0, 255, 0.12);
-            border: 1px solid rgba(181, 0, 255, 0.3);
-            color: #d880ff;
+            background: rgba(163, 0, 230, 0.08);
+            border: 1px solid rgba(163, 0, 230, 0.25);
+            color: #d175ff;
         }
 
         .badge-type-ikvm {
-            background: rgba(0, 240, 255, 0.12);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(0, 229, 242, 0.08);
+            border: 1px solid rgba(0, 229, 242, 0.25);
             color: var(--primary);
         }
 
         .badge-type-jnlp {
-            background: rgba(255, 170, 0, 0.12);
-            border: 1px solid rgba(255, 170, 0, 0.3);
+            background: rgba(255, 165, 0, 0.08);
+            border: 1px solid rgba(255, 165, 0, 0.25);
             color: #ffa500;
         }
 
         .badge-type-web {
-            background: rgba(0, 255, 135, 0.12);
-            border: 1px solid rgba(0, 255, 135, 0.3);
+            background: rgba(0, 217, 114, 0.08);
+            border: 1px solid rgba(0, 217, 114, 0.25);
             color: var(--success);
         }
 
         .badge-profile {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-muted);
         }
 
@@ -434,7 +438,7 @@ const SettingsHTML = `<!DOCTYPE html>
 
         .rule-pattern {
             font-family: monospace;
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.2);
             padding: 0.05rem 0.3rem;
             border-radius: 4px;
             color: #ffd080;
@@ -473,15 +477,15 @@ const SettingsHTML = `<!DOCTYPE html>
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
         .modal-overlay.active {
@@ -490,18 +494,18 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .modal {
-            background: #0e0e14;
+            background: #12121c; /* 명확한 다크그레이 */
             border: 1px solid var(--card-border);
             border-radius: 16px;
             width: 100%;
             max-width: 500px;
             padding: 2rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
-            transform: scale(0.95);
-            transition: all 0.3s ease;
+            transform: scale(0.96);
+            transition: all 0.25s ease;
         }
 
         .modal-overlay.active .modal {
@@ -511,7 +515,7 @@ const SettingsHTML = `<!DOCTYPE html>
         .modal-header {
             font-size: 1.15rem;
             font-weight: 700;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding-bottom: 0.5rem;
         }
 
@@ -524,8 +528,8 @@ const SettingsHTML = `<!DOCTYPE html>
 
         /* Info Banner & Guide Code Block */
         .info-banner {
-            background: rgba(0, 240, 255, 0.04);
-            border: 1px solid rgba(0, 240, 255, 0.15);
+            background: rgba(0, 229, 242, 0.02);
+            border: 1px solid rgba(0, 229, 242, 0.1);
             padding: 0.9rem 1.1rem;
             border-radius: 8px;
             font-size: 0.82rem;
@@ -542,8 +546,8 @@ const SettingsHTML = `<!DOCTYPE html>
             display: flex;
             gap: 1rem;
             align-items: flex-end;
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
             padding: 1.2rem;
             border-radius: 10px;
             margin-bottom: 1.2rem;
@@ -557,8 +561,8 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .code-block {
-            background: #040407;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #06060a;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 8px;
             padding: 1.2rem;
             font-family: 'Fira Code', Consolas, monospace;
@@ -599,7 +603,7 @@ const SettingsHTML = `<!DOCTYPE html>
                     <span>실행 프로필 (Profiles)</span>
                     <button class="btn btn-mini" onclick="openAddProfileModal()">➕ 추가</button>
                 </div>
-                <div class="info-banner" style="background: rgba(181, 0, 255, 0.02); border-color: rgba(181, 0, 255, 0.1)">
+                <div class="info-banner" style="background: rgba(163, 0, 230, 0.01); border-color: rgba(163, 0, 230, 0.08)">
                     자바 런타임 및 iKVM.jar 파일 버전을 프로필별로 분리 관리합니다. 각 항목의 파일 정상 존재 여부가 실시간 확인됩니다.
                 </div>
                 <div class="list-container" id="profile-container">
@@ -749,8 +753,8 @@ const SettingsHTML = `<!DOCTYPE html>
     <script>
         let configData = { rules: [], profiles: [], js_proxy_url: '', js_proxy_token: '' };
         let profileStatus = {};
-        let activeVendorFilter = ''; // 현재 적용된 벤더 필터 값 ('': 필터 없음)
-        let collapsedStates = {}; // 벤더 그룹별 접힘 상태 캐시
+        let activeVendorFilter = '';
+        let collapsedStates = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             loadConfig();
@@ -821,8 +825,7 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
-        // 아코디언 토글 제어
-        funcToggleGroup = (vendor) => {
+        function funcToggleGroup(vendor) {
             const body = document.getElementById('group-body-' + vendor);
             const arrow = document.getElementById('group-arrow-' + vendor);
             if (!body) return;
@@ -837,23 +840,18 @@ const SettingsHTML = `<!DOCTYPE html>
                 arrow.innerText = '▼';
                 collapsedStates[vendor] = true;
             }
-        };
+        }
 
-        // 벤더 필터 토글 클릭
         function toggleFilter(vendor) {
             if (activeVendorFilter === vendor) {
-                // 이미 활성화된 필터를 다시 누르면 해제
                 activeVendorFilter = '';
             } else {
-                // 특정 벤더 필터 활성화
                 activeVendorFilter = vendor;
-                // 필터링된 벤더 그룹은 자동으로 펼쳐지도록 셋팅
                 collapsedStates[vendor] = false;
             }
             renderRules();
         }
 
-        // 벤더별 그룹 박스 렌더링 (글로벌 디폴트 최상단 노출 및 기본 접힘 구현)
         function renderRules() {
             const container = document.getElementById('rule-container');
             const filterBar = document.getElementById('filter-bar');
@@ -865,10 +863,9 @@ const SettingsHTML = `<!DOCTYPE html>
                 return;
             }
 
-            // 1. 벤더별 그룹핑 분리
             const groups = {};
             const fallbackRules = [];
-            const vendorsSet = new Set(); // 고유 벤더명 목록
+            const vendorsSet = new Set();
 
             configData.rules.forEach(rule => {
                 if (rule.vendor === '*' && rule.model_pattern === '*') {
@@ -884,10 +881,8 @@ const SettingsHTML = `<!DOCTYPE html>
                 }
             });
 
-            // 2. 벤더 필터 버튼 생성 및 렌더링
             const sortedVendors = Array.from(vendorsSet).sort();
             
-            // 필터 전체 버튼
             const allBtn = document.createElement('button');
             allBtn.className = 'filter-btn' + (activeVendorFilter === '' ? ' active' : '');
             allBtn.innerText = '전체 보기';
@@ -902,12 +897,11 @@ const SettingsHTML = `<!DOCTYPE html>
                 filterBar.appendChild(btn);
             });
 
-            // 3. [최상단] 글로벌 Fallback 렌더링 (항상 열린 상태로 최상단 배치)
             if (fallbackRules.length > 0 && (activeVendorFilter === '')) {
                 const fallbackCard = document.createElement('div');
                 fallbackCard.className = 'vendor-group-card';
-                fallbackCard.style.borderColor = 'rgba(0, 240, 255, 0.15)';
-                fallbackCard.style.background = 'rgba(0, 240, 255, 0.01)';
+                fallbackCard.style.borderColor = 'rgba(0, 229, 242, 0.15)';
+                fallbackCard.style.background = 'rgba(0, 229, 242, 0.01)';
 
                 const header = document.createElement('div');
                 header.className = 'vendor-group-header';
@@ -949,9 +943,7 @@ const SettingsHTML = `<!DOCTYPE html>
                 container.appendChild(fallbackCard);
             }
 
-            // 4. [그 아래] 벤더 그룹 렌더링
             Object.keys(groups).sort().forEach(vendor => {
-                // 필터 조건이 있다면 일치하는 벤더만 렌더링
                 if (activeVendorFilter !== '' && activeVendorFilter !== vendor) {
                     return;
                 }
@@ -959,7 +951,6 @@ const SettingsHTML = `<!DOCTYPE html>
                 const groupCard = document.createElement('div');
                 groupCard.className = 'vendor-group-card';
 
-                // 헤더 클릭 시 아코디언 토글
                 const header = document.createElement('div');
                 header.className = 'vendor-group-header';
                 header.onclick = () => funcToggleGroup(vendor);
@@ -973,9 +964,8 @@ const SettingsHTML = `<!DOCTYPE html>
                 arrow.className = 'group-toggle-arrow';
                 arrow.id = 'group-arrow-' + vendor;
                 
-                // 접힘 상태 판별 (필터링 중이거나 캐시된 상태에 따름. 기본값은 접힘=true)
                 if (collapsedStates[vendor] === undefined) {
-                    collapsedStates[vendor] = true; 
+                    collapsedStates[vendor] = true;
                 }
                 
                 const isCollapsed = collapsedStates[vendor];
@@ -1221,7 +1211,6 @@ const SettingsHTML = `<!DOCTYPE html>
             saveAllConfig('규칙이 삭제되었습니다.');
         }
 
-        // 벤더 그룹 내부에서의 규칙 우선순위 교환
         function moveRuleInGroup(vendor, localIdx, direction) {
             const groupRules = configData.rules.filter(r => r.vendor.toLowerCase() === vendor.toLowerCase());
             
