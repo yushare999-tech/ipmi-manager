@@ -659,38 +659,63 @@ function supermicroDownloadJnlp(device) {
           return reject(new Error('세션 쿠키를 획득하지 못했습니다. ID/PW 설정을 확인하세요.'));
         }
 
-        console.log(`[Supermicro JNLP] 로그인 성공 (세션 획득) -> JNLP 다운로드 시도: ${protocol}://${ip}:${port}/cgi/launch_win.cgi`);
+        console.log(`[Supermicro JNLP] 로그인 성공 (세션 획득) -> JNLP 다운로드 시도`);
 
-        const downloadOptions = {
-          hostname: ip,
-          port: port,
-          path: '/cgi/launch_win.cgi', // X9 가상 콘솔 JNLP 반환 경로
-          method: 'GET',
-          headers: {
-            'Cookie': cookieStr
-          },
-          rejectUnauthorized: false, // SSL 에러 무시
-          timeout: 8000
-        };
+        // JNLP 다운로드 후보 경로 순차 시도 체인
+        const paths = [
+          '/cgi/launch_win.cgi',
+          '/cgi/viewer.jnlp',
+          '/cgi/viewer.jnlp?EXTPORT=-1&JNLPSTR=AppletRedirection'
+        ];
 
-        const dlReq = agent.request(downloadOptions, (dlRes) => {
-          if (dlRes.statusCode !== 200) {
-            return reject(new Error(`JNLP 다운로드 실패 (HTTP 상태코드: ${dlRes.statusCode})`));
+        let lastError = null;
+
+        const tryDownload = (index) => {
+          if (index >= paths.length) {
+            return reject(new Error(`모든 가용 JNLP 경로 다운로드 실패. 최종 에러: ${lastError ? lastError.message : '404 Not Found'}`));
           }
 
-          const tempPath = path.join(app.getPath('temp'), `supermicro_${device.id}.jnlp`);
-          const fileStream = fs.createWriteStream(tempPath);
-          dlRes.pipe(fileStream);
+          const currentPath = paths[index];
+          console.log(`[Supermicro JNLP] 다운로드 시도 (${index + 1}/${paths.length}): ${protocol}://${ip}:${port}${currentPath}`);
 
-          fileStream.on('finish', () => {
-            fileStream.close();
-            console.log(`[Supermicro JNLP] 다운로드 완료 -> 임시 저장 경로: ${tempPath}`);
-            resolve(tempPath);
+          const downloadOptions = {
+            hostname: ip,
+            port: port,
+            path: currentPath,
+            method: 'GET',
+            headers: {
+              'Cookie': cookieStr
+            },
+            rejectUnauthorized: false,
+            timeout: 8000
+          };
+
+          const dlReq = agent.request(downloadOptions, (dlRes) => {
+            if (dlRes.statusCode !== 200) {
+              lastError = new Error(`경로 ${currentPath} 실패 (HTTP 상태코드: ${dlRes.statusCode})`);
+              return tryDownload(index + 1); // 다음 경로로 즉시 폴백
+            }
+
+            const tempPath = path.join(app.getPath('temp'), `supermicro_${device.id}.jnlp`);
+            const fileStream = fs.createWriteStream(tempPath);
+            dlRes.pipe(fileStream);
+
+            fileStream.on('finish', () => {
+              fileStream.close();
+              console.log(`[Supermicro JNLP] 다운로드 완료 -> 임시 저장 경로: ${tempPath}`);
+              resolve(tempPath);
+            });
           });
-        });
 
-        dlReq.on('error', (err) => reject(new Error(`다운로드 중 네트워크 오류: ${err.message}`)));
-        dlReq.end();
+          dlReq.on('error', (err) => {
+            lastError = err;
+            tryDownload(index + 1); // 에러 발생 시 다음 경로 시도
+          });
+          dlReq.end();
+        };
+
+        // 첫 번째 경로로 다운로드 프로세스 시작
+        tryDownload(0);
       });
     });
 

@@ -63,6 +63,7 @@ docs/
   - 백엔드(Node.js)에서 직접 `cgi/login.cgi`에 로그인하여 세션 쿠키를 획득하는 백그라운드 인증 로직 구축
   - 인증된 세션 쿠키를 기반으로 `cgi/launch_win.cgi`에 접근하여 `launch.jnlp`를 임시 폴더에 자동 다운로드
   - 다운로드 시 HTTP/HTTPS 동적 탐색 지원 및 HTTPS 장애 시 HTTP 자동 폴백(상호 백업) 장치 마련 (보안 무시 옵션 기본 적용)
+  - JNLP 다운로드 실패(404 에러 등)에 대응하기 위해 세 가지 유력 다운로드 경로(`/cgi/launch_win.cgi`, `/cgi/viewer.jnlp` 등)를 순차적으로 자동 시도하는 다운로드 체인 구현 추가
   - 다운로드된 로컬 JNLP 파일을 로컬 Java 보안 정책 완화 하에 `javaws.exe`로 즉각 구동
 - **상태**: ✅ 완료
 
