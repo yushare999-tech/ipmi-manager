@@ -90,6 +90,17 @@ function renderDevices() {
       </div>
       ${d.model ? `<div class="device-note">모델: ${d.model}</div>` : ''}
       ${d.note  ? `<div class="device-note">${d.note}</div>` : ''}
+      ${d.username ? `
+      <div class="device-account">
+        <span>ID: <strong>${d.username}</strong></span>
+        <span class="separator">|</span>
+        <span class="pw-wrapper">
+          PW: 
+          <span class="pw-text" id="pw-text-${d.id}" data-password="${d.password || ''}">••••••••</span>
+          <button class="btn-toggle-card-pw" onclick="toggleCardPw('${d.id}')">👁️</button>
+        </span>
+      </div>
+      ` : ''}
       <div class="device-actions">
         <button class="btn btn-primary btn-sm" onclick="connectHtml5('${d.id}')">🖥️ HTML5 KVM</button>
         <button class="btn btn-secondary btn-sm" onclick="connectJnlp('${d.id}')">☕ JNLP</button>
@@ -504,3 +515,18 @@ async function init() {
 }
 
 init();
+
+// 카드 내 비밀번호 토글
+window.toggleCardPw = function(id) {
+  const pwSpan = document.getElementById(`pw-text-${id}`);
+  if (!pwSpan) return;
+  const btn = pwSpan.nextElementSibling;
+  const rawPw = pwSpan.dataset.password;
+  if (pwSpan.textContent === '••••••••') {
+    pwSpan.textContent = rawPw;
+    btn.textContent = '🙈';
+  } else {
+    pwSpan.textContent = '••••••••';
+    btn.textContent = '👁️';
+  }
+};

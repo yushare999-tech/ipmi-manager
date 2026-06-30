@@ -42,28 +42,37 @@ npm start
 
 ```
 ipmi-manager/
-├── main.js              # Electron 메인 프로세스 (SSL 우회, IPC 핸들러)
+├── main.js              # Electron 메인 프로세스 (SSL 우회, IPC 핸들러, 자동로그인)
 ├── preload.js           # 렌더러 ↔ 메인 보안 브릿지
 ├── renderer/
 │   ├── index.html       # 메인 UI
 │   ├── style.css        # 다크 테마 스타일
 │   └── app.js           # 렌더러 로직
 ├── vendors/
-│   └── java-manager.js  # Java 탐지/설정/실행 모듈
-└── api/                 # (추후) API 클라이언트 모듈
+│   ├── java-manager.js  # Java 탐지/설정/실행 모듈
+│   └── auto-login-scripts.js # 벤더별 자동 로그인 스크립트 빌더
+├── api/                 # (추후) API 클라이언트 모듈
+└── docs/                # 상세 설계 및 작업 이력 문서 (HISTORY.md 등)
 ```
 
 ## 변경 이력
 
+### v1.3.0 (2026-06-30)
+- 장비 카드 내부에 계정(ID/PW) 정보 표시 및 비밀번호 토글(👁️/🙈) 기능 추가
+- iframe 구조의 IPMI 로그인 페이지 대응을 위한 재귀적 프레임 탐색(`querySelectorAllAll`) 로직 도입
+- Electron 메인 프로세스에서 `did-frame-finish-load` 이벤트를 통한 스크립트 주입 보완
+
+### v1.2.0 (2026-06-29)
+- JNLP 실행 시 대상 장비 IP를 Java 예외 목록에 자동 등록 및 보안 해제 적용
+- `java.security` 차단 해제 UAC 연동 기능 구현
+
+### v1.1.0 (2026-06-25)
+- IPMI 자동 로그인 기능 구현 (Dell iDRAC, HP iLO, SuperMicro 대응)
+
 ### v1.0.0 (2026-06-25)
-- 최초 프로젝트 생성
-- Electron 기반 앱 구조 설계
-- Dell/HP/SuperMicro/ASUS/ASRock 벤더 지원
-- Java 환경 자동 탐지 및 호환성 분석
-- Java 보안 예외 사이트 자동 등록
-- SSL/TLS 구버전 우회 설정
-- API 연동 (장비 정보 가져오기) 기능
-- Git 저장소 초기화
+- 최초 프로젝트 생성 및 데스크탑 앱 기본 구조 구현
+- Java 환경 자동 탐지 및 SSL/TLS 구버전 우회 설정
+- API 연동 (장비 목록 연동) 및 기본 CRUD 구현
 
 ## 향후 계획 (Roadmap)
 

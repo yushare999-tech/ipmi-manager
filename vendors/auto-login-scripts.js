@@ -41,32 +41,58 @@ function getLoginScript(vendor, username, password, autoSubmit = false) {
 function getDellScript(u, p, autoSubmit) {
   return `
 (function() {
+  function querySelectorAllAll(selector, doc) {
+    doc = doc || document;
+    var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+    var frames = doc.querySelectorAll('iframe, frame');
+    for (var i = 0; i < frames.length; i++) {
+      try {
+        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+        if (frameDoc) {
+          elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+        }
+      } catch (e) {}
+    }
+    return elements;
+  }
+
   function tryFill() {
-    // iDRAC 6/7/8
-    var userEl = document.getElementById('user') ||
-                 document.querySelector('input[name="user"]') ||
-                 document.querySelector('input[type="text"]');
-    var passEl = document.getElementById('password') ||
-                 document.querySelector('input[name="password"]') ||
-                 document.querySelector('input[type="password"]');
+    var users = querySelectorAllAll('#user')
+      .concat(querySelectorAllAll('input[name="user"]'))
+      .concat(querySelectorAllAll('input[type="text"]'));
+    var passes = querySelectorAllAll('#password')
+      .concat(querySelectorAllAll('input[name="password"]'))
+      .concat(querySelectorAllAll('input[type="password"]'));
+
+    var userEl = users[0];
+    var passEl = passes[0];
 
     if (userEl && passEl) {
       // React/Vue 등 프레임워크 대응: nativeInputValueSetter 방식
       var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-      nativeInputValueSetter.call(userEl, ${u});
+      
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(userEl, ${u});
+      } else {
+        userEl.value = ${u};
+      }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      nativeInputValueSetter.call(passEl, ${p});
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(passEl, ${p});
+      } else {
+        passEl.value = ${p};
+      }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
       if (${autoSubmit}) {
         // Submit 버튼 탐색 후 클릭, 없으면 form submit
-        var btn = document.querySelector('button[type="submit"]') ||
-                  document.querySelector('input[type="submit"]') ||
-                  document.querySelector('#btnOK') ||
-                  document.querySelector('.btn-primary');
+        var btn = querySelectorAllAll('button[type="submit"]')
+          .concat(querySelectorAllAll('input[type="submit"]'))
+          .concat(querySelectorAllAll('#btnOK'))
+          .concat(querySelectorAllAll('.btn-primary'))[0];
         if (btn) {
           btn.click();
         } else if (userEl.form) {
@@ -82,7 +108,7 @@ function getDellScript(u, p, autoSubmit) {
   if (!tryFill()) {
     var attempts = 0;
     var timer = setInterval(function() {
-      if (tryFill() || ++attempts > 10) clearInterval(timer);
+      if (tryFill() || ++attempts > 15) clearInterval(timer);
     }, 500);
   }
 })();
@@ -94,31 +120,58 @@ function getDellScript(u, p, autoSubmit) {
 function getHpScript(u, p, autoSubmit) {
   return `
 (function() {
+  function querySelectorAllAll(selector, doc) {
+    doc = doc || document;
+    var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+    var frames = doc.querySelectorAll('iframe, frame');
+    for (var i = 0; i < frames.length; i++) {
+      try {
+        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+        if (frameDoc) {
+          elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+        }
+      } catch (e) {}
+    }
+    return elements;
+  }
+
   function tryFill() {
-    var userEl = document.getElementById('username') ||
-                 document.querySelector('input[name="username"]') ||
-                 document.querySelector('input[autocomplete="username"]') ||
-                 document.querySelector('input[type="text"]');
-    var passEl = document.getElementById('password') ||
-                 document.querySelector('input[name="password"]') ||
-                 document.querySelector('input[autocomplete="current-password"]') ||
-                 document.querySelector('input[type="password"]');
+    var users = querySelectorAllAll('#username')
+      .concat(querySelectorAllAll('input[name="username"]'))
+      .concat(querySelectorAllAll('input[autocomplete="username"]'))
+      .concat(querySelectorAllAll('input[type="text"]'));
+    var passes = querySelectorAllAll('#password')
+      .concat(querySelectorAllAll('input[name="password"]'))
+      .concat(querySelectorAllAll('input[autocomplete="current-password"]'))
+      .concat(querySelectorAllAll('input[type="password"]'));
+
+    var userEl = users[0];
+    var passEl = passes[0];
 
     if (userEl && passEl) {
       var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-      nativeInputValueSetter.call(userEl, ${u});
+      
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(userEl, ${u});
+      } else {
+        userEl.value = ${u};
+      }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      nativeInputValueSetter.call(passEl, ${p});
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(passEl, ${p});
+      } else {
+        passEl.value = ${p};
+      }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
       if (${autoSubmit}) {
-        var btn = document.querySelector('button[type="submit"]') ||
-                  document.querySelector('#btn-login') ||
-                  document.querySelector('.btn-primary') ||
-                  document.querySelector('input[type="submit"]');
+        var btn = querySelectorAllAll('button[type="submit"]')
+          .concat(querySelectorAllAll('#btn-login'))
+          .concat(querySelectorAllAll('.btn-primary'))
+          .concat(querySelectorAllAll('input[type="submit"]'))[0];
         if (btn) {
           btn.click();
         } else if (userEl.form) {
@@ -133,7 +186,7 @@ function getHpScript(u, p, autoSubmit) {
   if (!tryFill()) {
     var attempts = 0;
     var timer = setInterval(function() {
-      if (tryFill() || ++attempts > 10) clearInterval(timer);
+      if (tryFill() || ++attempts > 15) clearInterval(timer);
     }, 500);
   }
 })();
@@ -145,22 +198,55 @@ function getHpScript(u, p, autoSubmit) {
 function getSupermicroScript(u, p, autoSubmit) {
   return `
 (function() {
+  function querySelectorAllAll(selector, doc) {
+    doc = doc || document;
+    var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+    var frames = doc.querySelectorAll('iframe, frame');
+    for (var i = 0; i < frames.length; i++) {
+      try {
+        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+        if (frameDoc) {
+          elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+        }
+      } catch (e) {}
+    }
+    return elements;
+  }
+
   function tryFill() {
-    var userEl = document.querySelector('input[name="name"]') ||
-                 document.querySelector('input[name="username"]') ||
-                 document.querySelector('input[type="text"]');
-    var passEl = document.querySelector('input[name="pwd"]') ||
-                 document.querySelector('input[name="password"]') ||
-                 document.querySelector('input[type="password"]');
+    var users = querySelectorAllAll('input[name="name"]')
+      .concat(querySelectorAllAll('input[name="username"]'))
+      .concat(querySelectorAllAll('input[type="text"]'));
+    var passes = querySelectorAllAll('input[name="pwd"]')
+      .concat(querySelectorAllAll('input[name="password"]'))
+      .concat(querySelectorAllAll('input[type="password"]'));
+
+    var userEl = users[0];
+    var passEl = passes[0];
 
     if (userEl && passEl) {
-      userEl.value = ${u};
-      passEl.value = ${p};
+      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(userEl, ${u});
+      } else {
+        userEl.value = ${u};
+      }
+      userEl.dispatchEvent(new Event('input', { bubbles: true }));
+      userEl.dispatchEvent(new Event('change', { bubbles: true }));
+
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(passEl, ${p});
+      } else {
+        passEl.value = ${p};
+      }
+      passEl.dispatchEvent(new Event('input', { bubbles: true }));
+      passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
       if (${autoSubmit}) {
-        var btn = document.querySelector('input[type="submit"]') ||
-                  document.querySelector('button[type="submit"]') ||
-                  document.querySelector('#login_word');
+        var btn = querySelectorAllAll('input[type="submit"]')
+          .concat(querySelectorAllAll('button[type="submit"]'))
+          .concat(querySelectorAllAll('#login_word'))[0];
         if (btn) {
           btn.click();
         } else if (userEl.form) {
@@ -175,7 +261,7 @@ function getSupermicroScript(u, p, autoSubmit) {
   if (!tryFill()) {
     var attempts = 0;
     var timer = setInterval(function() {
-      if (tryFill() || ++attempts > 10) clearInterval(timer);
+      if (tryFill() || ++attempts > 15) clearInterval(timer);
     }, 500);
   }
 })();
@@ -186,17 +272,50 @@ function getSupermicroScript(u, p, autoSubmit) {
 function getAsusScript(u, p, autoSubmit) {
   return `
 (function() {
+  function querySelectorAllAll(selector, doc) {
+    doc = doc || document;
+    var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+    var frames = doc.querySelectorAll('iframe, frame');
+    for (var i = 0; i < frames.length; i++) {
+      try {
+        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+        if (frameDoc) {
+          elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+        }
+      } catch (e) {}
+    }
+    return elements;
+  }
+
   function tryFill() {
-    var userEl = document.querySelector('input[type="text"]');
-    var passEl = document.querySelector('input[type="password"]');
+    var users = querySelectorAllAll('input[type="text"]');
+    var passes = querySelectorAllAll('input[type="password"]');
+
+    var userEl = users[0];
+    var passEl = passes[0];
 
     if (userEl && passEl) {
-      userEl.value = ${u};
-      passEl.value = ${p};
+      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(userEl, ${u});
+      } else {
+        userEl.value = ${u};
+      }
+      userEl.dispatchEvent(new Event('input', { bubbles: true }));
+      userEl.dispatchEvent(new Event('change', { bubbles: true }));
+
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(passEl, ${p});
+      } else {
+        passEl.value = ${p};
+      }
+      passEl.dispatchEvent(new Event('input', { bubbles: true }));
+      passEl.dispatchEvent(new Event('change', { bubbles: true }));
       
       if (${autoSubmit}) {
-        var btn = document.querySelector('input[type="submit"]') ||
-                  document.querySelector('button[type="submit"]');
+        var btn = querySelectorAllAll('input[type="submit"]')
+          .concat(querySelectorAllAll('button[type="submit"]'))[0];
         if (btn) btn.click();
         else if (userEl.form) userEl.form.submit();
       }
@@ -208,7 +327,7 @@ function getAsusScript(u, p, autoSubmit) {
   if (!tryFill()) {
     var attempts = 0;
     var timer = setInterval(function() {
-      if (tryFill() || ++attempts > 10) clearInterval(timer);
+      if (tryFill() || ++attempts > 15) clearInterval(timer);
     }, 500);
   }
 })();
@@ -219,8 +338,23 @@ function getAsusScript(u, p, autoSubmit) {
 function getGenericScript(u, p, autoSubmit) {
   return `
 (function() {
+  function querySelectorAllAll(selector, doc) {
+    doc = doc || document;
+    var elements = Array.prototype.slice.call(doc.querySelectorAll(selector));
+    var frames = doc.querySelectorAll('iframe, frame');
+    for (var i = 0; i < frames.length; i++) {
+      try {
+        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+        if (frameDoc) {
+          elements = elements.concat(querySelectorAllAll(selector, frameDoc));
+        }
+      } catch (e) {}
+    }
+    return elements;
+  }
+
   function tryFill() {
-    var inputs = document.querySelectorAll('input');
+    var inputs = querySelectorAllAll('input');
     var userEl = null, passEl = null;
 
     inputs.forEach(function(el) {
@@ -233,23 +367,32 @@ function getGenericScript(u, p, autoSubmit) {
       }
     });
     // fallback: 첫번째 text input
-    if (!userEl) userEl = document.querySelector('input[type="text"]');
+    if (!userEl) userEl = querySelectorAllAll('input[type="text"]')[0];
 
     if (userEl && passEl) {
       var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-      nativeInputValueSetter.call(userEl, ${u});
+      
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(userEl, ${u});
+      } else {
+        userEl.value = ${u};
+      }
       userEl.dispatchEvent(new Event('input', { bubbles: true }));
       userEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      nativeInputValueSetter.call(passEl, ${p});
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(passEl, ${p});
+      } else {
+        passEl.value = ${p};
+      }
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
       if (${autoSubmit}) {
-        var btn = document.querySelector('button[type="submit"]') ||
-                  document.querySelector('input[type="submit"]') ||
-                  document.querySelector('.btn-primary') ||
-                  document.querySelector('.login-btn');
+        var btn = querySelectorAllAll('button[type="submit"]')
+          .concat(querySelectorAllAll('input[type="submit"]'))
+          .concat(querySelectorAllAll('.btn-primary'))
+          .concat(querySelectorAllAll('.login-btn'))[0];
         if (btn) btn.click();
         else if (userEl.form) userEl.form.submit();
       }

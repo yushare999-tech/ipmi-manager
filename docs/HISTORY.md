@@ -56,6 +56,17 @@ docs/
 
 ---
 
+### [v1.3.0] 2026-06-30 — 비밀번호 보기 토글 및 IPMI iframe 자동 로그인 개선
+- **작업자**: 삼식이 (AI) + kuri
+- **내용**:
+  - 메인 화면의 장비 카드 내부에 계정(ID/PW) 정보 노출 및 비밀번호 보기/숨기기 토글(👁️/🙈) 기능 추가
+  - `iframe` 및 `frame` 구조를 가지는 IPMI 페이지에서 자동완성이 실패하는 문제 해결을 위해 재귀적 프레임 탐색(`querySelectorAllAll`) 도입
+  - Electron 메인 프로세스에서 `did-frame-finish-load` 이벤트 감지를 통해 지연 로드되는 프레임에도 로그인 스크립트가 누락 없이 주입되도록 보완
+- **상태**: ✅ 완료
+- **관련 문서**: [비밀번호 보기 및 iframe 자동 로그인 개선](./features/password-visibility-and-autofill-fix.md)
+
+---
+
 ### [v1.2.0] 2026-06-29 — JNLP 실행 차단 해결 및 보안 정책 우회 구현
 - **작업자**: 삼식이 (AI) + kuri
 - **내용**:
@@ -70,4 +81,4 @@ docs/
 [https://github.com/yushare999-tech/ipmi-manager](https://github.com/yushare999-tech/ipmi-manager)
 
 ---
-*Managed by [사무실-삼식이] | Last Updated: 2026-06-29*
+*Managed by [사무실-삼식이] | Last Updated: 2026-06-30*

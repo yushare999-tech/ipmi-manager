@@ -636,3 +636,49 @@ h1 {
   padding: 16px 24px 20px;
   border-top: 1px solid var(--border);
 }
+
+/* ── 장비 카드 내 계정 정보 ── */
+.device-account {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.device-account .separator {
+  color: var(--border);
+}
+
+.device-account .pw-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.device-account .pw-text {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-primary);
+}
+
+.device-account .btn-toggle-card-pw {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition);
+}
+
+.device-account .btn-toggle-card-pw:hover {
+  color: var(--text-primary);
+}
