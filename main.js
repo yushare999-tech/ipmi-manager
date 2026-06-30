@@ -220,6 +220,14 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
   try {
     webContents.focus();
 
+    // 중복 로그 출력을 방지하기 위한 URL 상태 체크
+    const currentUrl = webContents.getURL();
+    let shouldLogDiag = false;
+    if (!webContents.$lastDiagUrl || webContents.$lastDiagUrl !== currentUrl) {
+      webContents.$lastDiagUrl = currentUrl;
+      shouldLogDiag = true;
+    }
+
     // 현재 페이지의 Form 및 Input 진단
     const diagScript = `
       (function() {
@@ -242,18 +250,12 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     `;
     
     const pageDiag = await webContents.executeJavaScript(diagScript).catch(() => null);
-    if (pageDiag) {
+    if (pageDiag && shouldLogDiag) {
       log(`[디버그][DOM 진단] URL: ${pageDiag.url}`);
       log(`[디버그][DOM 진단] 발견된 Form: ${JSON.stringify(pageDiag.forms)}`);
       log(`[디버그][DOM 진단] 발견된 Input: ${JSON.stringify(pageDiag.inputs)}`);
     }
 
-    const userSelectors = {
-      dell: `['#user', 'input[name="user"]', 'input[type="text"]']`,
-      hp: `['#username', 'input[name="username"]', 'input[autocomplete="username"]', 'input[type="text"]']`,
-      supermicro: `['input[name="name"]', 'input[name="username"]', 'input[type="text"]']`,
-      generic: `['input']`
-    };
     const vendorKey = (device.vendor || 'generic').toLowerCase();
     const uSelectors = userSelectors[vendorKey] || userSelectors.generic;
 
@@ -265,11 +267,18 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
     };
     const pSelectors = passSelectors[vendorKey] || passSelectors.generic;
 
-    // 단일 동기 자바스크립트 내에서 포커싱, 값 주입, 캐릭터별 키 이벤트 디스패치를 완벽히 수행 (순서 뒤바뀜 원천 방지)
+    // 단일 동기 자바스크립트 내에서 포커싱, 값 주입, 도메인 변경, 캐릭터별 키 이벤트 디스패치를 완벽히 수행
     const fillScript = `
       (function() {
         ${querySelectorAllAllHelper}
         
+        // 0. 도메인 셀렉트 박스가 있을 경우 로컬(This iDRAC, 보통 0번 인덱스)로 강제 복구
+        var domainSelect = querySelectorAllAll('#domainDisp').concat(querySelectorAllAll('select[name="domainDisp"]'))[0];
+        if (domainSelect && domainSelect.selectedIndex !== 0) {
+          domainSelect.selectedIndex = 0;
+          domainSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
         function fillField(selectors, value) {
           var el = null;
           var matched = '';
@@ -302,7 +311,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
           if (el) {
             el.focus();
             
-            // 1차 값 대입 (안전장치)
+            // 1차 값 대입
             var getProto = Object.getPrototypeOf || function(obj) { return obj.__proto__; };
             var proto = getProto(el);
             var desc = Object.getOwnPropertyDescriptor(proto, 'value');
@@ -313,7 +322,7 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
               el.value = value;
             }
             
-            // 2차 각 글자별 키보드 이벤트 순차 디스패치 (iDRAC 암호화 리스너 강제 발화)
+            // 2차 각 글자별 키보드 이벤트 순차 디스패치
             el.dispatchEvent(new Event('focus', { bubbles: true }));
             el.dispatchEvent(new Event('input', { bubbles: true }));
             el.dispatchEvent(new Event('change', { bubbles: true }));
@@ -348,7 +357,10 @@ async function performInteractiveLogin(webContents, device, autoSubmit, log) {
 
     const fillResult = await webContents.executeJavaScript(fillScript);
     if (!fillResult || !fillResult.success) {
-      log(`[디버그] 필드 입력 실패 단계: ${fillResult ? fillResult.step : 'unknown'}`);
+      // 요소를 탐색하는 동안 로그가 너무 도배되지 않도록 디버그 로깅 축소
+      if (shouldLogDiag) {
+        log(`[디버그] 필드 입력 대기 중... 실패 단계: ${fillResult ? fillResult.step : 'unknown'}`);
+      }
       return false;
     }
 
