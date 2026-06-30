@@ -19,6 +19,8 @@ let state = {
     apiEndpoint:      '/ipmi/devices',
     defaultKvmMethod: 'html5',
     javawsPath:       'C:\\Program Files\\Java\\jre1.8.0_441\\bin\\javaws.exe',
+    autoSubmit:       false,
+    enableDevTools:   false,
   },
   editingDeviceId: null,
 };
@@ -224,6 +226,20 @@ async function loadAll() {
   if (cfg.apiEndpoint)      { state.config.apiEndpoint = cfg.apiEndpoint; $('api-endpoint').value = cfg.apiEndpoint; }
   if (cfg.defaultKvmMethod) { state.config.defaultKvmMethod = cfg.defaultKvmMethod; $('default-kvm-method').value = cfg.defaultKvmMethod; }
   if (cfg.javawsPath)       { state.config.javawsPath = cfg.javawsPath; $('javaws-path').value  = cfg.javawsPath; }
+  
+  if (cfg.autoSubmit !== undefined) {
+    state.config.autoSubmit = cfg.autoSubmit;
+    if (cfg.autoSubmit) {
+      $('auto-submit-true').checked = true;
+    } else {
+      $('auto-submit-false').checked = true;
+    }
+  }
+  if (cfg.enableDevTools !== undefined) {
+    state.config.enableDevTools = cfg.enableDevTools;
+    $('enable-devtools').checked = cfg.enableDevTools;
+  }
+
   renderDevices();
 }
 
@@ -427,6 +443,9 @@ $('btn-browse-javaws').addEventListener('click', async () => {
 $('btn-save-settings').addEventListener('click', async () => {
   state.config.defaultKvmMethod = $('default-kvm-method').value;
   state.config.javawsPath       = $('javaws-path').value.trim();
+  state.config.autoSubmit       = $('auto-submit-true').checked;
+  state.config.enableDevTools   = $('enable-devtools').checked;
+  
   const cfg = await window.ipmiAPI.loadConfig();
   Object.assign(cfg, state.config);
   await window.ipmiAPI.saveConfig(cfg);

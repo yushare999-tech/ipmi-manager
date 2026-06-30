@@ -189,7 +189,7 @@
         <div><h1>환경설정</h1></div>
       </div>
       <div class="card">
-        <div class="card-header"><h2>기본 접속 방식</h2></div>
+        <div class="card-header"><h2>기본 접속 및 자동화 설정</h2></div>
         <div class="form-group">
           <label>KVM 기본 접속 방법</label>
           <select class="filter-select" id="default-kvm-method">
@@ -206,6 +206,33 @@
             <button class="btn btn-secondary" id="btn-browse-javaws">찾기</button>
           </div>
         </div>
+        
+        <!-- 자동 로그인 설정 -->
+        <div class="form-group">
+          <label>자동 로그인 동작</label>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+            <label class="radio-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="auto-submit" id="auto-submit-false" value="false" checked />
+              <span>자동완성만 수행 (ID/PW 입력 후 대기 - 권장)</span>
+            </label>
+            <label class="radio-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="radio" name="auto-submit" id="auto-submit-true" value="true" />
+              <span>자동 로그인 수행 (입력 후 자동 제출)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 디버그 설정 -->
+        <div class="form-group">
+          <label>개발자 설정</label>
+          <div style="margin-top: 6px;">
+            <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="enable-devtools" />
+              <span>개발자 도구(DevTools) 자동 열기</span>
+            </label>
+          </div>
+        </div>
+
         <button class="btn btn-primary" id="btn-save-settings">💾 설정 저장</button>
       </div>
     </section>

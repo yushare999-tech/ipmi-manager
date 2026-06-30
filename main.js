@@ -100,6 +100,15 @@ const isDev = process.argv.includes('--dev');
 let mainWindow;
 let kvmWindows = {};
 
+function readConfig() {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+  } catch (e) {
+    console.error('[Config] 읽기 실패:', e);
+  }
+  return {};
+}
+
 // ─── 메인 창 생성 ────────────────────────────────────────────────
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -120,7 +129,13 @@ function createMainWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-  mainWindow.once('ready-to-show', () => mainWindow.show());
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    const config = readConfig();
+    if (config.enableDevTools) {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    }
+  });
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 
@@ -197,6 +212,10 @@ async function openIpmiWithAutoLogin(device) {
 
   log(`시작 - 장비: ${device.name} (${device.vendor})`);
 
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -210,7 +229,7 @@ async function openIpmiWithAutoLogin(device) {
     show: false,
   });
 
-  if (isDev) win.webContents.openDevTools({ mode: 'detach' });
+  if (enableDevTools) win.webContents.openDevTools({ mode: 'detach' });
   win.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
   win.once('ready-to-show', () => { log('ready-to-show → 창 표시'); win.show(); });
   win.on('closed', () => { log('창 닫힘'); delete kvmWindows[winId]; });
@@ -253,7 +272,7 @@ async function openIpmiWithAutoLogin(device) {
 
     if (isLoginPage && device.username) {
       log('→ 로그인 스크립트 주입');
-      const script = autoLoginScripts.getLoginScript(device.vendor, device.username, device.password || '');
+      const script = autoLoginScripts.getLoginScript(device.vendor, device.username, device.password || '', autoSubmit);
       win.webContents.executeJavaScript(script)
         .then(() => log('→ 스크립트 주입 완료'))
         .catch((e) => log(`→ 스크립트 오류: ${e.message}`));
@@ -277,6 +296,10 @@ function openKvmWithAutoLogin(device) {
 
   log(`시작 - 장비: ${device.name} (${device.vendor})`);
 
+  const config = readConfig();
+  const autoSubmit = config.autoSubmit === true;
+  const enableDevTools = config.enableDevTools === true;
+
   const kvmWin = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -290,7 +313,7 @@ function openKvmWithAutoLogin(device) {
     show: false,
   });
 
-  if (isDev) kvmWin.webContents.openDevTools({ mode: 'detach' });
+  if (enableDevTools) kvmWin.webContents.openDevTools({ mode: 'detach' });
 
   kvmWin.webContents.session.setCertificateVerifyProc((_, callback) => callback(0));
 
@@ -330,7 +353,8 @@ function openKvmWithAutoLogin(device) {
       const script = autoLoginScripts.getLoginScript(
         device.vendor,
         device.username,
-        device.password || ''
+        device.password || '',
+        autoSubmit
       );
       kvmWin.webContents.executeJavaScript(script)
         .then(() => log('→ 스크립트 주입 완료'))

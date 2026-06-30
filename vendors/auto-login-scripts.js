@@ -13,30 +13,32 @@
  * @param {string} password
  * @returns {string} 브라우저에서 실행할 JS 코드 문자열
  */
-function getLoginScript(vendor, username, password) {
+function getLoginScript(vendor, username, password, autoSubmit = false) {
   const u = JSON.stringify(username);
   const p = JSON.stringify(password);
+  const submitFlag = !!autoSubmit;
 
   switch ((vendor || '').toLowerCase()) {
     case 'dell':
-      return getDellScript(u, p);
+      return getDellScript(u, p, submitFlag);
     case 'hp':
     case 'hpe':
-      return getHpScript(u, p);
+      return getHpScript(u, p, submitFlag);
     case 'supermicro':
-      return getSupermicroScript(u, p);
+      return getSupermicroScript(u, p, submitFlag);
     case 'asus':
     case 'asrock':
-      return getAsusScript(u, p);
+      return getAsusScript(u, p, submitFlag);
     default:
-      return getGenericScript(u, p);
+      return getGenericScript(u, p, submitFlag);
   }
 }
 
 // ─── Dell iDRAC ──────────────────────────────────────────────────
 // iDRAC6/7/8: #user / #password / form submit
 // iDRAC9: React 기반 SPA, 셀렉터 다름
-function getDellScript(u, p) {
+// autoSubmit이 true인 경우에만 자동 클릭/제출 수행
+function getDellScript(u, p, autoSubmit) {
   return `
 (function() {
   function tryFill() {
@@ -59,15 +61,17 @@ function getDellScript(u, p) {
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      // Submit 버튼 탐색 후 클릭, 없으면 form submit
-      var btn = document.querySelector('button[type="submit"]') ||
-                document.querySelector('input[type="submit"]') ||
-                document.querySelector('#btnOK') ||
-                document.querySelector('.btn-primary');
-      if (btn) {
-        btn.click();
-      } else if (userEl.form) {
-        userEl.form.submit();
+      if (${autoSubmit}) {
+        // Submit 버튼 탐색 후 클릭, 없으면 form submit
+        var btn = document.querySelector('button[type="submit"]') ||
+                  document.querySelector('input[type="submit"]') ||
+                  document.querySelector('#btnOK') ||
+                  document.querySelector('.btn-primary');
+        if (btn) {
+          btn.click();
+        } else if (userEl.form) {
+          userEl.form.submit();
+        }
       }
       return true;
     }
@@ -87,7 +91,7 @@ function getDellScript(u, p) {
 
 // ─── HP iLO ──────────────────────────────────────────────────────
 // iLO4/5: #username / #password
-function getHpScript(u, p) {
+function getHpScript(u, p, autoSubmit) {
   return `
 (function() {
   function tryFill() {
@@ -110,14 +114,16 @@ function getHpScript(u, p) {
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      var btn = document.querySelector('button[type="submit"]') ||
-                document.querySelector('#btn-login') ||
-                document.querySelector('.btn-primary') ||
-                document.querySelector('input[type="submit"]');
-      if (btn) {
-        btn.click();
-      } else if (userEl.form) {
-        userEl.form.submit();
+      if (${autoSubmit}) {
+        var btn = document.querySelector('button[type="submit"]') ||
+                  document.querySelector('#btn-login') ||
+                  document.querySelector('.btn-primary') ||
+                  document.querySelector('input[type="submit"]');
+        if (btn) {
+          btn.click();
+        } else if (userEl.form) {
+          userEl.form.submit();
+        }
       }
       return true;
     }
@@ -136,7 +142,7 @@ function getHpScript(u, p) {
 
 // ─── SuperMicro ───────────────────────────────────────────────────
 // name="name" / name="pwd"
-function getSupermicroScript(u, p) {
+function getSupermicroScript(u, p, autoSubmit) {
   return `
 (function() {
   function tryFill() {
@@ -151,13 +157,15 @@ function getSupermicroScript(u, p) {
       userEl.value = ${u};
       passEl.value = ${p};
 
-      var btn = document.querySelector('input[type="submit"]') ||
-                document.querySelector('button[type="submit"]') ||
-                document.querySelector('#login_word');
-      if (btn) {
-        btn.click();
-      } else if (userEl.form) {
-        userEl.form.submit();
+      if (${autoSubmit}) {
+        var btn = document.querySelector('input[type="submit"]') ||
+                  document.querySelector('button[type="submit"]') ||
+                  document.querySelector('#login_word');
+        if (btn) {
+          btn.click();
+        } else if (userEl.form) {
+          userEl.form.submit();
+        }
       }
       return true;
     }
@@ -175,7 +183,7 @@ function getSupermicroScript(u, p) {
 }
 
 // ─── ASUS / ASRock ────────────────────────────────────────────────
-function getAsusScript(u, p) {
+function getAsusScript(u, p, autoSubmit) {
   return `
 (function() {
   function tryFill() {
@@ -185,10 +193,13 @@ function getAsusScript(u, p) {
     if (userEl && passEl) {
       userEl.value = ${u};
       passEl.value = ${p};
-      var btn = document.querySelector('input[type="submit"]') ||
-                document.querySelector('button[type="submit"]');
-      if (btn) btn.click();
-      else if (userEl.form) userEl.form.submit();
+      
+      if (${autoSubmit}) {
+        var btn = document.querySelector('input[type="submit"]') ||
+                  document.querySelector('button[type="submit"]');
+        if (btn) btn.click();
+        else if (userEl.form) userEl.form.submit();
+      }
       return true;
     }
     return false;
@@ -205,7 +216,7 @@ function getAsusScript(u, p) {
 }
 
 // ─── Generic (공통 탐색) ──────────────────────────────────────────
-function getGenericScript(u, p) {
+function getGenericScript(u, p, autoSubmit) {
   return `
 (function() {
   function tryFill() {
@@ -234,12 +245,14 @@ function getGenericScript(u, p) {
       passEl.dispatchEvent(new Event('input', { bubbles: true }));
       passEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-      var btn = document.querySelector('button[type="submit"]') ||
-                document.querySelector('input[type="submit"]') ||
-                document.querySelector('.btn-primary') ||
-                document.querySelector('.login-btn');
-      if (btn) btn.click();
-      else if (userEl.form) userEl.form.submit();
+      if (${autoSubmit}) {
+        var btn = document.querySelector('button[type="submit"]') ||
+                  document.querySelector('input[type="submit"]') ||
+                  document.querySelector('.btn-primary') ||
+                  document.querySelector('.login-btn');
+        if (btn) btn.click();
+        else if (userEl.form) userEl.form.submit();
+      }
       return true;
     }
     return false;
