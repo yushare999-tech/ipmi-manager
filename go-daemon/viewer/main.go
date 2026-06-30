@@ -57,7 +57,7 @@ type winMONITORINFO struct {
 }
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.15"
+const Version = "1.5.17"
 
 // landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
 const landingPageHTML = `<!DOCTYPE html>
@@ -127,7 +127,7 @@ h1{
   <div class="logo-icon">??/div>
   <div class="logo-label">IPMI Manager</div>
 </div>
-<h1>?쒕쾭 ?곌껐 以?/h1>
+<h1>??뺤쒔 ?怨뚭퍙 餓?/h1>
 <div class="sub">Secure Management Console</div>
 <div class="ip-chip">
   <div class="dot"></div>
@@ -186,7 +186,7 @@ func main() {
 		deviceIP = p.Hostname()
 	}
 
-	// ?? Duplicate Prevention ?????????????????????????????????????????????????
+	// ???? Duplicate Prevention ??????????????????????????????????????????????????????????????????????????????????????????????????
 	// Create a named Global mutex keyed by device IP.
 	// If the mutex already exists, an ipmi-viewer for this IP is already running:
 	// bring that window to the front and exit immediately.
@@ -217,7 +217,7 @@ func main() {
 	if hMutex != 0 {
 		defer syscall.CloseHandle(syscall.Handle(hMutex))
 	}
-	// ?????????????????????????????????????????????????????????????????????????
+	// ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 	if *targetURL == "" {
 		log.Fatal("Error: --url parameter is required")
@@ -232,7 +232,7 @@ func main() {
 		*targetURL = "https://" + *targetURL
 	}
 
-	// Create WebView2 instance ??640횞480 default size
+	// Create WebView2 instance ??640??80 default size
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:     *debugMode,
 		AutoFocus: true,
@@ -247,62 +247,58 @@ func main() {
 
 	w.SetSize(640, 480, webview2.HintNone)
 
-	// Window state goroutine: find HWND after creation, center on active monitor, bring to front
-	go func() {
-		titlePtr, _ := syscall.UTF16PtrFromString(winTitle)
-		for i := 0; i < 40; i++ {
-			hwnd, _, _ := procFindWindowW.Call(0, uintptr(unsafe.Pointer(titlePtr)))
-			if hwnd != 0 {
-				if *hidden {
-					procShowWindow.Call(hwnd, swHide)
-				} else if *minimized {
-					procShowWindow.Call(hwnd, swShowMinimized)
-				} else {
-					// 1. Get current cursor position to detect active monitor
-					var pt winPOINT
-					procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
+	// Window state logic: center on active monitor and bring to front using native handle
+	hwnd := uintptr(w.Window())
+	if hwnd != 0 {
+		if *hidden {
+			procShowWindow.Call(hwnd, swHide)
+		} else if *minimized {
+			procShowWindow.Call(hwnd, swShowMinimized)
+		} else {
+			// 1. Get current cursor position to detect active monitor
+			var pt winPOINT
+			procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
 
-					// 2. Get the monitor handle where the cursor is
-					hMon, _, _ := procMonitorFromPoint.Call(
-						uintptr(pt.X),
-						uintptr(pt.Y),
-						monitorDefaultToNearest,
-					)
+			// 2. Get the monitor handle where the cursor is
+			hMon, _, _ := procMonitorFromPoint.Call(
+				uintptr(pt.X),
+				uintptr(pt.Y),
+				monitorDefaultToNearest,
+			)
 
-					// 3. Get monitor work area (excludes taskbar)
-					var mi winMONITORINFO
-					mi.CbSize = uint32(unsafe.Sizeof(mi))
-					procGetMonitorInfoW.Call(hMon, uintptr(unsafe.Pointer(&mi)))
+			// 3. Get monitor work area (excludes taskbar)
+			var mi winMONITORINFO
+			mi.CbSize = uint32(unsafe.Sizeof(mi))
+			procGetMonitorInfoW.Call(hMon, uintptr(unsafe.Pointer(&mi)))
 
-					// 4. Calculate center position on work area
-					const winW, winH = 640, 480
-					workW := mi.RcWork.Right - mi.RcWork.Left
-					workH := mi.RcWork.Bottom - mi.RcWork.Top
-					posX := mi.RcWork.Left + (workW-winW)/2 + (workW / 2)
-					posY := mi.RcWork.Top + (workH-winH)/2 + (workH / 2)
+			// 4. Calculate center position on work area (640x480)
+			const winW, winH = 640, 480
+			workW := mi.RcWork.Right - mi.RcWork.Left
+			workH := mi.RcWork.Bottom - mi.RcWork.Top
+			posX := mi.RcWork.Left + (workW-winW)/2
+			posY := mi.RcWork.Top + (workH-winH)/2
 
-					// 5. Move & resize window to center of active monitor
-					procShowWindow.Call(hwnd, swShowNormal)
-					procSetWindowPos.Call(
-						hwnd,
-						hwndTopmost,
-						uintptr(posX), uintptr(posY),
-						winW, winH,
-						swpShowWindow,
-					)
+			// 5. Move & resize window to center of active monitor
+			procShowWindow.Call(hwnd, swShowNormal)
+			procSetWindowPos.Call(
+				hwnd,
+				hwndTopmost,
+				uintptr(posX), uintptr(posY),
+				winW, winH,
+				swpShowWindow,
+			)
 
-					// 6. Bring to front, then restore normal Z-order
-					procSetForegroundWin.Call(hwnd)
-					procBringWindowToTop.Call(hwnd)
-					time.Sleep(100 * time.Millisecond)
-					procSetWindowPos.Call(hwnd, hwndNoTopmost, uintptr(posX), uintptr(posY), winW, winH, swpShowWindow)
-				}
-				break
-			}
-			time.Sleep(50 * time.Millisecond)
-
+			// 6. Bring to front, then restore normal Z-order
+			procSetForegroundWin.Call(hwnd)
+			procBringWindowToTop.Call(hwnd)
+			
+			// Restore normal Z-order in background to prevent locking user out
+			go func() {
+				time.Sleep(150 * time.Millisecond)
+				procSetWindowPos.Call(hwnd, hwndNoTopmost, uintptr(posX), uintptr(posY), winW, winH, swpShowWindow)
+			}()
 		}
-	}()
+	}
 
 	// Escape credential values for safe JS embedding
 	escapedURL := strings.ReplaceAll(*targetURL, "'", "\\'")
