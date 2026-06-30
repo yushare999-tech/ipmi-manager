@@ -275,6 +275,40 @@ const SettingsHTML = `<!DOCTYPE html>
             word-break: break-all;
         }
 
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1rem;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
+
         /* Vendor Group Box */
         .vendor-group-card {
             background: rgba(255, 255, 255, 0.012);
@@ -284,6 +318,15 @@ const SettingsHTML = `<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .vendor-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
         }
 
         .vendor-group-title {
@@ -295,6 +338,19 @@ const SettingsHTML = `<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .group-toggle-arrow {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .vendor-group-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.4rem;
         }
 
         /* Rule Item Box */
@@ -557,9 +613,12 @@ const SettingsHTML = `<!DOCTYPE html>
                     <span>스마트 라우팅 규칙 매트릭스</span>
                     <button class="btn btn-mini" onclick="openAddRuleModal()">➕ 규칙 추가</button>
                 </div>
-                <div class="info-banner">
-                    벤더별로 묶인 그룹 박스에서 비교가 수행됩니다. 각 벤더 내부에서 <strong>구체적인 모델 규칙</strong>이 먼저 평가된 후, 일치하지 않으면 <strong>벤더 디폴트 규칙(*)</strong>이 적용됩니다.
+                
+                <!-- Filter Buttons Bar -->
+                <div class="filter-bar" id="filter-bar">
+                    <!-- Filters render dynamically -->
                 </div>
+
                 <div class="list-container" id="rule-container" style="gap: 1.2rem;">
                     <!-- Rules render dynamically in vendor groups -->
                 </div>
@@ -690,6 +749,8 @@ const SettingsHTML = `<!DOCTYPE html>
     <script>
         let configData = { rules: [], profiles: [], js_proxy_url: '', js_proxy_token: '' };
         let profileStatus = {};
+        let activeVendorFilter = ''; // 현재 적용된 벤더 필터 값 ('': 필터 없음)
+        let collapsedStates = {}; // 벤더 그룹별 접힘 상태 캐시
 
         window.addEventListener('DOMContentLoaded', () => {
             loadConfig();
@@ -760,25 +821,62 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
-        // 벤더별 그룹 박스 렌더링
+        // 아코디언 토글 제어
+        funcToggleGroup = (vendor) => {
+            const body = document.getElementById('group-body-' + vendor);
+            const arrow = document.getElementById('group-arrow-' + vendor);
+            if (!body) return;
+
+            const isCollapsed = body.style.display === 'none';
+            if (isCollapsed) {
+                body.style.display = 'flex';
+                arrow.innerText = '▲';
+                collapsedStates[vendor] = false;
+            } else {
+                body.style.display = 'none';
+                arrow.innerText = '▼';
+                collapsedStates[vendor] = true;
+            }
+        };
+
+        // 벤더 필터 토글 클릭
+        function toggleFilter(vendor) {
+            if (activeVendorFilter === vendor) {
+                // 이미 활성화된 필터를 다시 누르면 해제
+                activeVendorFilter = '';
+            } else {
+                // 특정 벤더 필터 활성화
+                activeVendorFilter = vendor;
+                // 필터링된 벤더 그룹은 자동으로 펼쳐지도록 셋팅
+                collapsedStates[vendor] = false;
+            }
+            renderRules();
+        }
+
+        // 벤더별 그룹 박스 렌더링 (글로벌 디폴트 최상단 노출 및 기본 접힘 구현)
         function renderRules() {
             const container = document.getElementById('rule-container');
+            const filterBar = document.getElementById('filter-bar');
             container.innerHTML = '';
+            filterBar.innerHTML = '';
 
             if (!configData.rules || configData.rules.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-muted);">등록된 규칙이 없습니다.</div>';
                 return;
             }
 
-            // 1. 벤더별로 그룹핑
+            // 1. 벤더별 그룹핑 분리
             const groups = {};
             const fallbackRules = [];
+            const vendorsSet = new Set(); // 고유 벤더명 목록
 
             configData.rules.forEach(rule => {
                 if (rule.vendor === '*' && rule.model_pattern === '*') {
                     fallbackRules.push(rule);
                 } else {
                     const vendorKey = rule.vendor.toLowerCase();
+                    vendorsSet.add(vendorKey);
+                    
                     if (!groups[vendorKey]) {
                         groups[vendorKey] = [];
                     }
@@ -786,18 +884,109 @@ const SettingsHTML = `<!DOCTYPE html>
                 }
             });
 
-            // 2. 벤더 그룹 렌더링
+            // 2. 벤더 필터 버튼 생성 및 렌더링
+            const sortedVendors = Array.from(vendorsSet).sort();
+            
+            // 필터 전체 버튼
+            const allBtn = document.createElement('button');
+            allBtn.className = 'filter-btn' + (activeVendorFilter === '' ? ' active' : '');
+            allBtn.innerText = '전체 보기';
+            allBtn.onclick = () => { activeVendorFilter = ''; renderRules(); };
+            filterBar.appendChild(allBtn);
+
+            sortedVendors.forEach(vendor => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn' + (activeVendorFilter === vendor ? ' active' : '');
+                btn.innerText = vendor.toUpperCase();
+                btn.onclick = () => toggleFilter(vendor);
+                filterBar.appendChild(btn);
+            });
+
+            // 3. [최상단] 글로벌 Fallback 렌더링 (항상 열린 상태로 최상단 배치)
+            if (fallbackRules.length > 0 && (activeVendorFilter === '')) {
+                const fallbackCard = document.createElement('div');
+                fallbackCard.className = 'vendor-group-card';
+                fallbackCard.style.borderColor = 'rgba(0, 240, 255, 0.15)';
+                fallbackCard.style.background = 'rgba(0, 240, 255, 0.01)';
+
+                const header = document.createElement('div');
+                header.className = 'vendor-group-header';
+                header.style.cursor = 'default';
+
+                const title = document.createElement('h3');
+                title.className = 'vendor-group-title';
+                title.style.color = 'var(--primary)';
+                title.innerHTML = '🌐 글로벌 디폴트 Fallback (최우선 평가)';
+                header.appendChild(title);
+                fallbackCard.appendChild(header);
+
+                fallbackRules.forEach(rule => {
+                    const matchedProfile = configData.profiles.find(p => p.id === rule.profile_id);
+                    const profileName = matchedProfile ? matchedProfile.name : '기본 프로필';
+
+                    const item = document.createElement('div');
+                    item.className = 'rule-item';
+                    item.style.background = 'rgba(0,0,0,0.2)';
+
+                    let ruleHtml = '\n' +
+                    '    <div class="rule-info">\n' +
+                    '        <div class="rule-badge-row">\n' +
+                    '            <span class="badge badge-type-web">WEB (브라우저)</span>\n' +
+                    '            <span class="badge badge-profile">프로필: ' + profileName + '</span>\n' +
+                    '        </div>\n' +
+                    '        <p class="rule-desc">\n' +
+                    '            장비 타입이 ipmi가 아니거나, 스마트 라우팅 규칙 매칭에 실패 시 작동하는 전체 시스템 폴백 규칙입니다.\n' +
+                    '        </p>\n' +
+                    '    </div>\n' +
+                    '    <div class="rule-actions">\n' +
+                    '        <span style="font-size:0.8rem; color:var(--text-muted); padding-right:0.5rem;">시스템 기본 규칙</span>\n' +
+                    '    </div>\n';
+
+                    item.innerHTML = ruleHtml;
+                    fallbackCard.appendChild(item);
+                });
+
+                container.appendChild(fallbackCard);
+            }
+
+            // 4. [그 아래] 벤더 그룹 렌더링
             Object.keys(groups).sort().forEach(vendor => {
+                // 필터 조건이 있다면 일치하는 벤더만 렌더링
+                if (activeVendorFilter !== '' && activeVendorFilter !== vendor) {
+                    return;
+                }
+
                 const groupCard = document.createElement('div');
                 groupCard.className = 'vendor-group-card';
+
+                // 헤더 클릭 시 아코디언 토글
+                const header = document.createElement('div');
+                header.className = 'vendor-group-header';
+                header.onclick = () => funcToggleGroup(vendor);
 
                 const groupTitle = document.createElement('h3');
                 groupTitle.className = 'vendor-group-title';
                 groupTitle.innerHTML = '📂 ' + vendor.toUpperCase() + ' 벤더 그룹';
-                groupCard.appendChild(groupTitle);
+                header.appendChild(groupTitle);
+
+                const arrow = document.createElement('span');
+                arrow.className = 'group-toggle-arrow';
+                arrow.id = 'group-arrow-' + vendor;
+                
+                // 접힘 상태 판별 (필터링 중이거나 캐시된 상태에 따름. 기본값은 접힘=true)
+                if (collapsedStates[vendor] === undefined) {
+                    collapsedStates[vendor] = true; 
+                }
+                
+                const isCollapsed = collapsedStates[vendor];
+                arrow.innerText = isCollapsed ? '▼' : '▲';
+                header.appendChild(arrow);
+                groupCard.appendChild(header);
 
                 const groupBody = document.createElement('div');
-                groupBody.className = 'list-container';
+                groupBody.className = 'vendor-group-body';
+                groupBody.id = 'group-body-' + vendor;
+                groupBody.style.display = isCollapsed ? 'none' : 'flex';
 
                 const rulesInGroup = groups[vendor];
                 rulesInGroup.forEach((rule, localIdx) => {
@@ -833,11 +1022,11 @@ const SettingsHTML = `<!DOCTYPE html>
                     '    </div>\n' +
                     '    <div class="rule-actions">\n' +
                     '        <div class="order-btn-group">\n' +
-                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', -1)">▲</button>\n' +
-                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', 1)">▼</button>\n' +
+                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', -1); event.stopPropagation();">▲</button>\n' +
+                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', 1); event.stopPropagation();">▼</button>\n' +
                     '        </div>\n' +
-                    '        <button class="btn btn-secondary btn-mini" onclick="openEditRuleById(\'' + rule.id + '\')">📝</button>\n' +
-                    '        <button class="btn btn-danger btn-mini" onclick="deleteRule(\'' + rule.id + '\')">❌</button>\n' +
+                    '        <button class="btn btn-secondary btn-mini" onclick="openEditRuleById(\'' + rule.id + '\'); event.stopPropagation();">📝</button>\n' +
+                    '        <button class="btn btn-danger btn-mini" onclick="deleteRule(\'' + rule.id + '\'); event.stopPropagation();">❌</button>\n' +
                     '    </div>\n';
 
                     item.innerHTML = ruleHtml;
@@ -847,48 +1036,6 @@ const SettingsHTML = `<!DOCTYPE html>
                 groupCard.appendChild(groupBody);
                 container.appendChild(groupCard);
             });
-
-            // 3. 글로벌 Fallback 렌더링
-            if (fallbackRules.length > 0) {
-                const fallbackCard = document.createElement('div');
-                fallbackCard.className = 'vendor-group-card';
-                fallbackCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                fallbackCard.style.background = 'rgba(255, 255, 255, 0.005)';
-
-                const title = document.createElement('h3');
-                title.className = 'vendor-group-title';
-                title.style.color = 'var(--text-muted)';
-                title.innerHTML = '🌐 글로벌 디폴트 Fallback';
-                fallbackCard.appendChild(title);
-
-                fallbackRules.forEach(rule => {
-                    const matchedProfile = configData.profiles.find(p => p.id === rule.profile_id);
-                    const profileName = matchedProfile ? matchedProfile.name : '기본 프로필';
-
-                    const item = document.createElement('div');
-                    item.className = 'rule-item';
-                    item.style.background = 'rgba(0,0,0,0.15)';
-
-                    let ruleHtml = '\n' +
-                    '    <div class="rule-info">\n' +
-                    '        <div class="rule-badge-row">\n' +
-                    '            <span class="badge badge-type-web">WEB (브라우저)</span>\n' +
-                    '            <span class="badge badge-profile">프로필: ' + profileName + '</span>\n' +
-                    '        </div>\n' +
-                    '        <p class="rule-desc">\n' +
-                    '            모든 매칭 규칙 적용 실패 시 수행되는 최종 웹 연결 폴백 규칙입니다.\n' +
-                    '        </p>\n' +
-                    '    </div>\n' +
-                    '    <div class="rule-actions">\n' +
-                    '        <span style="font-size:0.8rem; color:var(--text-muted); padding-right:0.5rem;">시스템 기본 규칙</span>\n' +
-                    '    </div>\n';
-
-                    item.innerHTML = ruleHtml;
-                    fallbackCard.appendChild(item);
-                });
-
-                container.appendChild(fallbackCard);
-            }
         }
 
         function saveProxyConfig() {
@@ -1076,7 +1223,6 @@ const SettingsHTML = `<!DOCTYPE html>
 
         // 벤더 그룹 내부에서의 규칙 우선순위 교환
         function moveRuleInGroup(vendor, localIdx, direction) {
-            // 1. 해당 벤더 그룹의 규칙들만 필터링
             const groupRules = configData.rules.filter(r => r.vendor.toLowerCase() === vendor.toLowerCase());
             
             const targetIdx = localIdx + direction;
@@ -1085,10 +1231,8 @@ const SettingsHTML = `<!DOCTYPE html>
             const currentRule = groupRules[localIdx];
             const targetRule = groupRules[targetIdx];
 
-            // 벤더 디폴트 규칙(*)은 항상 그룹 최하단이어야 하므로 스왑 제한
             if (currentRule.model_pattern === '*' || targetRule.model_pattern === '*') return;
 
-            // 두 규칙의 priority 값 스왑
             const temp = currentRule.priority;
             currentRule.priority = targetRule.priority;
             targetRule.priority = temp;
