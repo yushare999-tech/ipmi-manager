@@ -40,11 +40,20 @@ const { ipcRenderer } = require('electron');
     const isDashboard = dashIndicators.some(kw => currentUrl.includes(kw));
     if (isDashboard && !dashboardDetected) {
       dashboardDetected = true;
-      console.log('[Preload] 대시보드 진입 감지 → 1.5초 후 새로고침 실행');
       if (checkTimer) clearInterval(checkTimer);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      
+      const isIdrac7 = (device.version || '').toLowerCase().includes('idrac7') || 
+                       (device.model || '').toLowerCase().includes('r620') ||
+                       (device.version || '').startsWith('1.');
+
+      if (!isIdrac7) {
+        console.log('[Preload] 대시보드 진입 감지 → 1.5초 후 새로고침 실행');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        console.log('[Preload] iDRAC 7 대시보드 진입 감지 → 세션 유실 방지를 위해 새로고침 생략');
+      }
       return;
     }
 

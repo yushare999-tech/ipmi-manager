@@ -238,7 +238,11 @@ async function openIpmiWithAutoLogin(device) {
   kvmWindows[winId] = win;
 
   // Dell iDRAC REST API 직접 로그인 시도
-  if (device.username && (device.vendor || '').toLowerCase() === 'dell') {
+  const isIdrac7 = (device.version || '').toLowerCase().includes('idrac7') || 
+                   (device.model || '').toLowerCase().includes('r620') ||
+                   (device.version || '').startsWith('1.'); // iDRAC 7 이하 대역 판별
+
+  if (device.username && (device.vendor || '').toLowerCase() === 'dell' && !isIdrac7) {
     log('Dell iDRAC REST API 로그인 시도');
     try {
       const loginResult = await idracLogin(device);
