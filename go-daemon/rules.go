@@ -13,7 +13,7 @@ import (
 type Profile struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
-	JavaPath    string `json:"java_path"`      // javaws.exe 경로
+	JavaPath    string `json:"java_path"`      // javaws.exe 경로 (동일 폴더 내 java.exe 존재 필수)
 	IkvmJarPath string `json:"ikvm_jar_path"`  // iKVM.jar 경로
 	IsDefault   bool   `json:"is_default"`     // 기본 프로필 여부
 	Description string `json:"description"`
@@ -26,7 +26,7 @@ type Rule struct {
 	ModelPattern string `json:"model_pattern"` // 모델명 매칭 키워드 (예: R630, X10, *)
 	ConnectType  string `json:"connect_type"`  // 실행할 방식 (ikvm, jnlp, WEB)
 	ProfileID    string `json:"profile_id"`    // 연동할 프로필 ID
-	Priority     int    `json:"priority"`      // 우선순위 (낮을수록 우선 매칭)
+	Priority     int    `json:"priority"`      // 동일 그룹 내 우선순위
 	Description  string `json:"description"`
 }
 
@@ -57,7 +57,7 @@ func GetDefaultProfiles() []Profile {
 			JavaPath:    "C:\\Program Files (x86)\\Java\\jre1.8.0_291\\bin\\javaws.exe",
 			IkvmJarPath: "C:\\Users\\kuri\\MyProJ\\ipmi-manager\\IPMIVIEW\\2.14.0\\extracted\\D_\\IPMI20\\FILES FOR IPMI VIEW\\iKVM.jar",
 			IsDefault:   true,
-			Description: "기본 자바 8 및 내장 Supermicro iKVM.jar(v2.14.0) 구동용 프로필",
+			Description: "기본 자바 8 및 내장 Supermicro iKVM.jar(v2.14.0) 구동용 프로필 (javaws.exe / java.exe 공존)",
 		},
 	}
 }
@@ -93,12 +93,21 @@ func GetDefaultRules() []Rule {
 			Description:  "Supermicro X11 세대 장비 iKVM.jar 직접 구동",
 		},
 		{
+			ID:           "rule_supermicro_default",
+			Vendor:       "supermicro",
+			ModelPattern: "*",
+			ConnectType:  "ikvm",
+			ProfileID:    "profile_default",
+			Priority:     9,
+			Description:  "Supermicro 벤더 기본 iKVM.jar 적용",
+		},
+		{
 			ID:           "rule_dell_idrac8_r630",
 			Vendor:       "dell",
 			ModelPattern: "r630",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     4,
+			Priority:     1,
 			Description:  "Dell iDRAC 8 (R630) - REST 세션 토큰 연동 JNLP 구동",
 		},
 		{
@@ -107,7 +116,7 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "r730",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     5,
+			Priority:     2,
 			Description:  "Dell iDRAC 8 (R730) - REST 세션 토큰 연동 JNLP 구동",
 		},
 		{
@@ -116,7 +125,7 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "r640",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
-			Priority:     6,
+			Priority:     3,
 			Description:  "Dell iDRAC 9 (R640) - 내장 HTML5 웹 콘솔 직접 연결",
 		},
 		{
@@ -125,8 +134,17 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "r740",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
-			Priority:     7,
+			Priority:     4,
 			Description:  "Dell iDRAC 9 (R740) - 내장 HTML5 웹 콘솔 직접 연결",
+		},
+		{
+			ID:           "rule_dell_default",
+			Vendor:       "dell",
+			ModelPattern: "*",
+			ConnectType:  "WEB",
+			ProfileID:    "profile_default",
+			Priority:     9,
+			Description:  "Dell 벤더 기본 웹 콘솔 연결",
 		},
 		{
 			ID:           "rule_hp_ilo3_jnlp",
@@ -134,7 +152,7 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "ilo3",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     8,
+			Priority:     1,
 			Description:  "HP iLO 3 장비 JNLP (자바 웹 스타트) 구동",
 		},
 		{
@@ -143,7 +161,7 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "ilo4",
 			ConnectType:  "jnlp",
 			ProfileID:    "profile_default",
-			Priority:     9,
+			Priority:     2,
 			Description:  "HP iLO 4 장비 JNLP (자바 웹 스타트) 구동",
 		},
 		{
@@ -152,8 +170,17 @@ func GetDefaultRules() []Rule {
 			ModelPattern: "ilo5",
 			ConnectType:  "WEB",
 			ProfileID:    "profile_default",
-			Priority:     10,
+			Priority:     3,
 			Description:  "HP iLO 5 장비 HTML5 웹 콘솔 직접 연결",
+		},
+		{
+			ID:           "rule_hp_default",
+			Vendor:       "hp",
+			ModelPattern: "*",
+			ConnectType:  "WEB",
+			ProfileID:    "profile_default",
+			Priority:     9,
+			Description:  "HP 벤더 기본 웹 콘솔 연결",
 		},
 		{
 			ID:           "rule_fallback_default",
@@ -179,7 +206,7 @@ func LoadRulesConfig() (RulesConfig, error) {
 	if _, err := os.Stat(rulesConfigPath); os.IsNotExist(err) {
 		config.Profiles = GetDefaultProfiles()
 		config.Rules = GetDefaultRules()
-		config.JsProxyURL = "https://js-proxy.jscomz.net/api/devices" // 실제 API 엔드포인트 기본값 지정
+		config.JsProxyURL = "https://js-proxy.jscomz.net/api/devices"
 		config.JsProxyToken = ""
 		err = SaveRulesConfig(config)
 		if err != nil {
@@ -198,7 +225,7 @@ func LoadRulesConfig() (RulesConfig, error) {
 		return config, err
 	}
 
-	// 규칙 우선순위 정렬
+	// 규칙 계층형 정렬
 	SortRules(config.Rules)
 
 	return config, nil
@@ -220,10 +247,45 @@ func SaveRulesConfig(config RulesConfig) error {
 	return ioutil.WriteFile(rulesConfigPath, fileBytes, 0644)
 }
 
-// SortRules 규칙 슬라이스를 우선순위 오름차순으로 정렬
+// SortRules 규칙을 [벤더 그룹화] -> [구체적 모델 우선] -> [벤더 디폴트(*)] -> [글로벌 Fallback] 순으로 강제 정렬
 func SortRules(rules []Rule) {
 	sort.Slice(rules, func(i, j int) bool {
-		return rules[i].Priority < rules[j].Priority
+		rI := rules[i]
+		rJ := rules[j]
+
+		// 1. 글로벌 Fallback (vendor가 "*")은 항상 가장 마지막으로 정렬
+		isFallbackI := rI.Vendor == "*" && rI.ModelPattern == "*"
+		isFallbackJ := rJ.Vendor == "*" && rJ.ModelPattern == "*"
+		if isFallbackI && !isFallbackJ {
+			return false
+		}
+		if !isFallbackI && isFallbackJ {
+			return true
+		}
+
+		// 2. 벤더명이 다르면 벤더명 알파벳 순으로 그룹화 정렬
+		if rI.Vendor != rJ.Vendor {
+			return rI.Vendor < rJ.Vendor
+		}
+
+		// 3. 동일 벤더 그룹 내부 정렬
+		// 3-1. 모델명이 "*" 인 벤더 디폴트 규칙은 그룹 내 가장 마지막으로 정렬
+		isDefaultI := rI.ModelPattern == "*"
+		isDefaultJ := rJ.ModelPattern == "*"
+		if isDefaultI && !isDefaultJ {
+			return false
+		}
+		if !isDefaultI && isDefaultJ {
+			return true
+		}
+
+		// 3-2. 둘 다 일반 모델 규칙이거나 둘 다 디폴트 규칙이면 Priority 순 정렬
+		if rI.Priority != rJ.Priority {
+			return rI.Priority < rJ.Priority
+		}
+
+		// 3-3. 우선순위도 같으면 모델명 알파벳 순 정렬
+		return rI.ModelPattern < rJ.ModelPattern
 	})
 }
 

@@ -275,12 +275,34 @@ const SettingsHTML = `<!DOCTYPE html>
             word-break: break-all;
         }
 
+        /* Vendor Group Box */
+        .vendor-group-card {
+            background: rgba(255, 255, 255, 0.012);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .vendor-group-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         /* Rule Item Box */
         .rule-item {
             background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 12px;
-            padding: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -288,27 +310,27 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .rule-item:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.025);
             border-color: rgba(0, 240, 255, 0.15);
         }
 
         .rule-info {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.35rem;
         }
 
         .rule-badge-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
         }
 
         .badge {
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-            font-size: 0.72rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -349,7 +371,7 @@ const SettingsHTML = `<!DOCTYPE html>
         }
 
         .rule-desc {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             line-height: 1.4;
         }
@@ -536,10 +558,10 @@ const SettingsHTML = `<!DOCTYPE html>
                     <button class="btn btn-mini" onclick="openAddRuleModal()">➕ 규칙 추가</button>
                 </div>
                 <div class="info-banner">
-                    호출 API가 접수되면 등록된 규칙 순서대로 판별을 시도합니다. 매칭 규칙의 연동 프로필 환경이 적용되며, 매칭 실패 혹은 연동 실패 시 기본 <strong>WEB</strong> 방식으로 자동 폴백됩니다.
+                    벤더별로 묶인 그룹 박스에서 비교가 수행됩니다. 각 벤더 내부에서 <strong>구체적인 모델 규칙</strong>이 먼저 평가된 후, 일치하지 않으면 <strong>벤더 디폴트 규칙(*)</strong>이 적용됩니다.
                 </div>
-                <div class="list-container" id="rule-container">
-                    <!-- Rules render dynamically -->
+                <div class="list-container" id="rule-container" style="gap: 1.2rem;">
+                    <!-- Rules render dynamically in vendor groups -->
                 </div>
             </div>
 
@@ -547,7 +569,7 @@ const SettingsHTML = `<!DOCTYPE html>
             <div class="card guide-section">
                 <h2 class="card-title"><span>Js-Proxy 연동 설정 (IP 기준 조회 API)</span></h2>
                 
-                <!-- Js-Proxy Form Moved Here -->
+                <!-- Js-Proxy Form -->
                 <div class="inline-proxy-form">
                     <div class="form-group" style="flex: 2;">
                         <label for="js_proxy_url">Js-Proxy API URL</label>
@@ -601,11 +623,11 @@ const SettingsHTML = `<!DOCTYPE html>
             <input type="hidden" id="rule_id">
             <div class="form-group">
                 <label for="rule_vendor">대상 벤더 (Vendor)</label>
-                <input type="text" id="rule_vendor" placeholder="예: supermicro, dell, *">
+                <input type="text" id="rule_vendor" placeholder="예: supermicro, dell, hp">
             </div>
             <div class="form-group">
                 <label for="rule_model">모델 매칭 패턴 (Model Pattern)</label>
-                <input type="text" id="rule_model" placeholder="예: x10, r630, *">
+                <input type="text" id="rule_model" placeholder="예: x10, r630 (벤더 디폴트는 * 입력)">
             </div>
             <div class="form-group">
                 <label for="rule_type">KVM 실행 방식 (Action)</label>
@@ -622,8 +644,8 @@ const SettingsHTML = `<!DOCTYPE html>
                 </select>
             </div>
             <div class="form-group">
-                <label for="rule_priority">우선순위 (Priority)</label>
-                <input type="number" id="rule_priority" min="1" max="98">
+                <label for="rule_priority">동일 그룹 내 우선순위 (Priority)</label>
+                <input type="number" id="rule_priority" min="1" max="98" value="1">
             </div>
             <div class="form-group">
                 <label for="rule_desc">규칙 설명</label>
@@ -646,8 +668,9 @@ const SettingsHTML = `<!DOCTYPE html>
                 <input type="text" id="profile_name" placeholder="예: Java 8 최신, JRE 8u161 구형">
             </div>
             <div class="form-group">
-                <label for="profile_java_path">javaws.exe 물리 경로</label>
+                <label for="profile_java_path">Java 런타임 경로 (javaws.exe / java.exe)</label>
                 <input type="text" id="profile_java_path" placeholder="C:\\Program Files (x86)\\Java\\...\\javaws.exe">
+                <span style="font-size:0.75rem; color:var(--primary); line-height: 1.3;">※ 지정하시는 javaws.exe 파일과 동일한 bin 폴더 내에 java.exe가 공존해야 합니다. (실시간 체크 반영)</span>
             </div>
             <div class="form-group">
                 <label for="profile_ikvm_path">iKVM.jar 물리 경로</label>
@@ -737,6 +760,7 @@ const SettingsHTML = `<!DOCTYPE html>
             });
         }
 
+        // 벤더별 그룹 박스 렌더링
         function renderRules() {
             const container = document.getElementById('rule-container');
             container.innerHTML = '';
@@ -746,56 +770,125 @@ const SettingsHTML = `<!DOCTYPE html>
                 return;
             }
 
-            configData.rules.forEach((rule, index) => {
-                const isDefaultFallback = (rule.vendor === '*' && rule.model_pattern === '*');
-                const matchedProfile = configData.profiles.find(p => p.id === rule.profile_id);
-                const profileName = matchedProfile ? matchedProfile.name : '기본 프로필';
+            // 1. 벤더별로 그룹핑
+            const groups = {};
+            const fallbackRules = [];
 
-                const item = document.createElement('div');
-                item.className = 'rule-item';
-                
-                let typeBadgeClass = 'badge-type-web';
-                let typeName = 'WEB';
-                if (rule.connect_type === 'ikvm') {
-                    typeBadgeClass = 'badge-type-ikvm';
-                    typeName = 'ikvm';
-                } else if (rule.connect_type === 'jnlp') {
-                    typeBadgeClass = 'badge-type-jnlp';
-                    typeName = 'jnlp';
-                }
-
-                let ruleHtml = '\n' +
-                '    <div class="rule-info">\n' +
-                '        <div class="rule-badge-row">\n' +
-                '            <span class="badge badge-priority">우선순위 ' + rule.priority + '</span>\n' +
-                '            <span class="badge badge-vendor">' + rule.vendor.toUpperCase() + '</span>\n' +
-                '            <span class="badge ' + typeBadgeClass + '">' + typeName + '</span>\n' +
-                '            <span class="badge badge-profile">프로필: ' + profileName + '</span>\n' +
-                '        </div>\n' +
-                '        <p class="rule-desc">\n' +
-                '            ' + (rule.description || '설명 없음') + ' \n' +
-                '            (매칭 패턴: 벤더 <span class="rule-pattern">' + rule.vendor + '</span> / 모델 <span class="rule-pattern">' + rule.model_pattern + '</span>)\n' +
-                '        </p>\n' +
-                '    </div>\n' +
-                '    <div class="rule-actions">\n';
-
-                if (!isDefaultFallback) {
-                    ruleHtml += '\n' +
-                    '        <div class="order-btn-group">\n' +
-                    '            <button class="order-btn" onclick="moveRule(' + index + ', -1)">▲</button>\n' +
-                    '            <button class="order-btn" onclick="moveRule(' + index + ', 1)">▼</button>\n' +
-                    '        </div>\n' +
-                    '        <button class="btn btn-secondary btn-mini" onclick="openEditRuleModal(' + index + ')">📝 수정</button>\n' +
-                    '        <button class="btn btn-danger btn-mini" onclick="deleteRule(\'' + rule.id + '\')">❌ 삭제</button>\n';
+            configData.rules.forEach(rule => {
+                if (rule.vendor === '*' && rule.model_pattern === '*') {
+                    fallbackRules.push(rule);
                 } else {
-                    ruleHtml += '        <span style="font-size:0.8rem; color:var(--text-muted);">Fallback 시스템 규칙</span>\n';
+                    const vendorKey = rule.vendor.toLowerCase();
+                    if (!groups[vendorKey]) {
+                        groups[vendorKey] = [];
+                    }
+                    groups[vendorKey].push(rule);
                 }
-                
-                ruleHtml += '    </div>\n';
-
-                item.innerHTML = ruleHtml;
-                container.appendChild(item);
             });
+
+            // 2. 벤더 그룹 렌더링
+            Object.keys(groups).sort().forEach(vendor => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'vendor-group-card';
+
+                const groupTitle = document.createElement('h3');
+                groupTitle.className = 'vendor-group-title';
+                groupTitle.innerHTML = '📂 ' + vendor.toUpperCase() + ' 벤더 그룹';
+                groupCard.appendChild(groupTitle);
+
+                const groupBody = document.createElement('div');
+                groupBody.className = 'list-container';
+
+                const rulesInGroup = groups[vendor];
+                rulesInGroup.forEach((rule, localIdx) => {
+                    const matchedProfile = configData.profiles.find(p => p.id === rule.profile_id);
+                    const profileName = matchedProfile ? matchedProfile.name : '기본 프로필';
+
+                    const item = document.createElement('div');
+                    item.className = 'rule-item';
+
+                    let typeBadgeClass = 'badge-type-web';
+                    let typeName = 'WEB';
+                    if (rule.connect_type === 'ikvm') {
+                        typeBadgeClass = 'badge-type-ikvm';
+                        typeName = 'ikvm';
+                    } else if (rule.connect_type === 'jnlp') {
+                        typeBadgeClass = 'badge-type-jnlp';
+                        typeName = 'jnlp';
+                    }
+
+                    const isDefaultRule = rule.model_pattern === '*';
+                    
+                    let ruleHtml = '\n' +
+                    '    <div class="rule-info">\n' +
+                    '        <div class="rule-badge-row">\n' +
+                    '            <span class="badge ' + typeBadgeClass + '">' + typeName + '</span>\n' +
+                    '            <span class="badge badge-profile">프로필: ' + profileName + '</span>\n' +
+                    '            ' + (isDefaultRule ? '<span class="badge" style="background:rgba(255,255,255,0.05); color:#ffd080">벤더 디폴트 규칙</span>' : '') + '\n' +
+                    '        </div>\n' +
+                    '        <p class="rule-desc">\n' +
+                    '            ' + (rule.description || '설명 없음') + ' \n' +
+                    '            (매칭 패턴: 벤더 <span class="rule-pattern">' + rule.vendor + '</span> / 모델 <span class="rule-pattern">' + rule.model_pattern + '</span>)\n' +
+                    '        </p>\n' +
+                    '    </div>\n' +
+                    '    <div class="rule-actions">\n' +
+                    '        <div class="order-btn-group">\n' +
+                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', -1)">▲</button>\n' +
+                    '            <button class="order-btn" onclick="moveRuleInGroup(\'' + vendor + '\', ' + localIdx + ', 1)">▼</button>\n' +
+                    '        </div>\n' +
+                    '        <button class="btn btn-secondary btn-mini" onclick="openEditRuleById(\'' + rule.id + '\')">📝</button>\n' +
+                    '        <button class="btn btn-danger btn-mini" onclick="deleteRule(\'' + rule.id + '\')">❌</button>\n' +
+                    '    </div>\n';
+
+                    item.innerHTML = ruleHtml;
+                    groupBody.appendChild(item);
+                });
+
+                groupCard.appendChild(groupBody);
+                container.appendChild(groupCard);
+            });
+
+            // 3. 글로벌 Fallback 렌더링
+            if (fallbackRules.length > 0) {
+                const fallbackCard = document.createElement('div');
+                fallbackCard.className = 'vendor-group-card';
+                fallbackCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                fallbackCard.style.background = 'rgba(255, 255, 255, 0.005)';
+
+                const title = document.createElement('h3');
+                title.className = 'vendor-group-title';
+                title.style.color = 'var(--text-muted)';
+                title.innerHTML = '🌐 글로벌 디폴트 Fallback';
+                fallbackCard.appendChild(title);
+
+                fallbackRules.forEach(rule => {
+                    const matchedProfile = configData.profiles.find(p => p.id === rule.profile_id);
+                    const profileName = matchedProfile ? matchedProfile.name : '기본 프로필';
+
+                    const item = document.createElement('div');
+                    item.className = 'rule-item';
+                    item.style.background = 'rgba(0,0,0,0.15)';
+
+                    let ruleHtml = '\n' +
+                    '    <div class="rule-info">\n' +
+                    '        <div class="rule-badge-row">\n' +
+                    '            <span class="badge badge-type-web">WEB (브라우저)</span>\n' +
+                    '            <span class="badge badge-profile">프로필: ' + profileName + '</span>\n' +
+                    '        </div>\n' +
+                    '        <p class="rule-desc">\n' +
+                    '            모든 매칭 규칙 적용 실패 시 수행되는 최종 웹 연결 폴백 규칙입니다.\n' +
+                    '        </p>\n' +
+                    '    </div>\n' +
+                    '    <div class="rule-actions">\n' +
+                    '        <span style="font-size:0.8rem; color:var(--text-muted); padding-right:0.5rem;">시스템 기본 규칙</span>\n' +
+                    '    </div>\n';
+
+                    item.innerHTML = ruleHtml;
+                    fallbackCard.appendChild(item);
+                });
+
+                container.appendChild(fallbackCard);
+            }
         }
 
         function saveProxyConfig() {
@@ -902,15 +995,16 @@ const SettingsHTML = `<!DOCTYPE html>
             document.getElementById('rule_vendor').value = '';
             document.getElementById('rule_model').value = '';
             document.getElementById('rule_type').value = 'ikvm';
-            document.getElementById('rule_priority').value = (configData.rules.length > 0) ? configData.rules[configData.rules.length - 1].priority + 1 : 10;
+            document.getElementById('rule_priority').value = 1;
             document.getElementById('rule_desc').value = '';
             
             buildProfileSelectOptions('');
             document.getElementById('rule-modal').classList.add('active');
         }
 
-        function openEditRuleModal(index) {
-            const rule = configData.rules[index];
+        function openEditRuleById(id) {
+            const rule = configData.rules.find(r => r.id === id);
+            if (!rule) return;
             document.getElementById('rule-modal-title').innerText = '라우팅 규칙 수정';
             document.getElementById('rule_id').value = rule.id;
             document.getElementById('rule_vendor').value = rule.vendor;
@@ -945,7 +1039,7 @@ const SettingsHTML = `<!DOCTYPE html>
             const model = document.getElementById('rule_model').value.trim().toLowerCase();
             const type = document.getElementById('rule_type').value;
             const profile = document.getElementById('rule_profile').value;
-            const priority = parseInt(document.getElementById('rule_priority').value);
+            const priority = parseInt(document.getElementById('rule_priority').value) || 1;
             const desc = document.getElementById('rule_desc').value.trim();
 
             if (!vendor || !model) {
@@ -980,14 +1074,24 @@ const SettingsHTML = `<!DOCTYPE html>
             saveAllConfig('규칙이 삭제되었습니다.');
         }
 
-        function moveRule(index, direction) {
-            const targetIndex = index + direction;
-            if (targetIndex < 0 || targetIndex >= configData.rules.length) return;
-            if (configData.rules[index].vendor === '*' || configData.rules[targetIndex].vendor === '*') return;
+        // 벤더 그룹 내부에서의 규칙 우선순위 교환
+        function moveRuleInGroup(vendor, localIdx, direction) {
+            // 1. 해당 벤더 그룹의 규칙들만 필터링
+            const groupRules = configData.rules.filter(r => r.vendor.toLowerCase() === vendor.toLowerCase());
+            
+            const targetIdx = localIdx + direction;
+            if (targetIdx < 0 || targetIdx >= groupRules.length) return;
 
-            const temp = configData.rules[index].priority;
-            configData.rules[index].priority = configData.rules[targetIndex].priority;
-            configData.rules[targetIndex].priority = temp;
+            const currentRule = groupRules[localIdx];
+            const targetRule = groupRules[targetIdx];
+
+            // 벤더 디폴트 규칙(*)은 항상 그룹 최하단이어야 하므로 스왑 제한
+            if (currentRule.model_pattern === '*' || targetRule.model_pattern === '*') return;
+
+            // 두 규칙의 priority 값 스왑
+            const temp = currentRule.priority;
+            currentRule.priority = targetRule.priority;
+            targetRule.priority = temp;
 
             saveAllConfig('우선순위가 변경되었습니다.');
         }
