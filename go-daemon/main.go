@@ -126,16 +126,17 @@ func runWebServer() {
 	// GUI 설정 페이지 서빙
 	http.HandleFunc("/", handleHome)
 	
-	// 규칙 관리 API
+	// 규칙 및 프로필 관리 API
 	http.HandleFunc("/api/rules", handleGetRules)
 	http.HandleFunc("/api/rules/save", handleSaveRules)
 	http.HandleFunc("/api/test-proxy", handleTestProxy)
+	http.HandleFunc("/api/diagnose", handleDiagnose)
 	
 	// 연결 처리 API
 	http.HandleFunc("/api/connect", handleConnect)
 	http.HandleFunc("/api/status", handleStatus)
 
-	port := "8080"
+	port := "4447"
 	logger.Infof("로컬 웹 서버 및 설정 GUI 기동 완료... http://127.0.0.1:%s", port)
 	
 	// 로컬 요청만 수용하기 위해 127.0.0.1로 바인딩
@@ -155,7 +156,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(SettingsHTML))
 }
 
-// handleGetRules 규칙 설정 불러오기
+// handleGetRules 규칙 및 프로필 설정 불러오기
 func handleGetRules(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -169,7 +170,7 @@ func handleGetRules(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(config)
 }
 
-// handleSaveRules 규칙 설정 저장하기
+// handleSaveRules 규칙 및 프로필 설정 저장하기
 func handleSaveRules(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -216,7 +217,6 @@ func handleTestProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// 테스트용으로 간단하게 GET 요청 수행 (타임아웃 3초)
 	client := &http.Client{Timeout: 3 * time.Second}
 	req, err := http.NewRequest("GET", reqBody.URL, nil)
 	if err != nil {
@@ -238,14 +238,80 @@ func handleTestProxy(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"success":true}`))
 }
 
+// handleDiagnose 특정 프로필 경로의 자바 및 JAR 파일 실시간 검증 API
+func handleDiagnose(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	profileID := r.URL.Query().Get("profile_id")
+	if profileID == "" {
+		http.Error(w, `{"error":"missing profile_id"}`, http.StatusBadRequest)
+		return
+	}
+
+	config, err := LoadRulesConfig()
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	var matchedProfile Profile
+	found := false
+	for _, p := range config.Profiles {
+		if p.ID == profileID {
+			matchedProfile = p
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		http.Error(w, `{"error":"profile not found"}`, http.StatusNotFound)
+		return
+	}
+
+	// 1. javaws.exe 파일 검증
+	javawsFound := false
+	if matchedProfile.JavaPath != "" {
+		if _, err := os.Stat(matchedProfile.JavaPath); err == nil {
+			javawsFound = true
+		}
+	}
+
+	// 2. java.exe 파일 검증 (javaws.exe 경로 기반 유추)
+	javaFound := false
+	if matchedProfile.JavaPath != "" {
+		javaBin := strings.Replace(matchedProfile.JavaPath, "javaws.exe", "java.exe", 1)
+		if _, err := os.Stat(javaBin); err == nil {
+			javaFound = true
+		}
+	}
+
+	// 3. iKVM.jar 파일 검증
+	jarFound := false
+	if matchedProfile.IkvmJarPath != "" {
+		if _, err := os.Stat(matchedProfile.IkvmJarPath); err == nil {
+			jarFound = true
+		}
+	}
+
+	response := map[string]interface{}{
+		"javaws_exe": javawsFound,
+		"java_exe":   javaFound,
+		"ikvm_jar":   jarFound,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write([]byte(`{"status":"running", "message":"IPMI Manager Daemon is active"}`))
 }
 
-// fetchDeviceFromJsProxy Js-Proxy API로부터 장비 상세 정보 조회
-func fetchDeviceFromJsProxy(apiURL, token, target string) (Device, error) {
+// fetchDeviceFromJsProxy Js-Proxy API로부터 단일 IP 기반 장비 정보 조회
+func fetchDeviceFromJsProxy(apiURL, token, ip string) (Device, error) {
 	var device Device
 	
 	u, err := url.Parse(apiURL)
@@ -254,12 +320,7 @@ func fetchDeviceFromJsProxy(apiURL, token, target string) (Device, error) {
 	}
 	
 	q := u.Query()
-	// 타겟이 IP 형식이면 ip 파라미터로, 아니면 id 파라미터로 전송
-	if strings.Contains(target, ".") {
-		q.Set("ip", target)
-	} else {
-		q.Set("id", target)
-	}
+	q.Set("ip", ip)
 	u.RawQuery = q.Encode()
 	
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -271,7 +332,7 @@ func fetchDeviceFromJsProxy(apiURL, token, target string) (Device, error) {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 	
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := &http.Client{Timeout: 4 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return device, fmt.Errorf("network error: %w", err)
@@ -287,15 +348,29 @@ func fetchDeviceFromJsProxy(apiURL, token, target string) (Device, error) {
 		return device, err
 	}
 	
-	err = json.Unmarshal(bodyBytes, &device)
-	if err != nil {
-		return device, fmt.Errorf("failed to parse JSON: %w (Response: %s)", err, string(bodyBytes))
+	// API 응답 데이터 파싱
+	// 만약 배열 형태로 들어올 경우 첫번째 데이터 추출 대응
+	if strings.HasPrefix(strings.TrimSpace(string(bodyBytes)), "[") {
+		var devices []Device
+		err = json.Unmarshal(bodyBytes, &devices)
+		if err != nil {
+			return device, fmt.Errorf("failed to parse JSON array: %w", err)
+		}
+		if len(devices) == 0 {
+			return device, fmt.Errorf("device array is empty")
+		}
+		device = devices[0]
+	} else {
+		err = json.Unmarshal(bodyBytes, &device)
+		if err != nil {
+			return device, fmt.Errorf("failed to parse JSON object: %w", err)
+		}
 	}
 	
 	return device, nil
 }
 
-// handleConnect 스마트 라우팅을 반영한 KVM 커넥트 엔드포인트
+// handleConnect IP 기반 스마트 라우팅 연결 엔드포인트
 func handleConnect(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -306,82 +381,135 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// id 또는 ip 파라미터를 유연하게 수용
-	target := r.URL.Query().Get("id")
-	if target == "" {
-		target = r.URL.Query().Get("ip")
+	ip := r.URL.Query().Get("ip")
+	if ip == "" {
+		// 예비 호환용 ID 파라미터 폴백 지원
+		ip = r.URL.Query().Get("id")
 	}
-	
-	// 사용자가 명시적으로 지정을 원할 경우에 대비한 수동 오버라이드 타입 (옵션)
-	manualType := r.URL.Query().Get("type") 
 
-	if target == "" {
-		http.Error(w, `{"error":"missing query parameter 'id' or 'ip'"}`, http.StatusBadRequest)
+	if ip == "" {
+		http.Error(w, `{"error":"missing query parameter 'ip'"}`, http.StatusBadRequest)
 		return
 	}
 
-	// 1. 규칙 파일 및 연동 정보 로드
+	// 규칙 설정 로드
 	rulesConfig, err := LoadRulesConfig()
 	if err != nil {
-		logger.Warningf("규칙 파일을 로드하지 못해 기본 규칙을 사용합니다: %v", err)
+		logger.Warningf("[Connect] 규칙 로드 실패: %v. 기본 규칙을 적용합니다.", err)
 		rulesConfig.Rules = GetDefaultRules()
+		rulesConfig.Profiles = GetDefaultProfiles()
 	}
 
 	var device Device
 	found := false
 
-	// 2. 일차적으로 로컬 ipmi-config.json에서 탐색 시도
-	localConfig, err := readConfig()
-	if err == nil {
-		d, err := findDeviceByIDOrIP(localConfig, target)
+	// 1. Js-Proxy가 설정되어 있다면 실시간 연동 조회 우선 적용
+	if rulesConfig.JsProxyURL != "" {
+		logger.Infof("[Connect] Js-Proxy 조회 시도 (IP: %s, URL: %s)", ip, rulesConfig.JsProxyURL)
+		d, err := fetchDeviceFromJsProxy(rulesConfig.JsProxyURL, rulesConfig.JsProxyToken, ip)
 		if err == nil {
 			device = d
 			found = true
-			logger.Infof("[Connect] 로컬 설정에서 장비 식별 성공: %s (%s)", device.Name, device.IpmiIP)
-		}
-	}
-
-	// 3. 로컬에 없거나 Js-Proxy 주소가 설정되어 있다면 외부 API를 통해 동적으로 장비 획득
-	if !found && rulesConfig.JsProxyURL != "" {
-		logger.Infof("[Connect] Js-Proxy를 통한 장비 조회 시도: %s (URL: %s)", target, rulesConfig.JsProxyURL)
-		d, err := fetchDeviceFromJsProxy(rulesConfig.JsProxyURL, rulesConfig.JsProxyToken, target)
-		if err == nil {
-			device = d
-			found = true
-			logger.Infof("[Connect] Js-Proxy API 장비 조회 성공: %s (%s)", device.Name, device.IpmiIP)
+			logger.Infof("[Connect] Js-Proxy 조회 완료: %s (%s, Type: %s)", device.Name, device.IpmiIP, device.Type)
 		} else {
-			logger.Errorf("[Connect] Js-Proxy API 조회 실패: %v", err)
+			logger.Errorf("[Connect] Js-Proxy 조회 실패: %v. 로컬 설정 조회를 시도합니다.", err)
 		}
 	}
 
+	// 2. Js-Proxy 실패 시 로컬 ipmi-config.json에서 검색 시도 (폴백)
 	if !found {
-		http.Error(w, fmt.Sprintf(`{"error":"device not found locally or via Js-Proxy: %s"}`, target), http.StatusNotFound)
+		localConfig, err := readConfig()
+		if err == nil {
+			d, err := findDeviceByIDOrIP(localConfig, ip)
+			if err == nil {
+				device = d
+				found = true
+				// 로컬 조회 장비는 기본적으로 ipmi 타입으로 보정
+				if device.Type == "" {
+					device.Type = "ipmi"
+				}
+				logger.Infof("[Connect] 로컬 설정 장비 조회 성공: %s (%s)", device.Name, device.IpmiIP)
+			}
+		}
+	}
+
+	// 3. 만약 어떤 경로로도 장비 정보를 획득하지 못했을 경우
+	if !found {
+		logger.Warningf("[Connect] 장비 조회 실패 (%s). 기본 정보로 WEB 방식 강제 기동합니다.", ip)
+		fallbackDevice := Device{IpmiIP: ip, HTTPS: true, Type: "ipmi"}
+		err = launchWeb(fallbackDevice)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"failed to launch WEB fallback: %s"}`, err.Error()), http.StatusInternalServerError)
+		} else {
+			w.Write([]byte(`{"success":true, "message":"device not found. launched WEB fallback."}`))
+		}
 		return
 	}
 
-	// 4. KVM 구동 방식 판별 (스마트 라우팅 규칙 적용)
-	connectType := manualType
-	if connectType == "" {
-		connectType = MatchRoute(rulesConfig.Rules, device.Vendor, device.Model)
-		logger.Infof("[Router] 스마트 라우팅 판별 완료: [%s / %s] -> 실행 방식: [%s]", device.Vendor, device.Model, connectType)
-	} else {
-		logger.Infof("[Router] 사용자 수동 지정 적용 -> 실행 방식: [%s]", connectType)
-	}
-
-	// 5. 판별 결과에 따른 구동 실행
-	if connectType == "ikvm" {
-		err = launchSupermicroIKVM(localConfig.JavaPath, device)
-	} else if connectType == "jnlp" {
-		err = launchJnlp(localConfig, device)
-	} else if connectType == "web" {
+	// 4. 장비의 type이 "ipmi"가 아닐 경우 즉각 WEB 방식으로 연결 처리
+	if strings.ToLower(device.Type) != "ipmi" {
+		logger.Infof("[Router] 장비 type이 'ipmi'가 아님 (%s). WEB 방식으로 직접 연결 처리합니다.", device.Type)
 		err = launchWeb(device)
-	} else {
-		err = fmt.Errorf("invalid connect type: %s", connectType)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"failed to launch WEB: %s"}`, err.Error()), http.StatusInternalServerError)
+		} else {
+			w.Write([]byte(`{"success":true, "message":"non-ipmi type device. launched WEB console."}`))
+		}
+		return
 	}
 
-	if err != nil {
-		logger.Errorf("[Connect] 실행 실패: %v", err)
-		http.Error(w, fmt.Sprintf(`{"error":"failed to launch: %s"}`, err.Error()), http.StatusInternalServerError)
+	// 5. 스마트 라우팅 규칙 매칭
+	connectType, profileID := MatchRoute(rulesConfig.Rules, device.Vendor, device.Model)
+	logger.Infof("[Router] 스마트 라우팅 결과: [%s / %s] -> 방식: [%s], 프로필 ID: [%s]", device.Vendor, device.Model, connectType, profileID)
+
+	// 6. 매칭된 프로필의 실제 경로 자원 획득
+	var activeProfile Profile
+	profileFound := false
+	for _, p := range rulesConfig.Profiles {
+		if p.ID == profileID {
+			activeProfile = p
+			profileFound = true
+			break
+		}
+	}
+	
+	// 프로필이 없는 경우 기본 프로필 적용
+	if !profileFound {
+		for _, p := range rulesConfig.Profiles {
+			if p.IsDefault {
+				activeProfile = p
+				profileFound = true
+				break
+			}
+		}
+	}
+	
+	// 최후의 안전장치
+	if !profileFound && len(rulesConfig.Profiles) > 0 {
+		activeProfile = rulesConfig.Profiles[0]
+	}
+
+	// 7. 지정된 프로필 환경 경로로 구동 처리
+	runErr := error(nil)
+	if connectType == "ikvm" {
+		runErr = launchSupermicroIKVM(activeProfile.JavaPath, activeProfile.IkvmJarPath, device)
+	} else if connectType == "jnlp" {
+		runErr = launchJnlp(activeProfile.JavaPath, device)
+	} else if connectType == "WEB" {
+		runErr = launchWeb(device)
+	} else {
+		runErr = fmt.Errorf("unknown connect type: %s", connectType)
+	}
+
+	// 8. 구동 에러 발생 시 최후의 보루로 WEB 방식 자동 폴백 기동
+	if runErr != nil {
+		logger.Errorf("[Connect] 방식 기동 실패 (%v). WEB 방식으로 최종 폴백을 구동합니다.", runErr)
+		fallbackErr := launchWeb(device)
+		if fallbackErr != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"failed to launch connect and fallback: %s"}`, fallbackErr.Error()), http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte(`{"success":true, "message":"connect failed. fallback to WEB initiated."}`))
 		return
 	}
 
@@ -389,14 +517,13 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 }
 
 // launchJnlp JNLP (Java Web Start) 실행 처리
-func launchJnlp(config AppConfig, device Device) error {
-	javaPath := config.JavaPath
+func launchJnlp(javaPath string, device Device) error {
 	if javaPath == "" {
 		javaPath = "C:\\Program Files (x86)\\Java\\jre1.8.0_291\\bin\\javaws.exe"
 	}
 
 	if _, err := os.Stat(javaPath); os.IsNotExist(err) {
-		return fmt.Errorf("Java Web Start (javaws.exe)가 설정되지 않았거나 경로에 없습니다. 설정에서 자바 경로를 지정해 주세요. (경로: %s)", javaPath)
+		return fmt.Errorf("Java Web Start (javaws.exe)가 경로에 존재하지 않습니다. 경로: %s", javaPath)
 	}
 
 	if err := AddJavaExceptionSite(device.IpmiIP); err != nil {
@@ -426,7 +553,11 @@ func launchJnlp(config AppConfig, device Device) error {
 			logger.Infof("[JNLP] REST 로그인 성공 및 토큰 연동 완료: %s", device.IpmiIP)
 		}
 	} else if vendor == "supermicro" || strings.Contains(strings.ToLower(device.Model), "x10drl") || strings.Contains(strings.ToLower(device.Model), "x9drl") {
-		return launchSupermicroIKVM(javaPath, device)
+		// Supermicro의 경우 예외적으로 iKVM 직접 실행으로 리다이렉션 (안전장치)
+		executablePath, _ := os.Executable()
+		execDir := filepath.Dir(executablePath)
+		defaultJar := filepath.Join(execDir, "IPMIVIEW", "2.14.0", "extracted", "D_", "IPMI20", "FILES FOR IPMI VIEW", "iKVM.jar")
+		return launchSupermicroIKVM(javaPath, defaultJar, device)
 	} else {
 		jnlpURL = fmt.Sprintf("%s://%s/viewer.jnlp", proto, device.IpmiIP)
 	}
@@ -437,34 +568,17 @@ func launchJnlp(config AppConfig, device Device) error {
 }
 
 // launchSupermicroIKVM Supermicro iKVM.jar 직접 기동
-func launchSupermicroIKVM(javawsPath string, device Device) error {
-	javaBin := strings.Replace(javawsPath, "javaws.exe", "java.exe", 1)
+func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
+	javaBin := strings.Replace(javaPath, "javaws.exe", "java.exe", 1)
 	if _, err := os.Stat(javaBin); os.IsNotExist(err) {
 		return fmt.Errorf("java.exe를 찾을 수 없습니다. 경로: %s", javaBin)
 	}
 
-	executablePath, _ := os.Executable()
-	execDir := filepath.Dir(executablePath)
-	
-	jarPaths := []string{
-		filepath.Join(execDir, "IPMIVIEW", "2.14.0", "extracted", "D_", "IPMI20", "FILES FOR IPMI VIEW", "iKVM.jar"),
-		filepath.Join("C:\\Users\\kuri\\MyProJ\\ipmi-manager\\gui-client", "IPMIVIEW", "2.14.0", "extracted", "D_", "IPMI20", "FILES FOR IPMI VIEW", "iKVM.jar"),
-		filepath.Join("C:\\Users\\kuri\\MyProJ\\ipmi-manager", "IPMIVIEW", "2.14.0", "extracted", "D_", "IPMI20", "FILES FOR IPMI VIEW", "iKVM.jar"),
+	if _, err := os.Stat(jarPath); os.IsNotExist(err) {
+		return fmt.Errorf("iKVM.jar 파일을 찾을 수 없습니다. 경로: %s", jarPath)
 	}
 
-	var ikvmJar string
-	for _, p := range jarPaths {
-		if _, err := os.Stat(p); err == nil {
-			ikvmJar = p
-			break
-		}
-	}
-
-	if ikvmJar == "" {
-		return fmt.Errorf("내장된 Supermicro iKVM.jar 파일을 찾을 수 없습니다.")
-	}
-
-	jarDir := filepath.Dir(ikvmJar)
+	jarDir := filepath.Dir(jarPath)
 	hostName := device.Name
 	if hostName == "" {
 		hostName = device.IpmiIP
@@ -480,7 +594,7 @@ func launchSupermicroIKVM(javawsPath string, device Device) error {
 		"-Dsun.java2d.d3d=false",
 		"-Dsun.java2d.uiScale=1.0",
 		"-jar",
-		ikvmJar,
+		jarPath,
 		device.IpmiIP,
 		device.Username,
 		device.Password,
@@ -497,11 +611,11 @@ func launchSupermicroIKVM(javawsPath string, device Device) error {
 	_ = webPort
 
 	cmd := exec.Command(javaBin, cmdArgs...)
-	cmd.Dir = jarDir
+	cmd.Dir = jarDir // Native DLL 로딩을 위해 작업 디렉토리를 JAR 폴더로 설정
 	return cmd.Start()
 }
 
-// launchWeb 웹 브라우저 기동
+// launchWeb 웹 브라우저 기동 (WEB 방식)
 func launchWeb(device Device) error {
 	executablePath, _ := os.Executable()
 	execDir := filepath.Dir(executablePath)
@@ -520,7 +634,7 @@ func launchWeb(device Device) error {
 	}
 
 	if electronPath != "" {
-		logger.Infof("[Web] Electron 뷰어 기동: %s (장비 ID: %s)", electronPath, device.ID)
+		logger.Infof("[WEB] Electron 뷰어 기동: %s (장비 ID: %s)", electronPath, device.ID)
 		cmd := exec.Command(electronPath, "--device-id="+device.ID, "--connect-type=web")
 		return cmd.Start()
 	}
@@ -537,8 +651,9 @@ func launchWeb(device Device) error {
 		loginUrl = fmt.Sprintf("%s://%s/restgui/start.html", proto, device.IpmiIP)
 	}
 
-	logger.Infof("[Web] Electron 뷰어를 찾을 수 없어 기본 웹 브라우저로 폴백 오픈: %s", loginUrl)
+	logger.Infof("[WEB] Electron 뷰어를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
 	cmd := exec.Command("cmd", "/c", "start", "", loginUrl)
 	return cmd.Start()
 }
+
 

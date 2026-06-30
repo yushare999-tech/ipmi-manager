@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Device 장비 스펙 정의 (ipmi-config.json과 동일)
+// Device 장비 스펙 정의 (ipmi-config.json 및 Js-Proxy 연동 규격)
 type Device struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -21,6 +21,7 @@ type Device struct {
 	Password string `json:"password"`
 	Note     string `json:"note"`
 	HTTPS    bool   `json:"https"`
+	Type     string `json:"type"` // 장비 제어 타입 (예: ipmi, ssh 등)
 }
 
 // Config 데이터 스펙

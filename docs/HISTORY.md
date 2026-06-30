@@ -8,6 +8,7 @@
 *   **프로젝트 메인**: [README.md](../README.md)
 *   **상세 설계 및 가이드**:
     *   [Node.js (Electron) 버전 기술 명세 및 벤더 연동 가이드](node_version_guide.md)
+    *   [Go 데몬 프로필 기반 스마트 라우터 설계 사양서](smart_router_profile_design.md)
     *   *Java 환경 설정 및 보안 우회 매커니즘 (추후 추가)*
     *   *Go 데몬 서비스 등록 및 관리 가이드 (추후 추가)*
 
