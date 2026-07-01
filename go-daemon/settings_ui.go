@@ -425,6 +425,12 @@ const SettingsHTML = `<!DOCTYPE html>
             color: var(--success);
         }
 
+        .badge-type-web-http {
+            background: rgba(255, 87, 51, 0.08);
+            border: 1px solid rgba(255, 87, 51, 0.30);
+            color: #ff5733;
+        }
+
         .badge-profile {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -698,7 +704,8 @@ const SettingsHTML = `<!DOCTYPE html>
                 <select id="rule_type">
                     <option value="ikvm">ikvm (iKVM.jar 직접실행)</option>
                     <option value="jnlp">jnlp (Java Web Start 기동)</option>
-                    <option value="WEB">WEB (웹 자동 로그인)</option>
+                    <option value="WEB">WEB-HTTPS (웹 자동 로그인 · HTTPS)</option>
+                    <option value="WEB-HTTP">WEB-HTTP (웹 자동 로그인 · HTTP)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -1000,13 +1007,16 @@ const SettingsHTML = `<!DOCTYPE html>
                     item.className = 'rule-item';
 
                     let typeBadgeClass = 'badge-type-web';
-                    let typeName = 'WEB';
+                    let typeName = 'WEB-HTTPS';
                     if (rule.connect_type === 'ikvm') {
                         typeBadgeClass = 'badge-type-ikvm';
                         typeName = 'ikvm';
                     } else if (rule.connect_type === 'jnlp') {
                         typeBadgeClass = 'badge-type-jnlp';
                         typeName = 'jnlp';
+                    } else if (rule.connect_type === 'WEB-HTTP') {
+                        typeBadgeClass = 'badge-type-web-http';
+                        typeName = 'WEB-HTTP';
                     }
 
                     const isDefaultRule = rule.model_pattern === '*';

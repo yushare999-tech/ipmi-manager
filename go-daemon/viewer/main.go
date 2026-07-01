@@ -16,18 +16,22 @@ import (
 )
 
 var (
-	modUser32            = syscall.NewLazyDLL("user32.dll")
-	modKernel32win       = syscall.NewLazyDLL("kernel32.dll")
-	procShowWindow       = modUser32.NewProc("ShowWindow")
-	procFindWindowW      = modUser32.NewProc("FindWindowW")
-	procSetForegroundWin = modUser32.NewProc("SetForegroundWindow")
-	procBringWindowToTop = modUser32.NewProc("BringWindowToTop")
-	procSetWindowPos     = modUser32.NewProc("SetWindowPos")
-	procGetCursorPos     = modUser32.NewProc("GetCursorPos")
-	procMonitorFromPoint = modUser32.NewProc("MonitorFromPoint")
-	procGetMonitorInfoW  = modUser32.NewProc("GetMonitorInfoW")
-	procGetSystemMetrics = modUser32.NewProc("GetSystemMetrics")
-	procCreateMutexW     = modKernel32win.NewProc("CreateMutexW")
+	modUser32                  = syscall.NewLazyDLL("user32.dll")
+	modKernel32win             = syscall.NewLazyDLL("kernel32.dll")
+	procShowWindow             = modUser32.NewProc("ShowWindow")
+	procFindWindowW            = modUser32.NewProc("FindWindowW")
+	procSetForegroundWin       = modUser32.NewProc("SetForegroundWindow")
+	procBringWindowToTop       = modUser32.NewProc("BringWindowToTop")
+	procSetWindowPos           = modUser32.NewProc("SetWindowPos")
+	procGetCursorPos           = modUser32.NewProc("GetCursorPos")
+	procMonitorFromPoint       = modUser32.NewProc("MonitorFromPoint")
+	procGetMonitorInfoW        = modUser32.NewProc("GetMonitorInfoW")
+	procGetSystemMetrics       = modUser32.NewProc("GetSystemMetrics")
+	procCreateMutexW           = modKernel32win.NewProc("CreateMutexW")
+	procEnumWindows            = modUser32.NewProc("EnumWindows")
+	procGetWindowThreadProcID  = modUser32.NewProc("GetWindowThreadProcessId")
+	procIsWindowVisible        = modUser32.NewProc("IsWindowVisible")
+	procGetWindowTextLenW      = modUser32.NewProc("GetWindowTextLengthW")
 )
 
 const (
@@ -58,7 +62,7 @@ type winMONITORINFO struct {
 }
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.24"
+const Version = "1.5.27"
 
 // landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
 const landingPageHTML = `<!DOCTYPE html>
@@ -125,10 +129,10 @@ h1{
 <body>
 <div class="grid"></div>
 <div class="logo-row">
-  <div class="logo-icon">💻</div>
+  <div class="logo-icon">?裕?/div>
   <div class="logo-label">IPMI Manager</div>
 </div>
-<h1>원격제어 콘솔 연결</h1>
+<h1>?癒?봄??뽯선 ?꾩꼷???怨뚭퍙</h1>
 <div class="sub">Secure Management Console</div>
 <div class="ip-chip">
   <div class="dot"></div>
@@ -170,6 +174,20 @@ h1{
 func main() {
 	// Bypass SSL/TLS security warnings, self-signed certificate errors and allow legacy TLS 1.0/1.1
 	os.Setenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--ignore-certificate-errors --ignore-ssl-errors --ssl-version-min=tls1 --tls-version-min=tls1")
+
+	// ???? --activate-pid 筌뤴뫀諭? Java ?袁⑥쨮?紐꾨뮞 筌≪럩??筌≪럩??筌≪럩????욧탢??뤿연 筌ㅼ뮇?억쭖?곸몵嚥?揶쎛?紐꾩긾 ????????????????????????????????????????????????
+	// ??筌뤴뫀諭??WebView2 ?λ뜃由????곸뵠 筌앸맩????쎈뻬??랁??ル굝利??몃빍??
+	for _, arg := range os.Args[1:] {
+		if len(arg) > 14 && arg[:14] == "--activate-pid" {
+			var targetPID uint32
+			fmt.Sscanf(arg[15:], "%d", &targetPID)
+			if targetPID > 0 {
+				activateWindowByPID(targetPID)
+			}
+			return
+		}
+	}
+	// ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 	// Parse CLI arguments
 	targetURL := flag.String("url", "", "IPMI Web Console URL")
@@ -465,4 +483,100 @@ func main() {
 
 	// Run main loop (landing page JS will redirect to targetURL after animation)
 	w.Run()
+}
+
+// activateWindowByPID finds the first visible top-level window owned by the given PID
+// and brings it to the foreground, centered on the active monitor.
+// Called via: ipmi-viewer.exe --activate-pid=<PID>
+func activateWindowByPID(pid uint32) {
+	// Retry for up to 10 seconds waiting for the Java window to appear
+	var foundHWND uintptr
+	for attempt := 0; attempt < 20 && foundHWND == 0; attempt++ {
+		if attempt > 0 {
+			time.Sleep(500 * time.Millisecond)
+		}
+
+		// EnumWindows callback: find a visible, titled window belonging to this PID
+		cb := syscall.NewCallback(func(hwnd, _ uintptr) uintptr {
+			var winPID uint32
+			procGetWindowThreadProcID.Call(hwnd, uintptr(unsafe.Pointer(&winPID)))
+			if winPID != pid {
+				return 1 // continue
+			}
+			vis, _, _ := procIsWindowVisible.Call(hwnd)
+			if vis == 0 {
+				return 1 // continue
+			}
+			// prefer windows that have a title
+			titleLen, _, _ := procGetWindowTextLenW.Call(hwnd)
+			if titleLen == 0 && foundHWND != 0 {
+				return 1 // skip untitled if we already have a candidate
+			}
+			foundHWND = hwnd
+			return 0 // stop enumeration
+		})
+		procEnumWindows.Call(cb, 0)
+	}
+
+	if foundHWND == 0 {
+		log.Printf("[Activate] PID %d ?????媛?쒖쟻 李쎌쓣 李얠? 紐삵뻽?듬땲??", pid)
+		return
+	}
+
+	// 1. Restore if minimized
+	procShowWindow.Call(foundHWND, uintptr(swShowNormal))
+	time.Sleep(80 * time.Millisecond)
+
+	// 2. Get active monitor info for centering
+	var cursorPt struct{ X, Y int32 }
+	procGetCursorPos.Call(uintptr(unsafe.Pointer(&cursorPt)))
+	hMonitor, _, _ := procMonitorFromPoint.Call(
+		uintptr(cursorPt.X), uintptr(cursorPt.Y),
+		2, // MONITOR_DEFAULTTONEAREST
+	)
+
+	type monitorInfo struct {
+		CbSize    uint32
+		RcMonitor struct{ Left, Top, Right, Bottom int32 }
+		RcWork    struct{ Left, Top, Right, Bottom int32 }
+		DwFlags   uint32
+	}
+	var mi monitorInfo
+	mi.CbSize = uint32(unsafe.Sizeof(mi))
+	procGetMonitorInfoW.Call(hMonitor, uintptr(unsafe.Pointer(&mi)))
+
+	mW := mi.RcWork.Right - mi.RcWork.Left
+	mH := mi.RcWork.Bottom - mi.RcWork.Top
+	mX := mi.RcWork.Left
+	mY := mi.RcWork.Top
+
+	// Fallback to GetSystemMetrics if monitor info unavailable
+	if mW == 0 || mH == 0 {
+		mW32, _, _ := procGetSystemMetrics.Call(0)
+		mH32, _, _ := procGetSystemMetrics.Call(1)
+		mW = int32(mW32)
+		mH = int32(mH32)
+	}
+
+	// Center with reasonable Java KVM window size
+	winW := int32(800)
+	winH := int32(600)
+	x := mX + (mW-winW)/2
+	y := mY + (mH-winH)/2
+
+	// 3. Move to center of active monitor
+	const swpNoSize = 0x0001
+	const swpShowWindow = 0x0040
+	procSetWindowPos.Call(foundHWND, uintptr(hwndTopmost), uintptr(x), uintptr(y), uintptr(winW), uintptr(winH), swpShowWindow)
+	time.Sleep(50 * time.Millisecond)
+
+	// 4. Bring to front
+	procSetForegroundWin.Call(foundHWND)
+	procBringWindowToTop.Call(foundHWND)
+	time.Sleep(100 * time.Millisecond)
+
+	// 5. Remove always-on-top
+	procSetWindowPos.Call(foundHWND, uintptr(hwndNoTopmost), 0, 0, 0, 0, uintptr(swpNoSize|swpNoMove))
+
+	log.Printf("[Activate] PID %d 李??쒖꽦???꾨즺.", pid)
 }

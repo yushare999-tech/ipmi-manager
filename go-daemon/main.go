@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kardianos/service"
@@ -18,6 +19,12 @@ import (
 
 var logger service.Logger
 var debugMode bool
+
+// javaProcessMap tracks running iKVM/JNLP Java process PIDs per device IP for duplicate prevention.
+var (
+	javaProcessMu  sync.Mutex
+	javaProcessMap = make(map[string]uint32) // key: deviceIP → child PID
+)
 
 type program struct {
 	exit chan struct{}
@@ -511,6 +518,11 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 		runErr = launchJnlp(activeProfile.JavaPath, device)
 	} else if connectType == "WEB" {
 		viewerFound, runErr = launchWeb(device)
+	} else if connectType == "WEB-HTTP" {
+		// WEB-HTTP: 규칙에 의해 HTTP 강제 사용 (device.HTTPS 무시)
+		httpDevice := device
+		httpDevice.HTTPS = false
+		viewerFound, runErr = launchWeb(httpDevice)
 	} else {
 		runErr = fmt.Errorf("unknown connect type: %s", connectType)
 	}
@@ -584,7 +596,27 @@ func launchJnlp(javaPath string, device Device) error {
 	}
 
 	logger.Infof("[JNLP] javaws 실행 주소: %s", jnlpURL)
-	return launchAsUser(javaPath, []string{jnlpURL}, "")
+
+	// ── 중복 c29지 ────────────────────────────────────────────────────────────────────
+	javaProcessMu.Lock()
+	existingPID, hasPID := javaProcessMap[device.IpmiIP]
+	javaProcessMu.Unlock()
+
+	if hasPID && isProcessRunning(existingPID) {
+		logger.Infof("[JNLP] 동일 IP에 대한 실행 중인 Java 프로세스 감지 (PID: %d). 전면 활성화.", existingPID)
+		return activateJavaWindow(existingPID)
+	}
+	// ─────────────────────────────────────────────────────────────────────────
+
+	pid, err := launchAsUserWithPID(javaPath, []string{jnlpURL}, "")
+	if err == nil && pid > 0 {
+		javaProcessMu.Lock()
+		javaProcessMap[device.IpmiIP] = pid
+		javaProcessMu.Unlock()
+		// 실행 직후 잘보이는 위치로 이동
+		go activateJavaWindowDelayed(pid, 3*time.Second)
+	}
+	return err
 }
 
 // launchSupermicroIKVM Supermicro iKVM.jar 직접 기동
@@ -630,7 +662,25 @@ func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
 	}
 	_ = webPort
 
-	return launchAsUser(javaBin, cmdArgs, jarDir)
+	// ── 중복 방지 ────────────────────────────────────────────────────────────────────
+	javaProcessMu.Lock()
+	existingPID, hasPID := javaProcessMap[device.IpmiIP]
+	javaProcessMu.Unlock()
+
+	if hasPID && isProcessRunning(existingPID) {
+		logger.Infof("[iKVM] 동일 IP에 대한 실행 중인 iKVM 프로세스 감지 (PID: %d). 전면 활성화.", existingPID)
+		return activateJavaWindow(existingPID)
+	}
+	// ─────────────────────────────────────────────────────────────────────────
+
+	pid, err := launchAsUserWithPID(javaBin, cmdArgs, jarDir)
+	if err == nil && pid > 0 {
+		javaProcessMu.Lock()
+		javaProcessMap[device.IpmiIP] = pid
+		javaProcessMu.Unlock()
+		go activateJavaWindowDelayed(pid, 4*time.Second)
+	}
+	return err
 }
 
 // launchWeb 웹 브라우저 기동 (WEB 방식)
@@ -686,4 +736,42 @@ func launchWeb(device Device) (bool, error) {
 	// 뷰어를 찾을 수 없는 경우 최후의 폴백으로 기본 웹 브라우저 직접 기동
 	logger.Warningf("[WEB] 초경량 웹 뷰어(ipmi-viewer.exe)를 찾을 수 없어 기본 웹 브라우저로 직접 접속: %s", loginUrl)
 	return false, launchAsUser("cmd", []string{"/c", "start", "", loginUrl}, "")
+}
+
+// resolveViewerPath finds ipmi-viewer.exe relative to the daemon executable.
+func resolveViewerPath() string {
+	executablePath, _ := os.Executable()
+	execDir := filepath.Dir(executablePath)
+	candidates := []string{
+		filepath.Join(execDir, "ipmi-viewer.exe"),
+		filepath.Join(filepath.Dir(execDir), "ipmi-viewer.exe"),
+	}
+	for _, p := range candidates {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return ""
+}
+
+// activateJavaWindow launches ipmi-viewer.exe in user session with --activate-pid flag.
+// ipmi-viewer.exe will enumerate Session 1 windows for the given PID and bring it to front.
+func activateJavaWindow(pid uint32) error {
+	viewerPath := resolveViewerPath()
+	if viewerPath == "" {
+		logger.Warningf("[Activate] ipmi-viewer.exe를 찾을 수 없어 창 활성화를 건너뜁니다.")
+		return nil
+	}
+	logger.Infof("[Activate] ipmi-viewer.exe --activate-pid=%d 실행", pid)
+	return launchAsUser(viewerPath, []string{fmt.Sprintf("--activate-pid=%d", pid)}, "")
+}
+
+// activateJavaWindowDelayed waits for the Java process to create its window, then activates it.
+func activateJavaWindowDelayed(pid uint32, delay time.Duration) {
+	time.Sleep(delay)
+	if isProcessRunning(pid) {
+		if err := activateJavaWindow(pid); err != nil {
+			logger.Warningf("[Activate] 창 활성화 실패 (PID: %d): %v", pid, err)
+		}
+	}
 }

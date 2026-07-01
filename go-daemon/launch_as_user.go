@@ -26,6 +26,7 @@ var (
 	procProcess32FirstW              = modKernel32.NewProc("Process32FirstW")
 	procProcess32NextW               = modKernel32.NewProc("Process32NextW")
 	procOpenProcess                  = modKernel32.NewProc("OpenProcess")
+	procGetExitCodeProcess           = modKernel32.NewProc("GetExitCodeProcess")
 )
 
 const (
@@ -332,6 +333,109 @@ func launchViaExec(exe string, args []string, workDir string) error {
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	logger.Infof("[LaunchViaExec] 직접 실행 (포그라운드 모드): %s %v", exe, args)
 	return cmd.Start()
+}
+
+// isProcessRunning returns true if the process with the given PID is still alive.
+func isProcessRunning(pid uint32) bool {
+	h, _, _ := procOpenProcess.Call(processQueryLimited, 0, uintptr(pid))
+	if h == 0 {
+		return false
+	}
+	defer syscall.CloseHandle(syscall.Handle(h))
+	var exitCode uint32
+	ret, _, _ := procGetExitCodeProcess.Call(h, uintptr(unsafe.Pointer(&exitCode)))
+	if ret == 0 {
+		return false
+	}
+	return exitCode == 259 // STILL_ACTIVE
+}
+
+// launchAsUserWithPID is like launchAsUser but also returns the PID of the spawned process.
+func launchAsUserWithPID(exe string, args []string, workDir string) (uint32, error) {
+	sessionID, _, _ := procWTSGetActiveConsoleSessionId.Call()
+
+	if sessionID != 0xFFFFFFFF {
+		_ = enablePrivilege("SeTcbPrivilege")
+		var userToken syscall.Handle
+		ret, _, wtsErr := procWTSQueryUserToken.Call(sessionID, uintptr(unsafe.Pointer(&userToken)))
+		if ret != 0 {
+			defer syscall.CloseHandle(userToken)
+			var dupToken syscall.Handle
+			ret2, _, _ := procDuplicateTokenEx.Call(
+				uintptr(userToken), maximumAllowed, 0, securityImpersonation, tokenPrimary,
+				uintptr(unsafe.Pointer(&dupToken)),
+			)
+			if ret2 != 0 {
+				defer syscall.CloseHandle(dupToken)
+				return createProcessWithTokenGetPID(dupToken, exe, args, workDir)
+			}
+		} else {
+			logger.Warningf("[LaunchAsUserWithPID] WTSQueryUserToken 실패 (%v). Explorer 토큰 방식 시도.", wtsErr)
+		}
+
+		dupToken, err := getUserTokenViaExplorer(uint32(sessionID))
+		if err != nil {
+			logger.Warningf("[LaunchAsUserWithPID] Explorer 토큰 방식도 실패 (%v).", err)
+		} else {
+			defer syscall.CloseHandle(dupToken)
+			return createProcessWithTokenGetPID(dupToken, exe, args, workDir)
+		}
+	}
+	// Fallback: exec.Command (returns 0 PID as it's not tracked)
+	return 0, launchViaExec(exe, args, workDir)
+}
+
+// createProcessWithTokenGetPID is like createProcessWithToken but returns the PID.
+func createProcessWithTokenGetPID(token syscall.Handle, exe string, args []string, workDir string) (uint32, error) {
+	var envBlock uintptr
+	procCreateEnvironmentBlock.Call(uintptr(unsafe.Pointer(&envBlock)), uintptr(token), 0)
+	if envBlock != 0 {
+		defer procDestroyEnvironmentBlock.Call(envBlock)
+	}
+
+	cmdLine, err := syscall.UTF16PtrFromString(buildCmdLine(exe, args))
+	if err != nil {
+		return 0, fmt.Errorf("UTF16PtrFromString 실패: %v", err)
+	}
+
+	desktop, _ := syscall.UTF16PtrFromString("winsta0\\default")
+	si := startupInfoW{
+		Cb:          uint32(unsafe.Sizeof(startupInfoW{})),
+		LpDesktop:   desktop,
+		DwFlags:     startfUseshowwindow,
+		WShowWindow: swHideWindow,
+	}
+	var pi processInformation
+
+	var workDirPtr *uint16
+	if workDir != "" {
+		workDirPtr, _ = syscall.UTF16PtrFromString(workDir)
+	}
+
+	flags := uint32(createNoWindow | normalPriorityClass)
+	if envBlock != 0 {
+		flags |= createUnicodeEnvironment
+	}
+
+	ret, _, err := procCreateProcessAsUser.Call(
+		uintptr(token), 0,
+		uintptr(unsafe.Pointer(cmdLine)),
+		0, 0, 0,
+		uintptr(flags),
+		envBlock,
+		uintptr(unsafe.Pointer(workDirPtr)),
+		uintptr(unsafe.Pointer(&si)),
+		uintptr(unsafe.Pointer(&pi)),
+	)
+	if ret == 0 {
+		return 0, fmt.Errorf("CreateProcessAsUser 실패: %v", err)
+	}
+
+	pid := pi.DwProcessId
+	syscall.CloseHandle(pi.HProcess)
+	syscall.CloseHandle(pi.HThread)
+	logger.Infof("[LaunchAsUserWithPID] ✅ 프로세스 기동 성공: %s (PID: %d)", exe, pid)
+	return pid, nil
 }
 
 // buildCmdLine builds a Windows-style quoted command line from exe + args.
