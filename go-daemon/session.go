@@ -15,6 +15,7 @@ type Device struct {
 	ID           string `json:"js_serial"`    // js_serial -> id
 	Name         string `json:"hostname"`     // hostname -> name
 	IpmiIP       string `json:"ip"`           // ip -> ipmi_ip
+	MAC          string `json:"mac"`          // mac address
 	Vendor       string `json:"vendor"`
 	Model        string `json:"model"`
 	Username     string `json:"username"`

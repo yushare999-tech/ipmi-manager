@@ -642,9 +642,18 @@ func launchSupermicroIKVM(javaPath, jarPath string, device Device) error {
 	}
 
 	jarDir := filepath.Dir(jarPath)
-	hostName := device.Name
-	if hostName == "" {
-		hostName = device.IpmiIP
+
+	// hostName 조합: "[js_serial][mac] model" 형식 (Node.js 버전 규격 동일)
+	// iKVM.jar args[3]에 전달되며 KVM 창 타이틀 및 세션 식별에 사용됨
+	jsSerial := device.ID  // js_serial
+	mac := device.MAC      // mac
+	model := device.Model  // model
+
+	var hostName string
+	if jsSerial != "" || mac != "" || model != "" {
+		hostName = fmt.Sprintf("[%s][%s] %s", jsSerial, mac, model)
+	} else {
+		hostName = device.IpmiIP // 최후 폴백: IP 주소
 	}
 
 	webPort := "443"
