@@ -36,12 +36,14 @@ const (
 	tokenQuery               = 0x0008
 	tokenDuplicate           = 0x0002
 	sePrivilegeEnabled       = 0x00000002
-	createNewConsole         = 0x00000010
+	createNoWindow           = 0x08000000 // 콘솔/CMD 창 완전 숨김 (createNewConsole 대체)
 	createUnicodeEnvironment = 0x00000400
 	normalPriorityClass      = 0x00000020
 	th32csSnapProcess        = 0x00000002
 	processQueryInformation  = 0x0400
 	processQueryLimited      = 0x1000
+	startfUseshowwindow      = 0x00000001 // STARTF_USESHOWWINDOW
+	swHideWindow             = 0          // SW_HIDE
 )
 
 type luid struct {
@@ -282,8 +284,10 @@ func createProcessWithToken(token syscall.Handle, exe string, args []string, wor
 
 	desktop, _ := syscall.UTF16PtrFromString("winsta0\\default")
 	si := startupInfoW{
-		Cb:        uint32(unsafe.Sizeof(startupInfoW{})),
-		LpDesktop: desktop,
+		Cb:          uint32(unsafe.Sizeof(startupInfoW{})),
+		LpDesktop:   desktop,
+		DwFlags:     startfUseshowwindow, // STARTF_USESHOWWINDOW: WShowWindow 필드를 유효하게 만듦
+		WShowWindow: swHideWindow,        // SW_HIDE: 프로세스 창을 처음부터 숨김
 	}
 	var pi processInformation
 
@@ -292,7 +296,7 @@ func createProcessWithToken(token syscall.Handle, exe string, args []string, wor
 		workDirPtr, _ = syscall.UTF16PtrFromString(workDir)
 	}
 
-	flags := uint32(createNewConsole | normalPriorityClass)
+	flags := uint32(createNoWindow | normalPriorityClass)
 	if envBlock != 0 {
 		flags |= createUnicodeEnvironment
 	}
@@ -324,6 +328,8 @@ func launchViaExec(exe string, args []string, workDir string) error {
 	if workDir != "" {
 		cmd.Dir = workDir
 	}
+	// 콘솔/CMD 창 없이 실행 (포그라운드 모드에서도 동일하게 창 숨김)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	logger.Infof("[LaunchViaExec] 직접 실행 (포그라운드 모드): %s %v", exe, args)
 	return cmd.Start()
 }

@@ -26,6 +26,7 @@ var (
 	procGetCursorPos     = modUser32.NewProc("GetCursorPos")
 	procMonitorFromPoint = modUser32.NewProc("MonitorFromPoint")
 	procGetMonitorInfoW  = modUser32.NewProc("GetMonitorInfoW")
+	procGetSystemMetrics = modUser32.NewProc("GetSystemMetrics")
 	procCreateMutexW     = modKernel32win.NewProc("CreateMutexW")
 )
 
@@ -57,7 +58,7 @@ type winMONITORINFO struct {
 }
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.17"
+const Version = "1.5.24"
 
 // landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
 const landingPageHTML = `<!DOCTYPE html>
@@ -124,10 +125,10 @@ h1{
 <body>
 <div class="grid"></div>
 <div class="logo-row">
-  <div class="logo-icon">??/div>
+  <div class="logo-icon">💻</div>
   <div class="logo-label">IPMI Manager</div>
 </div>
-<h1>??뺤쒔 ?怨뚭퍙 餓?/h1>
+<h1>원격제어 콘솔 연결</h1>
 <div class="sub">Secure Management Console</div>
 <div class="ip-chip">
   <div class="dot"></div>
@@ -137,14 +138,16 @@ h1{
   <div class="prog-track"><div class="prog-bar" id="bar"></div></div>
   <div class="prog-labels">
     <span class="status-txt" id="status">Initializing connection</span>
-    <span class="pct-txt" id="pct">0%%</span>
+    <span class="pct-txt" id="pct">0%</span>
   </div>
 </div>
 <script>
 (function(){
+  // Extract target URL from global variable
   var target = window.__IPMI_TARGET__ || '';
   var ip = target.replace(/https?:\/\//,'').split('/')[0].split('?')[0];
   document.getElementById('ip-text').textContent = ip || 'Unknown';
+  
   var bar = document.getElementById('bar');
   var statusEl = document.getElementById('status');
   var pctEl = document.getElementById('pct');
@@ -152,8 +155,8 @@ h1{
   var p = 0;
   var iv = setInterval(function(){
     p += 2;
-    bar.style.width = p + '%%';
-    pctEl.textContent = p + '%%';
+    bar.style.width = p + '%';
+    pctEl.textContent = p + '%';
     if(p===25) statusEl.textContent = msgs[1];
     if(p===60) statusEl.textContent = msgs[2];
     if(p===90) statusEl.textContent = msgs[3];
@@ -247,58 +250,86 @@ func main() {
 
 	w.SetSize(640, 480, webview2.HintNone)
 
-	// Window state logic: center on active monitor and bring to front using native handle
-	hwnd := uintptr(w.Window())
-	if hwnd != 0 {
+	// Window state logic: asynchronously wait for valid HWND, center on active monitor with fallback, and bring to front
+	go func() {
+		const winW, winH = 800, 600
+		var hwnd uintptr
+
+		// Poll for native window creation (max 2 seconds)
+		for i := 0; i < 40; i++ {
+			hwnd = uintptr(w.Window())
+			if hwnd != 0 {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		if hwnd == 0 {
+			log.Println("[IPMI-Viewer] [Warning] Failed to retrieve native HWND. Skip window positioning.")
+			return
+		}
+
 		if *hidden {
 			procShowWindow.Call(hwnd, swHide)
+			return
 		} else if *minimized {
 			procShowWindow.Call(hwnd, swShowMinimized)
-		} else {
-			// 1. Get current cursor position to detect active monitor
-			var pt winPOINT
-			procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
-
-			// 2. Get the monitor handle where the cursor is
-			hMon, _, _ := procMonitorFromPoint.Call(
-				uintptr(pt.X),
-				uintptr(pt.Y),
-				monitorDefaultToNearest,
-			)
-
-			// 3. Get monitor work area (excludes taskbar)
-			var mi winMONITORINFO
-			mi.CbSize = uint32(unsafe.Sizeof(mi))
-			procGetMonitorInfoW.Call(hMon, uintptr(unsafe.Pointer(&mi)))
-
-			// 4. Calculate center position on work area (640x480)
-			const winW, winH = 640, 480
-			workW := mi.RcWork.Right - mi.RcWork.Left
-			workH := mi.RcWork.Bottom - mi.RcWork.Top
-			posX := mi.RcWork.Left + (workW-winW)/2
-			posY := mi.RcWork.Top + (workH-winH)/2
-
-			// 5. Move & resize window to center of active monitor
-			procShowWindow.Call(hwnd, swShowNormal)
-			procSetWindowPos.Call(
-				hwnd,
-				hwndTopmost,
-				uintptr(posX), uintptr(posY),
-				winW, winH,
-				swpShowWindow,
-			)
-
-			// 6. Bring to front, then restore normal Z-order
-			procSetForegroundWin.Call(hwnd)
-			procBringWindowToTop.Call(hwnd)
-			
-			// Restore normal Z-order in background to prevent locking user out
-			go func() {
-				time.Sleep(150 * time.Millisecond)
-				procSetWindowPos.Call(hwnd, hwndNoTopmost, uintptr(posX), uintptr(posY), winW, winH, swpShowWindow)
-			}()
+			return
 		}
-	}
+
+		// Calculate center coordinates
+		var posX, posY int32
+		positioned := false
+
+		// 1. Try to find active monitor work area (excluding taskbar)
+		var pt winPOINT
+		if ret, _, _ := procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt))); ret != 0 {
+			hMon, _, _ := procMonitorFromPoint.Call(uintptr(pt.X), uintptr(pt.Y), monitorDefaultToNearest)
+			if hMon != 0 {
+				var mi winMONITORINFO
+				mi.CbSize = uint32(unsafe.Sizeof(mi))
+				if retInfo, _, _ := procGetMonitorInfoW.Call(hMon, uintptr(unsafe.Pointer(&mi))); retInfo != 0 && mi.RcWork.Right > mi.RcWork.Left {
+					workW := mi.RcWork.Right - mi.RcWork.Left
+					workH := mi.RcWork.Bottom - mi.RcWork.Top
+					posX = mi.RcWork.Left + (workW-winW)/2
+					posY = mi.RcWork.Top + (workH-winH)/2
+					positioned = true
+				}
+			}
+		}
+
+		// 2. Fail-safe Fallback: Use system screen metrics if monitor API fails
+		if !positioned {
+			scrW, _, _ := procGetSystemMetrics.Call(0) // SM_CXSCREEN
+			scrH, _, _ := procGetSystemMetrics.Call(1) // SM_CYSCREEN
+			if scrW > 0 && scrH > 0 {
+				posX = (int32(scrW) - winW) / 2
+				posY = (int32(scrH) - winH) / 2
+			} else {
+				// Absolute default fallback coordinates
+				posX = 300
+				posY = 200
+			}
+		}
+
+		// Apply window sizing & position
+		procShowWindow.Call(hwnd, swShowNormal)
+		procSetWindowPos.Call(
+			hwnd,
+			hwndTopmost,
+			uintptr(posX), uintptr(posY),
+			winW, winH,
+			swpShowWindow,
+		)
+
+		// Set focus & foreground
+		procSetForegroundWin.Call(hwnd)
+		procBringWindowToTop.Call(hwnd)
+
+		// Restore normal Z-order in background to prevent locking user out
+		time.Sleep(200 * time.Millisecond)
+		procSetWindowPos.Call(hwnd, hwndNoTopmost, uintptr(posX), uintptr(posY), winW, winH, swpShowWindow)
+	}()
 
 	// Escape credential values for safe JS embedding
 	escapedURL := strings.ReplaceAll(*targetURL, "'", "\\'")
