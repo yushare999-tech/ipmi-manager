@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/kardianos/service"
@@ -513,6 +516,14 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	runErr := error(nil)
 	viewerFound := false
 	if connectType == "ikvm" {
+		// iKVM 실행 전 ping 체크: 응답 없으면 offline 반환
+		if !pingHost(device.IpmiIP, 2*time.Second) {
+			logger.Warningf("[iKVM] %s 핑 응답 없음. offline 응답 반환.", device.IpmiIP)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(fmt.Sprintf(`{"success":false, "status":"offline", "message":"iKVM 연결 실패: %s 호스트가 응답하지 않습니다 (offline)"}`, device.IpmiIP)))
+			return
+		}
 		runErr = launchSupermicroIKVM(activeProfile.JavaPath, activeProfile.IkvmJarPath, device)
 	} else if connectType == "jnlp" {
 		runErr = launchJnlp(activeProfile.JavaPath, device)
@@ -774,4 +785,43 @@ func activateJavaWindowDelayed(pid uint32, delay time.Duration) {
 			logger.Warningf("[Activate] 창 활성화 실패 (PID: %d): %v", pid, err)
 		}
 	}
+}
+
+// pingHost checks whether a host is reachable within the given timeout.
+// Strategy (순서대로 시도):
+//  1. TCP 다이얼 – IPMI 공통 포트(443, 80, 623, 22) 중 하나라도 열려있으면 online.
+//  2. Windows ping.exe 1-packet – ICMP 응답 있으면 online.
+//
+// 둘 다 실패하면 offline 반환.
+func pingHost(ip string, timeout time.Duration) bool {
+	// 1. TCP fast-check: IPMI 장비에서 흔히 열려 있는 포트 시도
+	tcpPorts := []string{"443", "80", "22", "623"}
+	halfTimeout := timeout / time.Duration(len(tcpPorts)+1)
+	if halfTimeout < 300*time.Millisecond {
+		halfTimeout = 300 * time.Millisecond
+	}
+	for _, port := range tcpPorts {
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), halfTimeout)
+		if err == nil {
+			conn.Close()
+			logger.Infof("[Ping] %s TCP:%s 연결 성공 → online", ip, port)
+			return true
+		}
+	}
+
+	// 2. Fallback: Windows ping.exe (ICMP) – 1패킷, timeout(초) 지정
+	timeoutSec := int(timeout.Seconds())
+	if timeoutSec < 1 {
+		timeoutSec = 1
+	}
+	cmd := exec.Command("ping", "-n", "1", "-w", fmt.Sprintf("%d", timeoutSec*1000), ip)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	out, err := cmd.Output()
+	if err == nil && strings.Contains(string(out), "TTL=") {
+		logger.Infof("[Ping] %s ICMP 응답 확인 → online", ip)
+		return true
+	}
+
+	logger.Warningf("[Ping] %s 응답 없음 → offline", ip)
+	return false
 }

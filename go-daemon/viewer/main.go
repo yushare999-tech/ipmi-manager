@@ -62,7 +62,7 @@ type winMONITORINFO struct {
 }
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.27"
+const Version = "1.5.29"
 
 // landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
 const landingPageHTML = `<!DOCTYPE html>
