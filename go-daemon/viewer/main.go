@@ -16,22 +16,22 @@ import (
 )
 
 var (
-	modUser32                  = syscall.NewLazyDLL("user32.dll")
-	modKernel32win             = syscall.NewLazyDLL("kernel32.dll")
-	procShowWindow             = modUser32.NewProc("ShowWindow")
-	procFindWindowW            = modUser32.NewProc("FindWindowW")
-	procSetForegroundWin       = modUser32.NewProc("SetForegroundWindow")
-	procBringWindowToTop       = modUser32.NewProc("BringWindowToTop")
-	procSetWindowPos           = modUser32.NewProc("SetWindowPos")
-	procGetCursorPos           = modUser32.NewProc("GetCursorPos")
-	procMonitorFromPoint       = modUser32.NewProc("MonitorFromPoint")
-	procGetMonitorInfoW        = modUser32.NewProc("GetMonitorInfoW")
-	procGetSystemMetrics       = modUser32.NewProc("GetSystemMetrics")
-	procCreateMutexW           = modKernel32win.NewProc("CreateMutexW")
-	procEnumWindows            = modUser32.NewProc("EnumWindows")
-	procGetWindowThreadProcID  = modUser32.NewProc("GetWindowThreadProcessId")
-	procIsWindowVisible        = modUser32.NewProc("IsWindowVisible")
-	procGetWindowTextLenW      = modUser32.NewProc("GetWindowTextLengthW")
+	modUser32                 = syscall.NewLazyDLL("user32.dll")
+	modKernel32win            = syscall.NewLazyDLL("kernel32.dll")
+	procShowWindow            = modUser32.NewProc("ShowWindow")
+	procFindWindowW           = modUser32.NewProc("FindWindowW")
+	procSetForegroundWin      = modUser32.NewProc("SetForegroundWindow")
+	procBringWindowToTop      = modUser32.NewProc("BringWindowToTop")
+	procSetWindowPos          = modUser32.NewProc("SetWindowPos")
+	procGetCursorPos          = modUser32.NewProc("GetCursorPos")
+	procMonitorFromPoint      = modUser32.NewProc("MonitorFromPoint")
+	procGetMonitorInfoW       = modUser32.NewProc("GetMonitorInfoW")
+	procGetSystemMetrics      = modUser32.NewProc("GetSystemMetrics")
+	procCreateMutexW          = modKernel32win.NewProc("CreateMutexW")
+	procEnumWindows           = modUser32.NewProc("EnumWindows")
+	procGetWindowThreadProcID = modUser32.NewProc("GetWindowThreadProcessId")
+	procIsWindowVisible       = modUser32.NewProc("IsWindowVisible")
+	procGetWindowTextLenW     = modUser32.NewProc("GetWindowTextLengthW")
 )
 
 const (
@@ -62,7 +62,7 @@ type winMONITORINFO struct {
 }
 
 // Version Web Viewer Version (Auto incremented by build script)
-const Version = "1.5.31"
+const Version = "1.5.37"
 
 // landingPageHTML is the dark-themed loading page shown before navigating to the IPMI URL.
 const landingPageHTML = `<!DOCTYPE html>
@@ -84,7 +84,7 @@ body{
   width:36px;height:36px;
   background:linear-gradient(135deg,#38bdf8,#818cf8);
   border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;box-shadow:0 0 18px rgba(56,189,248,0.35);
+  font-size:12px;font-weight:bold;box-shadow:0 0 18px rgba(56,189,248,0.35);
 }
 .logo-label{font-size:13px;font-weight:600;letter-spacing:3px;color:#64748b;text-transform:uppercase}
 h1{
@@ -129,10 +129,10 @@ h1{
 <body>
 <div class="grid"></div>
 <div class="logo-row">
-  <div class="logo-icon">?裕?/div>
+  <div class="logo-icon">IPMI</div>
   <div class="logo-label">IPMI Manager</div>
 </div>
-<h1>?癒?봄??뽯선 ?꾩꼷???怨뚭퍙</h1>
+<h1>원격 서버 콘솔에 연결 중</h1>
 <div class="sub">Secure Management Console</div>
 <div class="ip-chip">
   <div class="dot"></div>

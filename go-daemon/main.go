@@ -470,7 +470,9 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	// 4. 장비의 type이 "ipmi"가 아닐 경우 즉각 WEB 방식으로 연결 처리
 	if strings.ToLower(device.Type) != "ipmi" {
 		logger.Infof("[Router] 장비 type이 'ipmi'가 아님 (%s). WEB 방식으로 직접 연결 처리합니다.", device.Type)
-		viewerFound, err := launchWeb(device)
+		nonIpmiDevice := device
+		nonIpmiDevice.HTTPS = true // non-IPMI도 HTTPS 기본값
+		viewerFound, err := launchWeb(nonIpmiDevice)
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -528,9 +530,13 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	} else if connectType == "jnlp" {
 		runErr = launchJnlp(activeProfile.JavaPath, device)
 	} else if connectType == "WEB" {
-		viewerFound, runErr = launchWeb(device)
+		// WEB: BMC 웹 UI는 IPMI 와이어 프로토콜(lanplus)과 무관하게 기본적으로 HTTPS
+		// Node.js 버전과 동일: device.https !== false → HTTPS 기본값
+		httpsDevice := device
+		httpsDevice.HTTPS = true
+		viewerFound, runErr = launchWeb(httpsDevice)
 	} else if connectType == "WEB-HTTP" {
-		// WEB-HTTP: 규칙에 의해 HTTP 강제 사용 (device.HTTPS 무시)
+		// WEB-HTTP: 규칙에 의해 HTTP 강제 사용 (명시적 HTTP 선택)
 		httpDevice := device
 		httpDevice.HTTPS = false
 		viewerFound, runErr = launchWeb(httpDevice)
@@ -541,7 +547,9 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	// 8. 구동 에러 발생 시 최후의 보루로 WEB 방식 자동 폴백 기동
 	if runErr != nil {
 		logger.Errorf("[Connect] 방식 기동 실패 (%v). WEB 방식으로 최종 폴백을 구동합니다.", runErr)
-		fallbackViewerFound, fallbackErr := launchWeb(device)
+		fallbackDevice := device
+		fallbackDevice.HTTPS = true // 폴백도 HTTPS 기본값
+		fallbackViewerFound, fallbackErr := launchWeb(fallbackDevice)
 		w.Header().Set("Content-Type", "application/json")
 		if fallbackErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
